@@ -3,7 +3,7 @@ import feedparser
 from lib.domain_types.domain_type import DomainType
 
 
-class RssParser(object):
+class RssParser:
 
     @staticmethod
     def get_article_urls(domain_type: DomainType):

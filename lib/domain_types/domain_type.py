@@ -12,5 +12,11 @@ class DomainType:
     def get_rss_url(self):
         raise NotImplemented
 
+    def use_regex_parser_for_article_urls(self):
+        return False
+
+    def get_regex_parser_args(self):
+        raise NotImplemented
+
     def get_article_urls(self):
         raise NotImplemented

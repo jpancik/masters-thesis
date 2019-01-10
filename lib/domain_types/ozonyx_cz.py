@@ -1,14 +1,8 @@
-import re
-from datetime import datetime
-
-import requests
-from bs4 import BeautifulSoup
-
 from lib.article_url_retrievers.regex_parser import RegexParserArgs
 from lib.domain_types.domain_type import DomainType
 
 
-class WithformCz(DomainType):
+class OzonyxCz(DomainType):
     def has_rss(self):
         return False
 
@@ -19,11 +13,10 @@ class WithformCz(DomainType):
         possible_sources = []
 
         for i in range(15):
-            possible_sources.append('http://www.withform.cz/page/%s/' % i)
+            possible_sources.append('http://www.ozonyx.cz/index.php/page/%s/' % i)
 
         return RegexParserArgs(
             possible_sources,
-            r'^http://www\.withform.cz/(\d{4})/(\d{2})/(\d{2})/[^/]*/$',
+            r'^http://www\.ozonyx\.cz/index\.php/(\d{4})/(\d{2})/(\d{2})/[^/]*/$',
             None,
-            True
-        )
+            True)

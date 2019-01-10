@@ -1,19 +1,12 @@
 import argparse
 
-from lib.domain_types.nwoo_org import NwooOrg
-from lib.domain_types.parlamentnilisty_cz import ParlamentnilistyCz
-from lib.domain_types.prvnizpravy_cz import PrvnizpravyCz
-from lib.domain_types.rukojmi_cz import RukojmiCz
-from lib.domain_types.securitymagazin_cz import SecuritymagazinCz
-from lib.domain_types.skrytapravda_cz import SkrytapravdaCz
-from lib.domain_types.svetkolemnas_info import SvetkolemnasInfo
-from lib.domain_types.vlasteneckenoviny_cz import VlasteneckenovinyCz
-from lib.domain_types.withform_cz import WithformCz
-from lib.domain_types.zvedavec_org import ZvedavecOrg
-from lib.rss_parser import RssParser
+from lib.article_url_retrievers.regex_parser import RegexParser
+from lib.domain_types.ozonyx_cz import OzonyxCz
+from lib.domain_types.protiproud_cz import ProtiproudCz
+from lib.article_url_retrievers.rss_parser import RssParser
 
 
-class GatherArticleUrls(object):
+class GatherArticleUrls:
     def __init__(self):
         self.args = self.parse_commandline()
         self.domain_types = self._init_domain_type()
@@ -34,7 +27,10 @@ class GatherArticleUrls(object):
                 pprint.pprint(article_urls)
                 print('Size retrieved: %s.' % len(article_urls))
             else:
-                article_urls = domain_type.get_article_urls()
+                if domain_type.use_regex_parser_for_article_urls():
+                    article_urls = RegexParser.get_article_urls(domain_type)
+                else:
+                    article_urls = domain_type.get_article_urls()
 
                 import pprint
                 pprint.pprint(article_urls)
@@ -51,7 +47,9 @@ class GatherArticleUrls(object):
             # SkrytapravdaCz(),
             # SecuritymagazinCz(),
             # RukojmiCz(),
-            PrvnizpravyCz(),
+            # PrvnizpravyCz(),
+            ProtiproudCz(),
+            OzonyxCz(),
         ]
 
 
