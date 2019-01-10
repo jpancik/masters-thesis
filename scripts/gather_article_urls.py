@@ -1,9 +1,13 @@
 import argparse
 
 from lib.article_url_retrievers.regex_parser import RegexParser
-from lib.domain_types.ozonyx_cz import OzonyxCz
-from lib.domain_types.protiproud_cz import ProtiproudCz
 from lib.article_url_retrievers.rss_parser import RssParser
+from lib.domain_types.halonoviny_cz import HalonovinyCz
+from lib.domain_types.isstras_eu import IsstrasEu
+from lib.domain_types.krajskelisty_cz import KrajskelistyCz
+from lib.domain_types.lajkit_cz import LajkitCz
+from lib.domain_types.mikan_cz import MikanCz
+from lib.domain_types.nejvicinfo_cz import NejvicinfoCz
 
 
 class GatherArticleUrls:
@@ -48,8 +52,14 @@ class GatherArticleUrls:
             # SecuritymagazinCz(),
             # RukojmiCz(),
             # PrvnizpravyCz(),
-            ProtiproudCz(),
-            OzonyxCz(),
+            # ProtiproudCz(),
+            # OzonyxCz(),
+            # NejvicinfoCz(),
+            # MikanCz(),
+            # LajkitCz(),
+            # KrajskelistyCz(),
+            # IsstrasEu(),
+            HalonovinyCz(),
         ]
 
 
