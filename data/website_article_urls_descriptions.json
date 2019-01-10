@@ -1,0 +1,158 @@
+{
+  "parlamentnilisty.cz": {
+    "has_rss": true,
+    "rss_url": "https://www.parlamentnilisty.cz/export/rss.aspx"
+  },
+  "nwoo.org": {
+    "has_rss": true,
+    "rss_url": "http://www.nwoo.org/feed/"
+  },
+  "www.zvedavec.org": {
+    "has_rss": true,
+    "rss_url": "http://www.zvedavec.org/zvedavec_rdf_100.xml"
+  },
+  "www.withform.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.withform.cz/page/1/", "http://www.withform.cz/page/2/",
+      "http://www.withform.cz/page/3/", "http://www.withform.cz/page/4/",
+      "http://www.withform.cz/page/5/", "http://www.withform.cz/page/6/",
+      "http://www.withform.cz/page/7/", "http://www.withform.cz/page/8/",
+      "http://www.withform.cz/page/9/", "http://www.withform.cz/page/10/",
+      "http://www.withform.cz/page/11/", "http://www.withform.cz/page/12/",
+      "http://www.withform.cz/page/13/", "http://www.withform.cz/page/14/",
+      "http://www.withform.cz/page/15/"
+    ],
+    "regex": "^http://www\\.withform.cz/(\\d{4})/(\\d{2})/(\\d{2})/[^/]*/$",
+    "parse_date": true
+  },
+  "www.vlasteneckenoviny.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.vlasteneckenoviny.cz/?paged=1", "http://www.vlasteneckenoviny.cz/?paged=2",
+      "http://www.vlasteneckenoviny.cz/?paged=3", "http://www.vlasteneckenoviny.cz/?paged=4",
+      "http://www.vlasteneckenoviny.cz/?paged=5", "http://www.vlasteneckenoviny.cz/?paged=6",
+      "http://www.vlasteneckenoviny.cz/?paged=7", "http://www.vlasteneckenoviny.cz/?paged=8",
+      "http://www.vlasteneckenoviny.cz/?paged=9", "http://www.vlasteneckenoviny.cz/?paged=10",
+      "http://www.vlasteneckenoviny.cz/?paged=11", "http://www.vlasteneckenoviny.cz/?paged=12",
+      "http://www.vlasteneckenoviny.cz/?paged=13", "http://www.vlasteneckenoviny.cz/?paged=14",
+      "http://www.vlasteneckenoviny.cz/?paged=15", "http://www.vlasteneckenoviny.cz/?paged=16",
+      "http://www.vlasteneckenoviny.cz/?paged=17", "http://www.vlasteneckenoviny.cz/?paged=18",
+      "http://www.vlasteneckenoviny.cz/?paged=19", "http://www.vlasteneckenoviny.cz/?paged=20",
+      "http://www.vlasteneckenoviny.cz/?paged=21", "http://www.vlasteneckenoviny.cz/?paged=22",
+      "http://www.vlasteneckenoviny.cz/?paged=23", "http://www.vlasteneckenoviny.cz/?paged=24",
+      "http://www.vlasteneckenoviny.cz/?paged=25", "http://www.vlasteneckenoviny.cz/?paged=26",
+      "http://www.vlasteneckenoviny.cz/?paged=27", "http://www.vlasteneckenoviny.cz/?paged=28",
+      "http://www.vlasteneckenoviny.cz/?paged=29", "http://www.vlasteneckenoviny.cz/?paged=30"
+    ],
+    "regex": "^http://www\\.vlasteneckenoviny\\.cz/\\?p=\\d+$"
+  },
+  "www.svetkolemnas.info": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.svetkolemnas.info/"
+    ],
+    "regex": "^/novinky/",
+    "domain_prefix": "http://www.svetkolemnas.info/"
+  },
+  "www.skrytapravda.cz": {
+    "has_rss": true,
+    "rss_url": "http://www.skrytapravda.cz/component/ninjarsssyndicator/?feed_id=1&format=raw"
+  },
+  "www.securitymagazin.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "https://www.securitymagazin.cz/?pg=1", "https://www.securitymagazin.cz/?pg=2",
+      "https://www.securitymagazin.cz/?pg=3", "https://www.securitymagazin.cz/?pg=4",
+      "https://www.securitymagazin.cz/?pg=5", "https://www.securitymagazin.cz/?pg=6",
+      "https://www.securitymagazin.cz/?pg=7", "https://www.securitymagazin.cz/?pg=8",
+      "https://www.securitymagazin.cz/?pg=9", "https://www.securitymagazin.cz/?pg=10",
+      "https://www.securitymagazin.cz/?pg=11", "https://www.securitymagazin.cz/?pg=12",
+      "https://www.securitymagazin.cz/?pg=13", "https://www.securitymagazin.cz/?pg=14",
+      "https://www.securitymagazin.cz/?pg=15", "https://www.securitymagazin.cz/?pg=16",
+      "https://www.securitymagazin.cz/?pg=17", "https://www.securitymagazin.cz/?pg=18",
+      "https://www.securitymagazin.cz/?pg=19", "https://www.securitymagazin.cz/?pg=20",
+      "https://www.securitymagazin.cz/?pg=21", "https://www.securitymagazin.cz/?pg=22",
+      "https://www.securitymagazin.cz/?pg=23", "https://www.securitymagazin.cz/?pg=24",
+      "https://www.securitymagazin.cz/?pg=25", "https://www.securitymagazin.cz/?pg=26",
+      "https://www.securitymagazin.cz/?pg=27", "https://www.securitymagazin.cz/?pg=28",
+      "https://www.securitymagazin.cz/?pg=29", "https://www.securitymagazin.cz/?pg=30"
+    ],
+    "regex": "^https://www\\.securitymagazin.cz/.*\\.html$"
+  },
+  "www.rukojmi.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.rukojmi.cz/"
+    ],
+    "regex": "^http://www.rukojmi.cz/clanky/\\d+.*$"
+  },
+  "www.prvnizpravy.cz": {
+    "has_rss": true,
+    "rss_url": "http://www.prvnizpravy.cz/repository/rss/zpravy_all_cs.xml"
+  },
+  "www.protiproud.cz": {
+    "has_rss": true,
+    "rss_url": "http://www.protiproud.cz/rss.xml"
+  },
+  "www.ozonyx.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.ozonyx.cz/index.php/page/1/", "http://www.ozonyx.cz/index.php/page/2/",
+      "http://www.ozonyx.cz/index.php/page/3/", "http://www.ozonyx.cz/index.php/page/4/",
+      "http://www.ozonyx.cz/index.php/page/5/", "http://www.ozonyx.cz/index.php/page/6/",
+      "http://www.ozonyx.cz/index.php/page/7/", "http://www.ozonyx.cz/index.php/page/8/",
+      "http://www.ozonyx.cz/index.php/page/9/", "http://www.ozonyx.cz/index.php/page/10/",
+      "http://www.ozonyx.cz/index.php/page/11/", "http://www.ozonyx.cz/index.php/page/12/",
+      "http://www.ozonyx.cz/index.php/page/13/", "http://www.ozonyx.cz/index.php/page/14/",
+      "http://www.ozonyx.cz/index.php/page/15/"
+    ],
+    "regex": "^http://www\\.ozonyx\\.cz/index\\.php/(\\d{4})/(\\d{2})/(\\d{2})/[^/]*/$",
+    "parse_date": true
+  },
+  "www.nejvic-info.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "https://www.nejvic-info.cz/page/1/", "https://www.nejvic-info.cz/page/2/",
+      "https://www.nejvic-info.cz/page/3/", "https://www.nejvic-info.cz/page/4/",
+      "https://www.nejvic-info.cz/page/5/", "https://www.nejvic-info.cz/page/6/",
+      "https://www.nejvic-info.cz/page/7/", "https://www.nejvic-info.cz/page/8/",
+      "https://www.nejvic-info.cz/page/9/", "https://www.nejvic-info.cz/page/10/",
+      "https://www.nejvic-info.cz/page/11/", "https://www.nejvic-info.cz/page/12/",
+      "https://www.nejvic-info.cz/page/13/", "https://www.nejvic-info.cz/page/14/",
+      "https://www.nejvic-info.cz/page/15/"
+    ],
+    "regex": "^https://www.nejvic-info.cz/[^/]*/$"
+  },
+  "www.mikan.cz": {
+    "has_rss": true,
+    "rss_url": "https://www.mikan.cz/rss/all.xml"
+  },
+  "www.lajkit.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "https://www.lajkit.cz/itemlist?limit=10&start=10", "https://www.lajkit.cz/itemlist?limit=10&start=20",
+      "https://www.lajkit.cz/itemlist?limit=10&start=30", "https://www.lajkit.cz/itemlist?limit=10&start=40",
+      "https://www.lajkit.cz/itemlist?limit=10&start=50", "https://www.lajkit.cz/itemlist?limit=10&start=60",
+      "https://www.lajkit.cz/itemlist?limit=10&start=70", "https://www.lajkit.cz/itemlist?limit=10&start=80",
+      "https://www.lajkit.cz/itemlist?limit=10&start=90", "https://www.lajkit.cz/itemlist?limit=10&start=100",
+      "https://www.lajkit.cz/itemlist?limit=10&start=110", "https://www.lajkit.cz/itemlist?limit=10&start=120",
+      "https://www.lajkit.cz/itemlist?limit=10&start=130", "https://www.lajkit.cz/itemlist?limit=10&start=140",
+      "https://www.lajkit.cz/itemlist?limit=10&start=150"
+    ],
+    "regex": "^/[^/]*/item/[^/]*$",
+    "prefix_domain": "https://www.lajkit.cz/"
+  },
+  "www.krajskelisty.cz": {
+    "has_rss": true,
+    "rss_url": "http://www.krajskelisty.cz/export/rss.xml"
+  },
+  "www.isstras.eu/cs": {
+    "has_rss": true,
+    "rss_url": "http://www.isstras.eu/cs/feed/"
+  },
+  "www.halonoviny.cz": {
+    "has_rss": true,
+    "rss_url": "http://www.halonoviny.cz/articles/newsfeed.rss"
+  }
+}

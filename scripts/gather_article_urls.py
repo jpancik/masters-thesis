@@ -1,13 +1,9 @@
 import argparse
+import json
 
 from lib.article_url_retrievers.regex_parser import RegexParser
 from lib.article_url_retrievers.rss_parser import RssParser
-from lib.domain_types.halonoviny_cz import HalonovinyCz
-from lib.domain_types.isstras_eu import IsstrasEu
-from lib.domain_types.krajskelisty_cz import KrajskelistyCz
-from lib.domain_types.lajkit_cz import LajkitCz
-from lib.domain_types.mikan_cz import MikanCz
-from lib.domain_types.nejvicinfo_cz import NejvicinfoCz
+from lib.domain_types.json_domain_type import JsonDomainType
 
 
 class GatherArticleUrls:
@@ -21,8 +17,12 @@ class GatherArticleUrls:
         return parser.parse_args()
 
     def run(self):
+        with open('data/website_article_urls_descriptions.json', 'r') as file:
+            json_data = json.load(file)
+            self.domain_types += JsonDomainType.get_json_domain_types(json_data)
+
         for domain_type in self.domain_types:
-            print('Gathering for: %s' % domain_type.__class__.__name__)
+            print('Gathering for: %s' % domain_type.get_name())
 
             if domain_type.has_rss():
                 article_urls = RssParser.get_article_urls(domain_type)
@@ -59,7 +59,7 @@ class GatherArticleUrls:
             # LajkitCz(),
             # KrajskelistyCz(),
             # IsstrasEu(),
-            HalonovinyCz(),
+            # HalonovinyCz(),
         ]
 
 
