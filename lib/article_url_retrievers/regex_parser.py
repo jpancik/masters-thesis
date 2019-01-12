@@ -31,7 +31,9 @@ class RegexParser:
         possible_articles = set()
 
         for url in regex_parser_args.possible_sources:
-            response = requests.get(url)
+            response = requests.get(url, timeout=15, headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+            })
 
             if response.status_code == 200:
                 content = response.text

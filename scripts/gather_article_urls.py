@@ -22,7 +22,7 @@ class GatherArticleUrls:
             self.domain_types += JsonDomainType.get_json_domain_types(json_data)
 
         for domain_type in self.domain_types:
-            # if domain_type.get_name() != 'svobodnenoviny.eu':
+            # if domain_type.get_name() != 'ipribeh.cz':
             #     continue
 
             print('Gathering for: %s' % domain_type.get_name())

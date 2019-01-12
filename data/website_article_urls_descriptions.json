@@ -260,7 +260,107 @@
   "orgo-net.blogspot.com": {
     "rss_url": "http://orgo-net.blogspot.com/feeds/posts/default?alt=rss"
   },
-  "e-republika.cz": {
+  "news.e-republika.cz": {
     "rss_url": "https://e-republika.cz/tiki-articles_rss.php?ver=2"
+  },
+  "morezprav.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "https://morezprav.cz/category/mix/page/1/",
+      "https://morezprav.cz/category/mix/page/2/",
+      "https://morezprav.cz/category/mix/page/3/",
+      "https://morezprav.cz/category/konspirace/page/1/",
+      "https://morezprav.cz/category/konspirace/page/2/",
+      "https://morezprav.cz/category/konspirace/page/3/",
+      "https://morezprav.cz/category/vesmir/page/1/",
+      "https://morezprav.cz/category/vesmir/page/2/",
+      "https://morezprav.cz/category/vesmir/page/3/",
+      "https://morezprav.cz/category/svetodeni/page/1/",
+      "https://morezprav.cz/category/svetodeni/page/2/",
+      "https://morezprav.cz/category/svetodeni/page/3/",
+      "https://morezprav.cz/category/zdravi/page/1/",
+      "https://morezprav.cz/category/zdravi/page/2/",
+      "https://morezprav.cz/category/zdravi/page/3/",
+      "https://morezprav.cz/category/cestovani/page/1/",
+      "https://morezprav.cz/category/cestovani/page/2/",
+      "https://morezprav.cz/category/cestovani/page/3/"
+    ],
+    "regex": "^https://morezprav\\.cz/[^/]+/[^/]+$"
+  },
+  "megazine.cz": {
+    "rss_url": "http://megazine.cz/feed/"
+  },
+  "jackings.net": {
+    "rss_url": "https://jackings.net/feed/"
+  },
+  "ipribeh.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://ipribeh.cz/page/1/",
+      "http://ipribeh.cz/page/2/",
+      "http://ipribeh.cz/page/3/",
+      "http://ipribeh.cz/page/4/",
+      "http://ipribeh.cz/page/5/",
+      "http://ipribeh.cz/page/6/",
+      "http://ipribeh.cz/page/7/",
+      "http://ipribeh.cz/page/8/",
+      "http://ipribeh.cz/page/9/",
+      "http://ipribeh.cz/page/10/"
+    ],
+    "regex": "^http://ipribeh\\.cz/([^/-]+-){5}[^/]+/$"
+  },
+  "instory.cz": {
+    "rss_url": "https://instory.cz/rss/"
+  },
+  "farmazdravi.cz": {
+    "rss_url": "https://farmazdravi.cz/feed/"
+  },
+  "www.eurasia24.cz": {
+    "rss_url": "https://www.eurasia24.cz/clanky-eurasia24/itemlist?format=feed&moduleID=614"
+  },
+  "cz.sputniknews.com": {
+    "rss_url": "https://cz.sputniknews.com/export/rss2/archive/index.xml"
+  },
+  "ceskozdrave.cz": {
+    "rss_url": "https://ceskozdrave.cz/feed/"
+  },
+  "ceskoaktualne.cz": {
+    "rss_url": "https://ceskoaktualne.cz/feed/"
+  },
+  "aeronet.cz": {
+    "rss_url": "https://aeronet.cz/news/feed/"
+  },
+  "ac24.cz": {
+    "rss_url": "https://ac24.cz/rss/feed.xml"
+  },
+  "www.duchdoby.cz": {
+    "rss_url": "https://www.duchdoby.cz/feed/"
+  },
+  "zpravy.dt24.cz": {
+    "rss_url": "https://zpravy.dt24.cz/feed/"
+  },
+  "e-republika.cz": {
+    "rss_url": "http://e-republika.cz/tiki-articles_rss.php?ver=2"
+  },
+  "www.eurabia.cz": {
+    "rss_url": "https://www.eurabia.cz/rss.aspx"
+  },
+  "eurodenik.cz": {
+    "rss_url": "http://eurodenik.cz/feed"
+  },
+  "eurozpravy.cz": {
+    "rss_url": "https://eurozpravy.cz/rss/all/"
+  },
+  "leva-net.webnode.cz": {
+    "rss_url": "http://leva-net.webnode.cz/rss/all.xml"
+  },
+  "www.necenzurujeme.cz": {
+    "rss_url": "http://www.necenzurujeme.cz/feed/rss.php"
+  },
+  "www.novaburzoazie.com": {
+    "rss_url": "http://www.novaburzoazie.com/436356161/feed.rss"
+  },
+  "vasevec.parlamentnilisty.cz": {
+    "rss_url": "http://vasevec.parlamentnilisty.cz/rss.xml"
   }
 }
