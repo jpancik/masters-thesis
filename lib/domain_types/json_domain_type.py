@@ -11,7 +11,7 @@ class JsonDomainType(DomainType):
         return self.name
 
     def has_rss(self):
-        return 'has_rss' in self.data_dict and self.data_dict['has_rss']
+        return 'rss_url' in self.data_dict and self.data_dict['rss_url']
 
     def get_rss_url(self):
         return self.data_dict['rss_url'] if 'rss_url' in self.data_dict else None

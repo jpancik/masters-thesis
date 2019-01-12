@@ -1,14 +1,11 @@
 {
   "parlamentnilisty.cz": {
-    "has_rss": true,
     "rss_url": "https://www.parlamentnilisty.cz/export/rss.aspx"
   },
   "nwoo.org": {
-    "has_rss": true,
     "rss_url": "http://www.nwoo.org/feed/"
   },
   "www.zvedavec.org": {
-    "has_rss": true,
     "rss_url": "http://www.zvedavec.org/zvedavec_rdf_100.xml"
   },
   "www.withform.cz": {
@@ -56,7 +53,6 @@
     "domain_prefix": "http://www.svetkolemnas.info/"
   },
   "www.skrytapravda.cz": {
-    "has_rss": true,
     "rss_url": "http://www.skrytapravda.cz/component/ninjarsssyndicator/?feed_id=1&format=raw"
   },
   "www.securitymagazin.cz": {
@@ -88,11 +84,9 @@
     "regex": "^http://www.rukojmi.cz/clanky/\\d+.*$"
   },
   "www.prvnizpravy.cz": {
-    "has_rss": true,
     "rss_url": "http://www.prvnizpravy.cz/repository/rss/zpravy_all_cs.xml"
   },
   "www.protiproud.cz": {
-    "has_rss": true,
     "rss_url": "http://www.protiproud.cz/rss.xml"
   },
   "www.ozonyx.cz": {
@@ -125,7 +119,6 @@
     "regex": "^https://www.nejvic-info.cz/[^/]*/$"
   },
   "www.mikan.cz": {
-    "has_rss": true,
     "rss_url": "https://www.mikan.cz/rss/all.xml"
   },
   "www.lajkit.cz": {
@@ -144,15 +137,130 @@
     "prefix_domain": "https://www.lajkit.cz/"
   },
   "www.krajskelisty.cz": {
-    "has_rss": true,
     "rss_url": "http://www.krajskelisty.cz/export/rss.xml"
   },
   "www.isstras.eu/cs": {
-    "has_rss": true,
     "rss_url": "http://www.isstras.eu/cs/feed/"
   },
   "www.halonoviny.cz": {
-    "has_rss": true,
     "rss_url": "http://www.halonoviny.cz/articles/newsfeed.rss"
+  },
+  "www.freepub.cz": {
+    "rss_url": "http://www.freepub.cz/feed/"
+  },
+  "www.freeglobe.cz": {
+    "rss_url": "https://www.freeglobe.cz/rss.aspx"
+  },
+  "www.euserver.cz": {
+    "rss_url": "https://www.euserver.cz/rss.aspx"
+  },
+  "www.euportal.cz": {
+    "rss_url": "https://www.euportal.cz/rss.aspx"
+  },
+  "www.eportal.cz": {
+    "rss_url": "https://www.eportal.cz/rss.aspx"
+  },
+  "www.czechfreepress.cz": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.czechfreepress.cz/",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-2.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-3.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-4.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-5.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-6.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-7.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-8.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-9.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-10.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-11.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-12.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-13.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-14.html",
+      "http://www.czechfreepress.cz/hlavni-stranka/strana-15.html"
+    ],
+    "regex": "^/(?!(hlavni)|(profil))[^/]+/[^/]+\\.html$",
+    "domain_prefix": "http://www.czechfreepress.cz/"
+  },
+  "www.ctusi.info": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://www.ctusi.info/",
+      "http://www.ctusi.info/?n=1&c=6",
+      "http://www.ctusi.info/?n=1&c=15"
+    ],
+    "regex": "^http://www\\.ctusi\\.info/[^/]+/[^/]+/.*$"
+  },
+  "www.casopis-sifra.cz": {
+    "rss_url": "https://www.casopis-sifra.cz/feed/"
+  },
+  "www.bezpolitickekorektnosti.cz": {
+    "rss_url": "http://www.bezpolitickekorektnosti.cz/?feed=rss2"
+  },
+  "www.alternativnimagazin.cz": {
+    "rss_url": "http://www.alternativnimagazin.cz/feed/"
+  },
+  "wertyzreport.cz": {
+    "rss_url": "http://wertyzreport.cz/xml"
+  },
+  "veksvetla.cz": {
+    "rss_url": "http://veksvetla.cz/feed/"
+  },
+  "tadesco.cz": {
+    "rss_url": "https://tadesco.cz/feed/"
+  },
+  "svobodnenoviny.eu": {
+    "use_regex_parser": true,
+    "possible_sources": [
+      "http://svobodnenoviny.eu/category/z-domova/page/1/",
+      "http://svobodnenoviny.eu/category/z-domova/page/2/",
+      "http://svobodnenoviny.eu/category/z-domova/page/3/",
+      "http://svobodnenoviny.eu/category/ze-sveta/page/1/",
+      "http://svobodnenoviny.eu/category/ze-sveta/page/2/",
+      "http://svobodnenoviny.eu/category/ze-sveta/page/3/",
+      "http://svobodnenoviny.eu/category/uprchlicka-krize/page/1/",
+      "http://svobodnenoviny.eu/category/uprchlicka-krize/page/2/",
+      "http://svobodnenoviny.eu/category/uprchlicka-krize/page/3/",
+      "http://svobodnenoviny.eu/category/zdravi/page/1/",
+      "http://svobodnenoviny.eu/category/zdravi/page/2/",
+      "http://svobodnenoviny.eu/category/zdravi/page/3/",
+      "http://svobodnenoviny.eu/category/zahady-a-exopolitika/page/1/",
+      "http://svobodnenoviny.eu/category/zahady-a-exopolitika/page/2/",
+      "http://svobodnenoviny.eu/category/zahady-a-exopolitika/page/3/",
+      "http://svobodnenoviny.eu/category/konspirace/page/1/",
+      "http://svobodnenoviny.eu/category/konspirace/page/2/",
+      "http://svobodnenoviny.eu/category/konspirace/page/3/",
+      "http://svobodnenoviny.eu/category/duchovno/page/1/",
+      "http://svobodnenoviny.eu/category/duchovno/page/2/",
+      "http://svobodnenoviny.eu/category/duchovno/page/3/"
+    ],
+    "regex": "^http://svobodnenoviny\\.eu/[^/]+/$"
+  },
+  "stredoevropan.cz": {
+    "rss_url": "https://stredoevropan.cz/feed/"
+  },
+  "stalo-se.cz": {
+    "rss_url": "https://stalo-se.cz/feed/"
+  },
+  "proevropu.com": {
+    "rss_url": "https://proevropu.com/feed/"
+  },
+  "procproto.cz": {
+    "rss_url": "http://procproto.cz/feed/"
+  },
+  "pravyprostor.cz": {
+    "rss_url": "https://pravyprostor.cz/feed/"
+  },
+  "pravdive.eu": {
+    "rss_url": "http://pravdive.eu/rss.xml"
+  },
+  "outsidermedia.cz": {
+    "rss_url": "http://outsidermedia.cz/feed/"
+  },
+  "orgo-net.blogspot.com": {
+    "rss_url": "http://orgo-net.blogspot.com/feeds/posts/default?alt=rss"
+  },
+  "e-republika.cz": {
+    "rss_url": "https://e-republika.cz/tiki-articles_rss.php?ver=2"
   }
 }

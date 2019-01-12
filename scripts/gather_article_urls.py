@@ -22,6 +22,9 @@ class GatherArticleUrls:
             self.domain_types += JsonDomainType.get_json_domain_types(json_data)
 
         for domain_type in self.domain_types:
+            # if domain_type.get_name() != 'svobodnenoviny.eu':
+            #     continue
+
             print('Gathering for: %s' % domain_type.get_name())
 
             if domain_type.has_rss():
@@ -41,26 +44,7 @@ class GatherArticleUrls:
                 print('Size retrieved: %s.' % len(article_urls))
 
     def _init_domain_type(self):
-        return [
-            # ParlamentnilistyCz(),
-            # NwooOrg(),
-            # ZvedavecOrg(),
-            # WithformCz(),
-            # VlasteneckenovinyCz(),
-            # SvetkolemnasInfo(),
-            # SkrytapravdaCz(),
-            # SecuritymagazinCz(),
-            # RukojmiCz(),
-            # PrvnizpravyCz(),
-            # ProtiproudCz(),
-            # OzonyxCz(),
-            # NejvicinfoCz(),
-            # MikanCz(),
-            # LajkitCz(),
-            # KrajskelistyCz(),
-            # IsstrasEu(),
-            # HalonovinyCz(),
-        ]
+        return []
 
 
 if __name__ == '__main__':
