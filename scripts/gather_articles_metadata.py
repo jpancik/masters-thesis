@@ -10,7 +10,7 @@ from lib.domain_types.json_domain_type import JsonDomainType
 import psycopg2
 
 
-class GatherArticleUrls:
+class GatherArticlesMetadata:
     def __init__(self):
         self.args = self.parse_commandline()
         self.domain_types = self._init_domain_type()
@@ -94,5 +94,5 @@ class GatherArticleUrls:
 
 
 if __name__ == '__main__':
-    gather_article_urls = GatherArticleUrls()
-    gather_article_urls.run()
+    gather_articles_metadata = GatherArticlesMetadata()
+    gather_articles_metadata.run()
