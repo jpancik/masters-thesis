@@ -9,6 +9,7 @@ from lib.domain_types.json_domain_type import JsonDomainType
 
 import psycopg2
 
+
 class GatherArticleUrls:
     def __init__(self):
         self.args = self.parse_commandline()
@@ -54,10 +55,14 @@ class GatherArticleUrls:
     def _upload_articles(self, domain_type, articles_metadata):
         cur = self.db_con.cursor()
 
+        uploaded_count = 0
+
         for metadata in articles_metadata:
-            cur.execute('SELECT COUNT(*) FROM article a WHERE a.url = %s', (metadata['link'],))
+            cur.execute('SELECT COUNT(*) FROM article_metadata a WHERE a.url = %s', (metadata['link'],))
 
             if cur.fetchone()[0] == 0:
+                uploaded_count += 1
+
                 published_parsed = metadata['published_parsed'] if 'published_parsed' in metadata else None
                 if published_parsed:
                     publication_date = datetime.fromtimestamp(mktime(published_parsed))
@@ -65,11 +70,16 @@ class GatherArticleUrls:
                     publication_date = None
 
                 cur.execute(
-                    'INSERT INTO article (website_domain, url, title, publication_date) VALUES (%s, %s, %s, %s)',
+                    'INSERT INTO article_metadata (website_domain, url, title, publication_date) VALUES (%s, %s, %s, %s)',
                     (domain_type.get_name(),
                      metadata['link'],
                      metadata['title'] if 'title' in metadata else None,
                      publication_date))
+
+        cur.execute(
+            'INSERT INTO article_metadata_gathering_summary (website_domain, total_articles_count, new_articles_count) VALUES (%s, %s, %s)',
+            (domain_type.get_name(), len(articles_metadata), uploaded_count)
+        )
 
         self.db_con.commit()
         cur.close()
