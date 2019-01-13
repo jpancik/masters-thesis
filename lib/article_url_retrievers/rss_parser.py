@@ -6,7 +6,7 @@ from lib.domain_types.domain_type import DomainType
 class RssParser:
 
     @staticmethod
-    def get_article_urls(domain_type: DomainType):
+    def get_article_metadata(domain_type: DomainType):
         if not domain_type.has_rss():
             raise AssertionError('Domain type does not have an RSS feed.')
 

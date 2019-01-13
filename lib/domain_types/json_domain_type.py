@@ -26,7 +26,7 @@ class JsonDomainType(DomainType):
             self.data_dict['domain_prefix'] if 'domain_prefix' in self.data_dict else None,
             self.data_dict['parse_date'] if 'parse_date' in self.data_dict else False)
 
-    def get_article_urls(self):
+    def get_articles_metadata(self):
         raise NotImplemented
 
     @classmethod

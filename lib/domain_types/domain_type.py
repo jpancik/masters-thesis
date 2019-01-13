@@ -20,5 +20,5 @@ class DomainType:
     def get_regex_parser_args(self):
         raise NotImplemented
 
-    def get_article_urls(self):
+    def get_articles_metadata(self):
         raise NotImplemented
