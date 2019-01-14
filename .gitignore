@@ -2,3 +2,5 @@ venv/
 .idea/
 *.iml
 *.pyc
+data/raw_articles/
+.DS_Store

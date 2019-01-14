@@ -15,3 +15,10 @@ CREATE TABLE article_metadata_gathering_summary (
   new_articles_count INT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE article_raw_html (
+  id SERIAL PRIMARY KEY,
+  article_metadata_id INT NOT NULL,
+  filename TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+)

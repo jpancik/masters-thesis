@@ -21,7 +21,7 @@ class GatherArticlesMetadata:
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--domain', type=str, default=None, help='Only gather article urls for specified domain.')
         parser.add_argument('--dry-run', action='store_true', default=False,
-                            help='Doesn\'t store results into DB and instead it prints them to stdout')
+                            help='Doesn\'t store results into DB and instead it prints them to stdout.')
         return parser.parse_args()
 
     def run(self):
@@ -63,18 +63,12 @@ class GatherArticlesMetadata:
             if cur.fetchone()[0] == 0:
                 uploaded_count += 1
 
-                published_parsed = metadata['published_parsed'] if 'published_parsed' in metadata else None
-                if published_parsed:
-                    publication_date = datetime.fromtimestamp(mktime(published_parsed))
-                else:
-                    publication_date = None
-
                 cur.execute(
                     'INSERT INTO article_metadata (website_domain, url, title, publication_date) VALUES (%s, %s, %s, %s)',
                     (domain_type.get_name(),
                      metadata['link'],
                      metadata['title'] if 'title' in metadata else None,
-                     publication_date))
+                     metadata['published_parsed'] if 'published_parsed' in metadata else None))
 
         cur.execute(
             'INSERT INTO article_metadata_gathering_summary (website_domain, total_articles_count, new_articles_count) VALUES (%s, %s, %s)',

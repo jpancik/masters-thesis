@@ -134,7 +134,7 @@
       "https://www.lajkit.cz/itemlist?limit=10&start=150"
     ],
     "regex": "^/[^/]*/item/[^/]*$",
-    "prefix_domain": "https://www.lajkit.cz/"
+    "domain_prefix": "https://www.lajkit.cz/"
   },
   "www.krajskelisty.cz": {
     "rss_url": "http://www.krajskelisty.cz/export/rss.xml"

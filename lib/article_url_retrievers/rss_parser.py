@@ -1,3 +1,6 @@
+from datetime import datetime
+from time import mktime
+
 import feedparser
 
 from lib.domain_types.domain_type import DomainType
@@ -23,7 +26,7 @@ class RssParser:
                 article['link'] = item['link']
 
             if 'published_parsed' in item:
-                article['published_parsed'] = item['published_parsed']
+                article['published_parsed'] = datetime.fromtimestamp(mktime(item['published_parsed']))
 
             articles.append(article)
 
