@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from lib.domain_types.domain_type import DomainType
+from lib.articles_url_gatherer_domain_types.articles_url_gatherer_domain_type import DomainType
 
 
 class RegexParserArgs:

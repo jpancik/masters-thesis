@@ -1,5 +1,5 @@
 from lib.article_url_retrievers.regex_parser import RegexParserArgs
-from lib.domain_types.domain_type import DomainType
+from lib.articles_url_gatherer_domain_types.articles_url_gatherer_domain_type import DomainType
 
 
 class JsonDomainType(DomainType):

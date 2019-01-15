@@ -1,13 +1,11 @@
 import argparse
 import json
-from datetime import datetime
-from time import mktime
+
+import psycopg2
 
 from lib.article_url_retrievers.regex_parser import RegexParser
 from lib.article_url_retrievers.rss_parser import RssParser
-from lib.domain_types.json_domain_type import JsonDomainType
-
-import psycopg2
+from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainType
 
 
 class GatherArticlesMetadata:
@@ -45,10 +43,11 @@ class GatherArticlesMetadata:
             if self.args.dry_run:
                 import pprint
                 pprint.pprint(articles_metadata)
+                uploaded_count = 0
             else:
-                self._upload_articles(domain_type, articles_metadata)
+                uploaded_count = self._upload_articles(domain_type, articles_metadata)
 
-            print('Size retrieved: %s.' % len(articles_metadata))
+            print('Number of articles uploaded/retrieved: %s/%s.' % (uploaded_count, len(articles_metadata)))
 
         self._close_db_connection()
 
@@ -77,6 +76,7 @@ class GatherArticlesMetadata:
 
         self.db_con.commit()
         cur.close()
+        return uploaded_count
 
     @staticmethod
     def _init_domain_type():

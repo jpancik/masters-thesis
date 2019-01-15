@@ -3,7 +3,7 @@ from time import mktime
 
 import feedparser
 
-from lib.domain_types.domain_type import DomainType
+from lib.articles_url_gatherer_domain_types.articles_url_gatherer_domain_type import DomainType
 
 
 class RssParser:
