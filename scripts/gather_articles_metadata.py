@@ -1,5 +1,6 @@
 import argparse
 import json
+from multiprocessing.pool import Pool
 
 import psycopg2
 
@@ -18,6 +19,7 @@ class GatherArticlesMetadata:
     def parse_commandline():
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--domain', type=str, default=None, help='Only gather article urls for specified domain.')
+        parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
         parser.add_argument('--dry-run', action='store_true', default=False,
                             help='Doesn\'t store results into DB and instead it prints them to stdout.')
         return parser.parse_args()
@@ -27,29 +29,42 @@ class GatherArticlesMetadata:
             json_data = json.load(file)
             self.domain_types += JsonDomainType.get_json_domain_types(json_data)
 
-        for domain_type in self.domain_types:
-            if self.args.domain and domain_type.get_name() != self.args.domain:
-                continue
+        with Pool(self.args.processes) as pool:
+            domain_types_to_process = []
+            for domain_type in self.domain_types:
+                if self.args.domain and domain_type.get_name() != self.args.domain:
+                    continue
 
-            print('Gathering for: %s' % domain_type.get_name())
+                domain_types_to_process.append(domain_type)
 
-            if domain_type.has_rss():
-                articles_metadata = RssParser.get_article_metadata(domain_type)
-            elif domain_type.use_regex_parser_for_article_urls():
-                articles_metadata = RegexParser.get_article_metadata(domain_type)
-            else:
-                articles_metadata = domain_type.get_article_metadata()
+            results = pool.map(self._gather_articles_metadata, domain_types_to_process)
 
-            if self.args.dry_run:
-                import pprint
-                pprint.pprint(articles_metadata)
-                uploaded_count = 0
-            else:
-                uploaded_count = self._upload_articles(domain_type, articles_metadata)
+            for domain_type, articles_metadata in results:
+                if self.args.dry_run:
+                    import pprint
+                    pprint.pprint(articles_metadata)
+                    uploaded_count = 0
+                else:
+                    uploaded_count = self._upload_articles(domain_type, articles_metadata)
 
-            print('Number of articles uploaded/retrieved: %s/%s.' % (uploaded_count, len(articles_metadata)))
+                print('%s: Number of articles uploaded/retrieved: %s/%s.'
+                      % (domain_type.get_name(), uploaded_count, len(articles_metadata)))
 
         self._close_db_connection()
+
+    @staticmethod
+    def _gather_articles_metadata(domain_type):
+        print('Gathering for: %s' % domain_type.get_name())
+
+        if domain_type.has_rss():
+            articles_metadata = RssParser.get_article_metadata(domain_type)
+        elif domain_type.use_regex_parser_for_article_urls():
+            articles_metadata = RegexParser.get_article_metadata(domain_type)
+        else:
+            articles_metadata = domain_type.get_article_metadata()
+
+        return domain_type, articles_metadata
+
 
     def _upload_articles(self, domain_type, articles_metadata):
         cur = self.db_con.cursor()
