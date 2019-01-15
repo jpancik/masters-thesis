@@ -31,16 +31,19 @@ class RegexParser:
         possible_articles = set()
 
         for url in regex_parser_args.possible_sources:
-            response = requests.get(url, timeout=15, headers={
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-            })
+            try:
+                response = requests.get(url, timeout=15, headers={
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+                })
 
-            if response.status_code == 200:
-                content = response.text
-                soup = BeautifulSoup(content, 'html.parser')
+                if response.status_code == 200:
+                    content = response.text
+                    soup = BeautifulSoup(content, 'html.parser')
 
-                for link in soup.find_all('a'):
-                    possible_articles.add(link.get('href'))
+                    for link in soup.find_all('a'):
+                        possible_articles.add(link.get('href'))
+            except Exception as e:
+                print(e)
 
         article_regex = re.compile(regex_parser_args.regex)
 
