@@ -4,8 +4,8 @@ from multiprocessing.pool import Pool
 
 import psycopg2
 
-from lib.article_url_retrievers.regex_parser import RegexParser
-from lib.article_url_retrievers.rss_parser import RssParser
+from lib.articles_url_retrievers.regex_parser import RegexParser
+from lib.articles_url_retrievers.rss_parser import RssParser
 from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainType
 
 

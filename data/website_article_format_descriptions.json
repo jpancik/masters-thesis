@@ -1,15 +1,11 @@
 {
   "parlamentnilisty.cz": {
     "title": "article.detail section.article-header h1",
-    //"title_regex": "",
-    "autor": "#main article section section.section-inarticle",
-    //"autor_regex": "TODO",
+    "author": "#main article section section.section-inarticle",
+    "author_regex": "autor: <strong>([^<]*)</strong>",
     "date": "#main div div div article section div div div.time",
-    //"data_regex": "",
     "prerex": "#main div div div article section p strong",
-    //"prerex_regex": "",
     "keywords": "#main div div div article section section div div div",
-    //"keywords_regex": "",
     "article": "#main div:nth-child(2) div div article section.article-content div",
     "article_remove_selectors": [
       "div.related-article",
