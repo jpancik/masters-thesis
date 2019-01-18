@@ -34,16 +34,20 @@ class ProcessArticles:
 
         cur = self.db_con.cursor()
 
-        cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
+        cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
                     'FROM article_metadata a '
                     'JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                    'WHERE a.website_domain = \'www.svetkolemnas.info\' LIMIT 10 OFFSET 0')
-                    #'WHERE a.website_domain = \'www.vlasteneckenoviny.cz\' LIMIT 10 OFFSET 0')
-                    #'WHERE a.website_domain = \'www.zvedavec.org\' LIMIT 10 OFFSET 0')
-                    #'WHERE a.website_domain = \'nwoo.org\' LIMIT 10 OFFSET 0')
-                    #'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 10 OFFSET 0')
+                    'WHERE a.website_domain = \'www.rukojmi.cz\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'www.securitymagazin.cz\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'www.skrytapravda.cz\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'www.svetkolemnas.info\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'www.vlasteneckenoviny.cz\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'www.zvedavec.org\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'nwoo.org\' LIMIT 10 OFFSET 0')
+                    # 'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 10 OFFSET 0')
         articles_raw_data = cur.fetchall()
-        for index, (id, website_domain, url, title, publication_date, filename) in enumerate(articles_raw_data):
+        for index, (id, website_domain, url, title, publication_date, filename, created_at) in enumerate(
+                articles_raw_data):
             print('(%s/%s) Started processing: %s from %s.' % (index + 1, len(articles_raw_data), filename, url))
             if website_domain not in self.domain_types:
                 print('(%s/%s) Unsupported website domain: %s for article with id %s.'
@@ -53,7 +57,7 @@ class ProcessArticles:
 
             try:
                 with open(filename, 'r') as file:
-                    html_extractor = HtmlExtractor(domain_type, file, self.args.debug)
+                    html_extractor = HtmlExtractor(domain_type, file, created_at, self.args.debug)
 
                     out = {
                         'title': html_extractor.get_title(),

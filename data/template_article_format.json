@@ -1,0 +1,23 @@
+  "": {
+    "title": {
+      "selector": ""
+    },
+    "author": {
+      "selector": ""
+    },
+    "date": {
+      "selector": ""
+    },
+    "prerex": {
+      "selector": ""
+    },
+    "keywords": {
+      "selector": ""
+    },
+    "article": {
+      "selector": "",
+      "remove_selectors": [
+
+      ]
+    }
+  }
