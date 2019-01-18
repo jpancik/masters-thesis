@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 
@@ -26,6 +27,48 @@ class HtmlExtractor:
             'author',
             self.domain_type.get_author_selector(),
             self.domain_type.get_author_regex())
+
+    def get_date(self):
+        date_format = self.domain_type.get_date_format()
+        parsed = self.get_attribute_with_regex(
+            'date',
+            self.domain_type.get_date_selector(),
+            self.domain_type.get_date_regex())
+        return datetime.strptime(parsed, date_format) if date_format else parsed
+
+    def get_prerex(self):
+        return self.get_attribute_with_regex(
+            'prerex',
+            self.domain_type.get_prerex_selector(),
+            self.domain_type.get_prerex_regex())
+
+    def get_keywords(self):
+        return self.get_attribute_with_regex(
+            'keywords',
+            self.domain_type.get_keywords_selector(),
+            self.domain_type.get_keywords_regex())
+
+    def get_article(self):
+        selector = self.domain_type.get_article_content_selector()
+        self.log_debug('Using selector "%s" to extract %s.' % (selector, 'article'))
+        article = self.soup.select(selector)
+        #print(article)
+
+        selected = ''.join([str(a) for a in article])
+        # print(selected)
+        article_soup = BeautifulSoup(selected, 'html.parser')
+        #print(article_soup)
+        for selector_to_remove in self.domain_type.get_article_remove_selectors():
+            removed = [x.extract() for x in article_soup.select(selector_to_remove)]
+            self.log_debug('Selector to remove %s removed: "%s".' % (selector_to_remove, removed))
+        # print(article_soup)
+
+        text = article_soup.get_text()
+        # print(text)
+        text_no_tabs_and_new_lines = text.replace('\n', ' ').replace('\t', ' ').replace(str(chr(160)), ' ')
+        remove_spaces_regex = re.compile(r'([ ][ ]+)', flags=re.MULTILINE)
+        text_processed = remove_spaces_regex.sub(' ', text_no_tabs_and_new_lines)
+        return text_processed
 
     def get_attribute_with_regex(self, attribute_name, selector, regex, select_index=0):
         self.log_debug('Using selector "%s" to extract %s.' % (selector, attribute_name))

@@ -27,6 +27,9 @@ class JsonDomainType(DomainType):
     def get_date_regex(self):
         return self.get_or_return_none('date_regex')
 
+    def get_date_format(self):
+        return self.get_or_return_none('date_format')
+
     def get_prerex_selector(self):
         return self.get_or_return_none('prerex')
 

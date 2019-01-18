@@ -22,7 +22,7 @@ class DownloadArticles:
         cur = self.db_con.cursor()
 
         current_date = datetime.now()
-        folder_name = '%s%s-%s-%s_%s-%s-%s' % (
+        folder_name = '%s%s-%02d-%02d_%02d-%02d-%02d' % (
             self.FOLDER_PREFIX,
             current_date.year,
             current_date.month,

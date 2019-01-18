@@ -4,9 +4,9 @@
     "author": "#main article section section.section-inarticle",
     "author_regex": "autor: <strong>([^<]*)</strong>",
     "date": "#main div div div article section div div div.time",
+    "date_format": "%d.%m.%Y %H:%M",
     "prerex": "#main div div div article section p strong",
-    "keywords": "#main div div div article section section div div div",
-    "article": "#main div:nth-child(2) div div article section.article-content div",
+    "article": "#main div:nth-child(2) div div article section.article-content",
     "article_remove_selectors": [
       "div.related-article",
       "a",

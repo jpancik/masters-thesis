@@ -35,7 +35,7 @@ class ProcessArticles:
 
         cur.execute('SELECT a.id, a.website_domain, a.title, a.publication_date, r.filename FROM article_metadata a '
                     'JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                    'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 5')
+                    'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 5 OFFSET 0')
         articles_raw_data = cur.fetchall()
         for index, (id, website_domain, title, publication_date, filename) in enumerate(articles_raw_data):
             if website_domain not in self.domain_types:
@@ -47,8 +47,12 @@ class ProcessArticles:
             try:
                 with open(filename, 'r') as file:
                     html_extractor = HtmlExtractor(domain_type, file, self.args.debug)
-                    print(html_extractor.get_title())
-                    print(html_extractor.get_author())
+                    # print(html_extractor.get_title())
+                    # print(html_extractor.get_author())
+                    # print(html_extractor.get_date())
+                    # print(html_extractor.get_prerex())
+                    # print(html_extractor.get_keywords())
+                    print(html_extractor.get_article())
 
                     # soup = BeautifulSoup(file, 'html.parser')
                     #

@@ -1,4 +1,4 @@
-from lib.article_url_retrievers.regex_parser import RegexParserArgs
+from lib.articles_url_retrievers.regex_parser import RegexParserArgs
 from lib.articles_url_gatherer_domain_types.articles_url_gatherer_domain_type import DomainType
 
 

@@ -25,6 +25,9 @@ class DomainType:
     def get_date_regex(self):
         return None
 
+    def get_date_format(self):
+        return None
+
     def get_prerex_selector(self):
         return None
 
