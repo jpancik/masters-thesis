@@ -26,6 +26,7 @@
       ]
     }
   },
+
   "nwoo.org": {
     "title": {
       "selector": "div.post h2.title.open"
@@ -45,6 +46,7 @@
       "selector": "div.post div.entry p"
     }
   },
+
   "www.zvedavec.org": {
     "title": {
       "selector": "article#clanek h1"
@@ -53,7 +55,8 @@
       "selector": "article#clanek p.autor a"
     },
     "date": {
-      "selector": "article#clanek div.det p span.detaily span"
+      "selector": "article#clanek div.det p span.detaily span",
+      "date_format": "%d.%m.%Y"
     },
     "prerex": {
       "selector": "article#clanek section.perex p"
@@ -67,6 +70,56 @@
       "remove_selectors":  [
         "div.podcarou",
         "a"
+      ]
+    }
+  },
+
+  "www.vlasteneckenoviny.cz": {
+    "title": {
+      "selector": "article.post header h1.entry-title"
+    },
+    "author": {
+      "selector": "article.post header h2.entry-meta a"
+    },
+    "date": {
+      "selector": "article.post header h2 time.published",
+      "date_format": "%d. %m. %Y v %H:%M"
+    },
+    "keywords": {
+      "selector": "article.post footer.entry p.tags",
+      "regex_text": "Štítky: (.*)"
+    },
+    "article": {
+      "selector": "article.post div.entry-content p",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.svetkolemnas.info": {
+    "title": {
+      "selector": "#system article header h1.title"
+    },
+    "author": {
+      "selector": "#system article header p.meta",
+      "regex_raw_html": "Napsal <a[^>]*>([^<]*)</a[^>]*>"
+    },
+    "date": {
+      "selector": "#system article header p.meta",
+      "regex_raw_html": "<time datetime=\"([^\"]+)\"",
+      "date_format": "%Y-%m-%d"
+    },
+    "keywords": {
+      "selector": "#system article header p.meta",
+      "regex_raw_html": "Kategorie *<a[^>]*>([^<]*)</a[^>]*>"
+    },
+    "article": {
+      "selector": "#system article div.content",
+      "remove_selectors": [
+        "script",
+        "a",
+        "style"
       ]
     }
   }

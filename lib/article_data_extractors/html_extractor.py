@@ -1,4 +1,5 @@
 import re
+import traceback
 from datetime import datetime
 
 from bs4 import BeautifulSoup
@@ -31,7 +32,11 @@ class HtmlExtractor:
 
         date_format = selector_info.get_extra('date_format')
         parsed = self.get_attribute_with_selector_info(selector_info)
-        return datetime.strptime(parsed, date_format) if date_format else parsed
+        try:
+            return datetime.strptime(parsed, date_format) if date_format else parsed
+        except Exception as e:
+            traceback.print_exc()
+            return parsed
 
     def get_prerex(self):
         selector_info = self.domain_type.get_attribute_selector_info('prerex')
@@ -39,15 +44,7 @@ class HtmlExtractor:
 
     def get_keywords(self):
         selector_info = self.domain_type.get_attribute_selector_info('keywords')
-        found = self.get_attribute_with_selector_info(selector_info) if selector_info else None
-
-        if not found:
-            return None
-
-        found = found.replace('\n', '').replace('\t', '')
-        remove_spaces_regex = re.compile(r'([ ][ ]+)', flags=re.MULTILINE)
-        text_processed = remove_spaces_regex.sub(' ', found)
-        return text_processed.strip()
+        return self.get_attribute_with_selector_info(selector_info) if selector_info else None
 
     def get_article_content(self):
         selector = self.domain_type.get_article_content_selector()
@@ -58,18 +55,16 @@ class HtmlExtractor:
         article = self.soup.select(selector)
         #print(article)
 
-        selected = ''.join([str(a) for a in article])
-        # print(selected)
-        article_soup = BeautifulSoup(selected, 'html.parser')
         #print(article_soup)
         remove_selectors = self.domain_type.get_article_remove_selectors()
         if remove_selectors:
-            for selector_to_remove in remove_selectors:
-                removed = [x.extract() for x in article_soup.select(selector_to_remove)]
-                self.log_debug('Selector to remove %s removed: "%s".' % (selector_to_remove, removed))
+            for a in article:
+                for selector_to_remove in remove_selectors:
+                    removed = [x.extract() for x in a.select(selector_to_remove)]
+                    self.log_debug('Selector to remove %s removed: "%s".' % (selector_to_remove, removed))
         # print(article_soup)
 
-        text = article_soup.get_text()
+        text = ' '.join([a.get_text() for a in article])
         # print(text)
         text_no_tabs_and_new_lines = text.replace('\n', ' ').replace('\t', ' ').replace(str(chr(160)), ' ')
         remove_spaces_regex = re.compile(r'([ ][ ]+)', flags=re.MULTILINE)
@@ -115,4 +110,10 @@ class HtmlExtractor:
                 self.log_debug('Text regex match is "%s" on %s.' % (match, attribute_name))
                 text = match.group(1)
 
-        return text
+        if text:
+            text_no_tabs_and_new_lines = text.replace('\n', ' ').replace('\t', ' ').replace(str(chr(160)), ' ')
+            remove_spaces_regex = re.compile(r'([ ][ ]+)', flags=re.MULTILINE)
+            text_processed = remove_spaces_regex.sub(' ', text_no_tabs_and_new_lines)
+            return text_processed.strip()
+        else:
+            return None
