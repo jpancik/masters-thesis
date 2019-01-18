@@ -1,19 +1,73 @@
 {
   "parlamentnilisty.cz": {
-    "title": "article.detail section.article-header h1",
-    "author": "#main article section section.section-inarticle",
-    "author_regex": "autor: <strong>([^<]*)</strong>",
-    "date": "#main div div div article section div div div.time",
-    "date_format": "%d.%m.%Y %H:%M",
-    "prerex": "#main div div div article section p strong",
-    "article": "#main div:nth-child(2) div div article section.article-content",
-    "article_remove_selectors": [
-      "div.related-article",
-      "a",
-      "script",
-      "div.well",
-      "h2",
-      "div.poll-percent"
-    ]
+    "title": {
+      "selector": "article.detail section.article-header h1"
+    },
+    "author": {
+      "selector": "#main article section section.section-inarticle",
+      "regex_raw_html": "autor: <strong>([^<]*)</strong>"
+    },
+    "date": {
+      "selector": "#main div div div article section div div div.time",
+      "date_format": "%d.%m.%Y %H:%M"
+    },
+    "prerex": {
+      "selector": "#main div div div article section p strong"
+    },
+    "article": {
+      "selector": "#main div:nth-child(2) div div article section.article-content",
+      "remove_selectors":  [
+        "div.related-article",
+        "a",
+        "script",
+        "div.well",
+        "h2",
+        "div.poll-percent"
+      ]
+    }
+  },
+  "nwoo.org": {
+    "title": {
+      "selector": "div.post h2.title.open"
+    },
+    "author": {
+      "selector": "div.post div span.meta_author",
+      "regex_raw_html": "Autor: <a[^>]*>(.*)</a[^>]*>"
+    },
+    "date": {
+      "selector": "div.post div span.meta_date",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": "div.post div.postmeta-primary"
+    },
+    "article": {
+      "selector": "div.post div.entry p"
+    }
+  },
+  "www.zvedavec.org": {
+    "title": {
+      "selector": "article#clanek h1"
+    },
+    "author": {
+      "selector": "article#clanek p.autor a"
+    },
+    "date": {
+      "selector": "article#clanek div.det p span.detaily span"
+    },
+    "prerex": {
+      "selector": "article#clanek section.perex p"
+    },
+    "keywords": {
+      "selector": "article#clanek div.det p span.detaily span:nth-child(3)",
+      "regex_text": "Témata: (.*)"
+    },
+    "article": {
+      "selector": "article#clanek section.clanek-obsah",
+      "remove_selectors":  [
+        "div.podcarou",
+        "a"
+      ]
+    }
   }
 }

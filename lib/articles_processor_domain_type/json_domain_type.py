@@ -1,6 +1,27 @@
 from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
 
 
+class SelectorInfo:
+    def __init__(self, name, dict):
+        self.name = name
+        self.dict = dict
+
+    def get_name(self):
+        return self.name
+
+    def get_selector(self):
+        return self.dict.get('selector')
+
+    def get_regex_raw_html(self):
+        return self.dict.get('regex_raw_html')
+
+    def get_regex_text(self):
+        return self.dict.get('regex_text')
+
+    def get_extra(self, key):
+        return self.dict.get(key)
+
+
 class JsonDomainType(DomainType):
     def __init__(self, name, data_dict):
         self.name = name
@@ -9,47 +30,16 @@ class JsonDomainType(DomainType):
     def get_name(self):
         return self.name
 
-    def get_title_selector(self):
-        return self.get_or_return_none('title')
-
-    def get_title_regex(self):
-        return self.get_or_return_none('title_regex')
-
-    def get_author_selector(self):
-        return self.get_or_return_none('author')
-
-    def get_author_regex(self):
-        return self.get_or_return_none('author_regex')
-
-    def get_date_selector(self):
-        return self.get_or_return_none('date')
-
-    def get_date_regex(self):
-        return self.get_or_return_none('date_regex')
-
-    def get_date_format(self):
-        return self.get_or_return_none('date_format')
-
-    def get_prerex_selector(self):
-        return self.get_or_return_none('prerex')
-
-    def get_prerex_regex(self):
-        return self.get_or_return_none('prerex_regex')
-
-    def get_keywords_selector(self):
-        return self.get_or_return_none('keywords')
-
-    def get_keywords_regex(self):
-        return self.get_or_return_none('keywords_regex')
+    def get_attribute_selector_info(self, attribute_name) -> SelectorInfo:
+        return SelectorInfo(attribute_name, self.data_dict[attribute_name]) if attribute_name in self.data_dict else None
 
     def get_article_content_selector(self):
-        return self.get_or_return_none('article')
+        dict = self.data_dict.get('article')
+        return dict.get('selector') if dict else None
 
     def get_article_remove_selectors(self):
-        return self.get_or_return_none('article_remove_selectors')
-
-    def get_or_return_none(self, key):
-        return self.data_dict[key] if key in self.data_dict else None
+        dict = self.data_dict.get('article')
+        return dict.get('remove_selectors') if dict else None
 
     @classmethod
     def get_json_domain_types(cls, loaded_json):

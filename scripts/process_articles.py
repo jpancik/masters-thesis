@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import re
+import traceback
 from datetime import datetime
 
 import psycopg2
@@ -33,11 +34,14 @@ class ProcessArticles:
 
         cur = self.db_con.cursor()
 
-        cur.execute('SELECT a.id, a.website_domain, a.title, a.publication_date, r.filename FROM article_metadata a '
+        cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
+                    'FROM article_metadata a '
                     'JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                    'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 5 OFFSET 0')
+                    'WHERE a.website_domain = \'www.zvedavec.org\' LIMIT 5 OFFSET 0')
+                    #'WHERE a.website_domain = \'nwoo.org\' LIMIT 5 OFFSET 0')
+                    #'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 5 OFFSET 0')
         articles_raw_data = cur.fetchall()
-        for index, (id, website_domain, title, publication_date, filename) in enumerate(articles_raw_data):
+        for index, (id, website_domain, url, title, publication_date, filename) in enumerate(articles_raw_data):
             if website_domain not in self.domain_types:
                 print('(%s/%s) Unsupported website domain: %s for article with id %s.'
                       % (index + 1, len(articles_raw_data), website_domain, id))
@@ -47,47 +51,23 @@ class ProcessArticles:
             try:
                 with open(filename, 'r') as file:
                     html_extractor = HtmlExtractor(domain_type, file, self.args.debug)
-                    # print(html_extractor.get_title())
-                    # print(html_extractor.get_author())
-                    # print(html_extractor.get_date())
-                    # print(html_extractor.get_prerex())
-                    # print(html_extractor.get_keywords())
-                    print(html_extractor.get_article())
 
-                    # soup = BeautifulSoup(file, 'html.parser')
-                    #
-                    # # title = soup.select('article.detail section.article-header h1')
-                    # # print(title)
-                    # #
-                    # # author = soup.select('#main article section section.section-inarticle')
-                    # # print(author)
-                    #
-                    # article = soup.select('#main div:nth-child(2) div div article section.article-content')
-                    # #print(article)
-                    #
-                    # selected = ''.join([str(a) for a in article])
-                    # # print(selected)
-                    # article_soup = BeautifulSoup(selected, 'html.parser')
-                    # #print(article_soup)
-                    # [x.extract() for x in article_soup.select('div.related-article')]
-                    # [x.extract() for x in article_soup.select('a')]
-                    # [x.extract() for x in article_soup.select('script')]
-                    # [x.extract() for x in article_soup.select('div.well')]
-                    # [x.extract() for x in article_soup.select('h2')]
-                    # [x.extract() for x in article_soup.select('div.poll-percent')]
-                    # # print(article_soup)
-                    #
-                    # text = article_soup.get_text()
-                    # # print(text)
-                    # text_no_tabs_and_new_lines = text.replace('\n', ' ').replace('\t', ' ').replace(str(chr(160)), ' ')
-                    # remove_spaces_regex = re.compile(r'([ ][ ]+)', flags=re.MULTILINE)
-                    # text_processed = remove_spaces_regex.sub(' ', text_no_tabs_and_new_lines)
-                    # print(text_processed)
+                    out = {
+                        'title': html_extractor.get_title(),
+                        'author': html_extractor.get_author(),
+                        'publication_date': str(html_extractor.get_date()),
+                        'prerex': html_extractor.get_prerex(),
+                        'keywords': html_extractor.get_keywords(),
+                        'article_content': html_extractor.get_article_content()
+                    }
 
+                    print(json.dumps(out, indent=4, ensure_ascii=False))
 
-                print('(%s/%s) Finished processing: %s.' % (index + 1, len(articles_raw_data), filename))
+                print('(%s/%s) Finished processing: %s from %s.' % (index + 1, len(articles_raw_data), filename, url))
             except Exception as e:
-                print('(%s/%s) Error processing %s with message: %s.' % (index + 1, len(articles_raw_data), filename, e))
+                print('(%s/%s) Error processing %s from %s with message: %s.'
+                      % (index + 1, len(articles_raw_data), filename, url, e))
+                traceback.print_exc()
 
         cur.close()
         self._close_db_connection()
