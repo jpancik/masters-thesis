@@ -34,17 +34,18 @@ class ProcessArticles:
 
         cur = self.db_con.cursor()
 
+        names = [ 'parlamentnilisty.cz', 'nwoo.org', 'www.zvedavec.org',
+                  'www.vlasteneckenoviny.cz', 'www.svetkolemnas.info','www.skrytapravda.cz',
+                  'www.securitymagazin.cz', 'www.rukojmi.cz', 'www.prvnizpravy.cz',
+                  'www.protiproud.cz', 'www.nejvic-info.cz', 'www.mikan.cz',
+                  'www.lajkit.cz'
+        ]
+        name_index = 12
+
         cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
                     'FROM article_metadata a '
                     'JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                    'WHERE a.website_domain = \'www.rukojmi.cz\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'www.securitymagazin.cz\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'www.skrytapravda.cz\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'www.svetkolemnas.info\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'www.vlasteneckenoviny.cz\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'www.zvedavec.org\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'nwoo.org\' LIMIT 10 OFFSET 0')
-                    # 'WHERE a.website_domain = \'parlamentnilisty.cz\' LIMIT 10 OFFSET 0')
+                    'WHERE a.website_domain = \'%s\' LIMIT 10 OFFSET 0' % names[name_index])
         articles_raw_data = cur.fetchall()
         for index, (id, website_domain, url, title, publication_date, filename, created_at) in enumerate(
                 articles_raw_data):

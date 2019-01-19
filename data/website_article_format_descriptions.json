@@ -19,7 +19,6 @@
       "remove_selectors":  [
         "div.related-article",
         "a",
-        "script",
         "div.well",
         "h2",
         "div.poll-percent"
@@ -117,9 +116,7 @@
     "article": {
       "selector": "#system article div.content",
       "remove_selectors": [
-        "script",
-        "a",
-        "style"
+        "a"
       ]
     }
   },
@@ -140,8 +137,7 @@
     "article": {
       "selector": "article.item-page div[itemprop=\"articleBody\"]",
       "remove_selectors": [
-        "div.bt-social-share",
-        "script"
+        "div.bt-social-share"
       ]
     }
   },
@@ -189,6 +185,149 @@
       "remove_selectors": [
         "div.preview",
         "a"
+      ]
+    }
+  },
+
+  "www.prvnizpravy.cz": {
+    "title": {
+      "selector": "#mainContent div div div div h1"
+    },
+    "author": {
+      "selector": "#zprava_text div div i"
+    },
+    "date": {
+      "selector": "#mainContent div div div div strong",
+      "replace": [
+        { "old": "ledna", "new": "01."},
+        { "old": "února", "new": "02."},
+        { "old": "března", "new": "03."},
+        { "old": "dubna", "new": "04."},
+        { "old": "května", "new": "05."},
+        { "old": "června", "new": "06."},
+        { "old": "července", "new": "07."},
+        { "old": "srpna", "new": "08."},
+        { "old": "září", "new": "09."},
+        { "old": "října", "new": "10."},
+        { "old": "listopadu", "new": "11."},
+        { "old": "prosince", "new": "12."}
+      ],
+      "date_format": "%d. %m. %Y - %H:%M"
+    },
+    "prerex": {
+      "selector": "#mainContent div div div div p b"
+    },
+    "keywords": {
+      "selector": "#mainContent div.main_left div.h1box h1"
+    },
+    "article": {
+      "selector": "#zprava_text",
+      "remove_selectors": [
+        "a"
+      ]
+    }
+  },
+
+  "www.protiproud.cz": {
+    "title": {
+      "selector": "div#ArticleTop h1"
+    },
+    "author": {
+      "selector": ".clkAutor"
+    },
+    "date": {
+      "selector": ".clkDtm"
+    },
+    "prerex": {
+      "selector": ".clkPerex"
+    },
+    "keywords": {
+      "selector": "div#kwsTags"
+    },
+    "article": {
+      "selector": "#Article",
+      "remove_selectors": [
+        "div.doporucujeme",
+        "div#kwsTags",
+        ".clkInfoStrip",
+        "h2.sekceTitle",
+        "#cphCONTENT_reklamaFBC",
+        "a"
+      ]
+    }
+  },
+
+  "www.nejvic-info.cz": {
+    "title": {
+      "selector": "section.page-section div.page-title h1"
+    },
+    "author": {
+      "selector": "div.single-post div.info ul li:nth-child(1) a"
+    },
+    "date": {
+      "selector": "div.single-post div.info ul li:nth-child(2) a"
+    },
+    "article": {
+      "selector": "div.post-content article",
+      "remove_selectors": [
+        "div.addtoany_share_save_container"
+      ]
+    }
+  },
+
+  "www.mikan.cz": {
+    "title": {
+      "selector": "#pageFrame div.contOut h1"
+    },
+    "date": {
+      "selector": "#pageFrame div.wsw",
+      "regex_raw_html": "(\\d{2}.\\d{2}.\\d{4} \\d{2}:\\d{2})"
+    },
+    "prerex": {
+      "selector": "#pageFrame div.wsw h2 span"
+    },
+    "article": {
+      "selector": "#pageFrame div.wsw",
+      "remove_selectors": [
+        "h2",
+        "a",
+        ".contactName",
+        ".contactPhone",
+        "address",
+        ".footerText"
+      ]
+    }
+  },
+
+  "www.lajkit.cz": {
+    "title": {
+      "selector": "#k2Container div.itemHeader h2.itemTitle"
+    },
+    "author": {
+      "selector": "#k2Container span.itemAuthor a"
+    },
+    "date": {
+      "selector": "#k2Container span.itemDateCreated",
+      "replace": [
+        { "old": "led", "new": "01."},
+        { "old": "úno", "new": "02."},
+        { "old": "bře", "new": "03."},
+        { "old": "dub", "new": "04."},
+        { "old": "kvě", "new": "05."},
+        { "old": "čen", "new": "06."},
+        { "old": "čec", "new": "07."},
+        { "old": "srp", "new": "08."},
+        { "old": "zář", "new": "09."},
+        { "old": "říj", "new": "10."},
+        { "old": "lis", "new": "11."},
+        { "old": "pro", "new": "12."}
+      ],
+      "date_format": "%m. %d, %Y"
+    },
+    "article": {
+      "selector": "div.itemFullText",
+      "remove_selectors": [
+        ".bt-social-share"
       ]
     }
   }

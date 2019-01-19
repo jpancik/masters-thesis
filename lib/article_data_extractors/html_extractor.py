@@ -68,7 +68,11 @@ class HtmlExtractor:
         #print(article)
 
         #print(article_soup)
-        remove_selectors = self.domain_type.get_article_remove_selectors()
+        remove_selectors = [
+            'style', 'script'
+        ]
+        if self.domain_type.get_article_remove_selectors():
+            remove_selectors.extend(self.domain_type.get_article_remove_selectors())
         if remove_selectors:
             for a in article:
                 for selector_to_remove in remove_selectors:
