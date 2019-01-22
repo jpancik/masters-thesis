@@ -508,5 +508,170 @@
         "a"
       ]
     }
+  },
+
+  "www.czechfreepress.cz": {
+    "title": {
+      "selector": "#isotope-detail-container h1.contentheading"
+    },
+    "author": {
+      "selector": "#isotope-detail-container dd.createdby",
+      "regex_text": "(.*)\\s*\\|"
+    },
+    "date": {
+      "selector": "#isotope-detail-container dd.published",
+      "regex_text": "(.*)\\s*\\|",
+      "replace": [
+        { "old": "leden", "new": "01."},
+        { "old": "únor", "new": "02."},
+        { "old": "březen", "new": "03."},
+        { "old": "duben", "new": "04."},
+        { "old": "květen", "new": "05."},
+        { "old": "červen", "new": "06."},
+        { "old": "červenec", "new": "07."},
+        { "old": "srpen", "new": "08."},
+        { "old": "září", "new": "09."},
+        { "old": "říjen", "new": "10."},
+        { "old": "listopad", "new": "11."},
+        { "old": "prosinec", "new": "12."}
+      ],
+      "date_format": "%d. %m. %Y"
+    },
+    "prerex": {
+      "selector": "#isotope-detail-container p"
+    },
+    "article": {
+      "selector": ".f2c-maintext",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.ctusi.info": {
+    "title": {
+      "selector": ".chanel_messages_detail h1.h2"
+    },
+    "date": {
+      "selector": ".chanel_messages_detail span.pubDateText",
+      "regex_text": "Publikováno: (.*)",
+      "date_format": "%d.%m.%Y %H:%M"
+    },
+    "prerex": {
+      "selector": "div.messText h2"
+    },
+    "article": {
+      "selector": ".detailText",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.casopis-sifra.cz": {
+    "title": {
+      "selector": "h1.entry-title"
+    },
+    "date": {
+      "selector": "time.entry-date",
+      "date_format": "%d.%m.%Y"
+    },
+    "article": {
+      "selector": "div.td-post-content",
+      "remove_selectors": [
+        "h4"
+      ]
+    }
+  },
+
+  "www.bezpolitickekorektnosti.cz": {
+    "title": {
+      "selector": "h1.entry-title"
+    },
+    "author": {
+      "selector": "h2.entry-meta",
+      "regex_raw_html": " Autor: <a[^>]*>(.*)</a>"
+    },
+    "date": {
+      "selector": "time.published",
+      "date_format": "%d. %m. %Y v %H:%M"
+    },
+    "keywords": {
+      "selector": "p.tags",
+      "regex_text": "Štítky: (.*)"
+    },
+    "article": {
+      "selector": ".entry-content",
+      "remove_selectors": [
+        "div",
+        "h6"
+      ]
+    }
+  },
+
+  "www.alternativnimagazin.cz": {
+    "title": {
+      "selector": "#page section article h1.post-title.entry-title"
+    },
+    "author": {
+      "selector": "#page section article p span span a"
+    },
+    "date": {
+      "selector": "#page section article p time.published",
+      "date_format": "%d.%m.%Y"
+    },
+    "prerex": {
+      "selector": ""
+    },
+    "keywords": {
+      "selector": "#page section div.pad.group p.post-tags",
+      "regex_text": "Štítky: (.*)"
+    },
+    "article": {
+      "selector": "div.entry-inner",
+      "remove_selectors": [
+        "div.post-views",
+        "h3",
+        ".SC_TBlock"
+      ]
+    }
+  },
+
+  "wertyzreport.cz": {
+    "title": {
+      "selector": "h1.post-title"
+    },
+    "article": {
+      "selector": "section:nth-child(1)",
+      "remove_selectors": [
+        ".twitter-share-button",
+        ".twitter-follow-button"
+      ]
+    }
+  },
+
+  "veksvetla.cz": {
+    "title": {
+      "selector": ".entry-title"
+    },
+    "author": {
+      "selector": "span.author a"
+    },
+    "date": {
+      "selector": "time.entry-date",
+      "date_format": "%d.%m.%Y"
+    },
+    "prerex": {
+      "selector": ""
+    },
+    "keywords": {
+      "selector": "span.tag-links"
+    },
+    "article": {
+      "selector": ".entry-content",
+      "remove_selectors": [
+        ".pmpro_content_message"
+      ]
+    }
   }
 }

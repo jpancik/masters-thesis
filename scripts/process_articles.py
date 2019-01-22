@@ -40,9 +40,11 @@ class ProcessArticles:
                   'www.protiproud.cz', 'www.nejvic-info.cz', 'www.mikan.cz',
                   'www.lajkit.cz', 'www.krajskelisty.cz', 'www.isstras.eu/cs',
                   'www.freepub.cz', 'www.freeglobe.cz', 'www.euserver.cz',
-                  'www.euportal.cz', 'www.eportal.cz'
+                  'www.euportal.cz', 'www.eportal.cz', 'www.czechfreepress.cz',
+                  'www.ctusi.info', 'www.casopis-sifra.cz', 'www.bezpolitickekorektnosti.cz',
+                  'www.alternativnimagazin.cz', 'wertyzreport.cz', 'veksvetla.cz',
         ]
-        name_index = 19
+        name_index = 26
 
         cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
                     'FROM article_metadata a '
