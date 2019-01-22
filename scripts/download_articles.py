@@ -52,7 +52,6 @@ class DownloadArticles:
                 with open(full_path, 'w') as file:
                     file.write(response.text)
 
-
                 cur.execute(
                     'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
                     (id, full_path))

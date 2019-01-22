@@ -330,5 +330,183 @@
         ".bt-social-share"
       ]
     }
+  },
+
+  "www.krajskelisty.cz": {
+    "title": {
+      "selector": "#article h1"
+    },
+    "author": {
+      "selector": "p.autor",
+      "regex_text": "Vložil: (.*)"
+    },
+    "date": {
+      "selector": "span#info-datum.mini-info-item",
+      "date_format": "%d.%m.%Y"
+    },
+    "prerex": {
+      "selector": "#article p.clk-perex"
+    },
+    "keywords": {
+      "selector": "#kws-tags",
+      "regex_text": "Tagy((?:.|\n)*)"
+    },
+    "article": {
+      "selector": "#article",
+      "remove_selectors": [
+        "div",
+        "h1",
+        "em",
+        "p.autor",
+        "p.clk-perex"
+      ]
+    }
+  },
+
+  "www.isstras.eu/cs": {
+    "title": {
+      "selector": "#content .title"
+    },
+    "date": {
+      "selector": ".meta_date",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": ".meta_tags"
+    },
+    "article": {
+      "selector": ".post .entry",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.freepub.cz": {
+    "title": {
+      "selector": "#content .title"
+    },
+    "author": {
+      "selector": ".postmeta-primary a"
+    },
+    "date": {
+      "selector": ".meta_date",
+      "date_format": "%d. %m. %Y"
+    },
+    "article": {
+      "selector": "#content .entry",
+      "remove_selectors": [
+        "div",
+        "ul"
+      ]
+    }
+  },
+
+  "www.freeglobe.cz": {
+    "title": {
+      "selector": "div#main div.content div.al_Article h2"
+    },
+    "author": {
+      "selector": "a#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_hlAutor"
+    },
+    "date": {
+      "selector": "#main div.al_Head",
+      "regex_text": "Publikováno: ([^|]+)",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": "div#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_pnlTags",
+      "regex_text": "Klíčová slova: (.*)"
+    },
+    "article": {
+      "selector": ".al_Article",
+      "remove_selectors": [
+        ".al_Head",
+        ".ad_Foot",
+        ".al_Tags",
+        "h2",
+        "a"
+      ]
+    }
+  },
+
+  "www.euserver.cz": {
+    "title": {
+      "selector": "div#main div.content div.al_Article h2"
+    },
+    "author": {
+      "selector": "a#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_hlAutor"
+    },
+    "date": {
+      "selector": "#main div.al_Head",
+      "regex_text": "Publikováno: ([^|]+)",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": "div#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_pnlTags",
+      "regex_text": "Klíčová slova: (.*)"
+    },
+    "article": {
+      "selector": ".al_Article",
+      "remove_selectors": [
+        ".al_Head",
+        ".ad_Foot",
+        ".al_Tags",
+        "h2",
+        "a"
+      ]
+    }
+  },
+
+  "www.euportal.cz": {
+    "title": {
+      "selector": "div#main div.content div.al_Article h1"
+    },
+    "author": {
+      "selector": "a#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_hlAutor"
+    },
+    "date": {
+      "selector": "#main div.al_Head",
+      "regex_text": "Publikováno: ([^|]+)",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": "div#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_pnlTags",
+      "regex_text": "Klíčová slova: (.*)"
+    },
+    "article": {
+      "selector": ".al_Article",
+      "remove_selectors": [
+        ".al_Head",
+        ".ad_Foot",
+        ".al_Tags",
+        "h2",
+        "a"
+      ]
+    }
+  },
+
+  "www.eportal.cz": {
+    "title": {
+      "selector": "div#main div.content div.al_Article h1"
+    },
+    "author": {
+      "selector": "a#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_hlAutor"
+    },
+    "date": {
+      "selector": "#main div.al_Head",
+      "regex_text": "Publikováno: ([^|]+)",
+      "date_format": "%d.%m.%Y"
+    },
+    "article": {
+      "selector": ".al_Article",
+      "remove_selectors": [
+        ".al_Head",
+        ".ad_Foot",
+        ".al_Tags",
+        "h2",
+        "a"
+      ]
+    }
   }
 }

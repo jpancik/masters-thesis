@@ -120,7 +120,7 @@ class HtmlExtractor:
 
         regex_text = selector_info.get_regex_text()
         if text and regex_text:
-            self._log_debug('Using text regex "%s" on %s.' % (regex_text, attribute_name))
+            self._log_debug('Using text regex "%s" on %s with text "%s".' % (regex_text, attribute_name, text))
             match = re.search(regex_text, text, flags=re.MULTILINE)
             if match:
                 self._log_debug('Text regex match is "%s" on %s.' % (match, attribute_name))

@@ -38,9 +38,11 @@ class ProcessArticles:
                   'www.vlasteneckenoviny.cz', 'www.svetkolemnas.info','www.skrytapravda.cz',
                   'www.securitymagazin.cz', 'www.rukojmi.cz', 'www.prvnizpravy.cz',
                   'www.protiproud.cz', 'www.nejvic-info.cz', 'www.mikan.cz',
-                  'www.lajkit.cz'
+                  'www.lajkit.cz', 'www.krajskelisty.cz', 'www.isstras.eu/cs',
+                  'www.freepub.cz', 'www.freeglobe.cz', 'www.euserver.cz',
+                  'www.euportal.cz', 'www.eportal.cz'
         ]
-        name_index = 12
+        name_index = 19
 
         cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
                     'FROM article_metadata a '
