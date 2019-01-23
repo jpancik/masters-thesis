@@ -673,5 +673,217 @@
         ".pmpro_content_message"
       ]
     }
+  },
+
+  "tadesco.cz": {
+    "title": {
+      "selector": "#page section article h1.post-title.entry-title"
+    },
+    "author": {
+      "selector": "#page section article p span span a"
+    },
+    "date": {
+      "selector": "#page section article p time.published",
+      "date_format": "%d.%m.%Y"
+    },
+    "article": {
+      "selector": "div.entry-inner",
+      "remove_selectors": [
+        ".heateor_sss_sharing_title"
+      ]
+    }
+  },
+
+  "svobodnenoviny.eu": {
+    "title": {
+      "selector": "h1.entry-title"
+    },
+    "author": {
+      "selector": "h3.author-title.name"
+    },
+    "date": {
+      "selector": "span.date",
+      "regex_text": "Zveřejněno\\s*(.*)",
+      "date_format": "%d.%m.%Y"
+    },
+    "article": {
+      "selector": "div.entry-content",
+      "remove_selectors": [
+        ".fballshare",
+        "#zem_rp_first"
+      ]
+    }
+  },
+
+  "stredoevropan.cz": {
+    "title": {
+      "selector": "h1.entry-title"
+    },
+    "author": {
+      "selector": ".td-post-author-name a"
+    },
+    "date": {
+      "selector": "time.entry-date",
+      "regex_raw_html": "datetime=\"([^\"]*)\\+\\d{2}:\\d{2}\"",
+      "date_format": "%Y-%m-%dT%H:%M:%S"
+    },
+    "article": {
+      "selector": "div.td-post-content",
+      "remove_selectors": [
+        "#jp-relatedposts",
+        ".sharedaddy"
+      ]
+    }
+  },
+
+  "stalo-se.cz": {
+    "title": {
+      "selector": "h1.post-title"
+    },
+    "author": {
+      "selector": "a.author-url"
+    },
+    "date": {
+      "selector": "div.post-box-meta-single",
+      "regex_raw_html": "<span>(\\d{1,2}\\.\\d{1,2}.\\d{4})</span>",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": ".post-tags"
+    },
+    "article": {
+      "selector": "div.inner-post-entry",
+      "remove_selectors": [
+        ".post-tags"
+      ]
+    }
+  },
+
+  "proevropu.com": {
+    "title": {
+      "selector": "div#content h1.page-title"
+    },
+    "author": {
+      "selector": "#content div.post-author span.post-author a  "
+    },
+    "date": {
+      "selector": "#content div.post-author span.post-date a",
+      "replace": [
+        { "old": "Leden", "new": "01."},
+        { "old": "Únor", "new": "02."},
+        { "old": "Březen", "new": "03."},
+        { "old": "Duben", "new": "04."},
+        { "old": "Květen", "new": "05."},
+        { "old": "Červen", "new": "06."},
+        { "old": "Červenec", "new": "07."},
+        { "old": "Srpen", "new": "08."},
+        { "old": "Září", "new": "09."},
+        { "old": "Říjen", "new": "10."},
+        { "old": "Listopad", "new": "11."},
+        { "old": "Prosinec", "new": "12."}
+      ],
+      "date_format": "%m. %d, %Y"
+    },
+    "keywords": {
+      "selector": "div#content div.post-meta span-post.tag a"
+    },
+    "article": {
+      "selector": "div.entrytext",
+      "remove_selectors": [
+        ".ctotal"
+      ]
+    }
+  },
+
+  "procproto.cz": {
+    "title": {
+      "selector": "h1.entry-title"
+    },
+    "author": {
+      "selector": ".td-post-author-name a"
+    },
+    "date": {
+      "selector": "time.entry-date",
+      "regex_raw_html": "datetime=\"([^\"]*)\\+\\d{2}:\\d{2}\"",
+      "date_format": "%Y-%m-%dT%H:%M:%S"
+    },
+    "keywords": {
+      "selector": "ul.td-tags",
+      "regex_text": "TAGY(.*)"
+    },
+    "article": {
+      "selector": "div.td-post-content",
+      "remove_selectors": [
+        "#jp-relatedposts",
+        ".sharedaddy"
+      ]
+    }
+  },
+
+  "pravyprostor.cz": {
+    "title": {
+      "selector": "h1.title"
+    },
+    "author": {
+      "selector": ".meta-desc a"
+    },
+    "date": {
+      "selector": "div.thetime",
+      "date_format": "%d.%m.%Y"
+    },
+    "article": {
+      "selector": "div.post-single-content",
+      "remove_selectors": [
+        ".addtoany_share_save_container",
+        "div.description",
+        "div.abh_box"
+      ]
+    }
+  },
+
+  "pravdive.eu": {
+    "title": {
+      "selector": ".article-page h1 a"
+    },
+    "article": {
+      "selector": "div.article-content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "outsidermedia.cz": {
+    "title": {
+      "selector": "h1.single-entry-title"
+    },
+    "author": {
+      "selector": "div.entry-meta span:nth-child(1) a"
+    },
+    "date": {
+      "selector": ".entry-meta",
+      "regex_raw_html": "•(.*)•",
+      "replace": [
+        { "old": "ledna", "new": "01."},
+        { "old": "února", "new": "02."},
+        { "old": "března", "new": "03."},
+        { "old": "dubna", "new": "04."},
+        { "old": "května", "new": "05."},
+        { "old": "června", "new": "06."},
+        { "old": "července", "new": "07."},
+        { "old": "srpna", "new": "08."},
+        { "old": "září", "new": "09."},
+        { "old": "října", "new": "10."},
+        { "old": "listopadu", "new": "11."},
+        { "old": "prosince", "new": "12."}
+      ],
+      "date_format": "%d. %m. %Y"
+    },
+    "article": {
+      "selector": "div.entry-content",
+      "remove_selectors": [
+
+      ]
+    }
   }
 }

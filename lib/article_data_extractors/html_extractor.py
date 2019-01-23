@@ -101,7 +101,8 @@ class HtmlExtractor:
         regex_raw_html = selector_info.get_regex_raw_html()
         text = None
         if regex_raw_html:
-            self._log_debug('Using raw regex html "%s" on %s.' % (regex_raw_html, attribute_name))
+            self._log_debug('Using raw regex html "%s" on %s with text "%s".'
+                            % (regex_raw_html, attribute_name, [str(tag) for tag in selected_tags]))
             for tag in selected_tags:
                 match = re.search(regex_raw_html, str(tag), flags=re.MULTILINE)
                 if match:

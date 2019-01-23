@@ -43,8 +43,11 @@ class ProcessArticles:
                   'www.euportal.cz', 'www.eportal.cz', 'www.czechfreepress.cz',
                   'www.ctusi.info', 'www.casopis-sifra.cz', 'www.bezpolitickekorektnosti.cz',
                   'www.alternativnimagazin.cz', 'wertyzreport.cz', 'veksvetla.cz',
+                  'tadesco.cz', 'svobodnenoviny.eu', 'stredoevropan.cz',
+                  'stalo-se.cz', 'proevropu.com', 'procproto.cz',
+                  'pravyprostor.cz', 'pravdive.eu', 'outsidermedia.cz'
         ]
-        name_index = 26
+        name_index = 35
 
         cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
                     'FROM article_metadata a '
