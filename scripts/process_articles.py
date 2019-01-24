@@ -37,8 +37,6 @@ class ProcessArticles:
         return parser.parse_args()
 
     def run(self):
-        self._load_json_descriptions()
-
         cur = self.db_con.cursor()
         sql_query, article_begin_id = self._construct_query(cur)
         print('Executing query "%s".' % sql_query)
@@ -90,11 +88,6 @@ class ProcessArticles:
 
         cur.close()
         self._close_db_connection()
-
-    def _load_json_descriptions(self):
-        with open('data/website_article_format_descriptions.json', 'r') as file:
-            json_data = json.load(file)
-            self.domain_types.update(JsonDomainType.get_json_domain_types(json_data))
 
     def _construct_query(self, cur):
         # ONLY FOR DEBUGGING
@@ -153,7 +146,13 @@ class ProcessArticles:
             file.write(json_data)
 
     def _init_domain_types(self):
-        return dict()
+        out = dict()
+
+        with open('data/website_article_format_descriptions.json', 'r') as file:
+            json_data = json.load(file)
+            out.update(JsonDomainType.get_json_domain_types(json_data))
+
+        return out
 
     def _close_db_connection(self):
         if self.db_con:

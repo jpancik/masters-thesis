@@ -143,7 +143,8 @@
     "rss_url": "http://www.isstras.eu/cs/feed/"
   },
   "www.halonoviny.cz": {
-    "rss_url": "http://www.halonoviny.cz/articles/newsfeed.rss"
+    "rss_url": "http://www.halonoviny.cz/articles/newsfeed.rss",
+    "encoding": "utf-8"
   },
   "www.freepub.cz": {
     "rss_url": "http://www.freepub.cz/feed/"
@@ -189,7 +190,8 @@
       "http://www.ctusi.info/?n=1&c=6",
       "http://www.ctusi.info/?n=1&c=15"
     ],
-    "regex": "^http://www\\.ctusi\\.info/[^/]+/[^/]+/.*$"
+    "regex": "^http://www\\.ctusi\\.info/[^/]+/[^/]+/.*$",
+    "encoding": "windows-1250"
   },
   "www.casopis-sifra.cz": {
     "rss_url": "https://www.casopis-sifra.cz/feed/"
@@ -252,7 +254,8 @@
     "rss_url": "https://pravyprostor.cz/feed/"
   },
   "pravdive.eu": {
-    "rss_url": "http://pravdive.eu/rss.xml"
+    "rss_url": "http://pravdive.eu/rss.xml",
+    "encoding": "utf-8"
   },
   "outsidermedia.cz": {
     "rss_url": "http://outsidermedia.cz/feed/"

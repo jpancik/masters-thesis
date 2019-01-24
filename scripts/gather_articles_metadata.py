@@ -12,7 +12,7 @@ from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainTy
 class GatherArticlesMetadata:
     def __init__(self):
         self.args = self.parse_commandline()
-        self.domain_types = self._init_domain_type()
+        self.domain_types = self._init_domain_types()
         self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
 
     @staticmethod
@@ -25,10 +25,6 @@ class GatherArticlesMetadata:
         return parser.parse_args()
 
     def run(self):
-        with open('data/website_article_urls_descriptions.json', 'r') as file:
-            json_data = json.load(file)
-            self.domain_types += JsonDomainType.get_json_domain_types(json_data)
-
         with Pool(self.args.processes) as pool:
             domain_types_to_process = []
             for domain_type in self.domain_types:
@@ -94,8 +90,14 @@ class GatherArticlesMetadata:
         return uploaded_count
 
     @staticmethod
-    def _init_domain_type():
-        return []
+    def _init_domain_types():
+        out = []
+
+        with open('data/website_article_urls_descriptions.json', 'r') as file:
+            json_data = json.load(file)
+            out += JsonDomainType.get_json_domain_types(json_data)
+
+        return out
 
     def _close_db_connection(self):
         if self.db_con:

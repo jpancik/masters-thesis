@@ -22,3 +22,6 @@ class DomainType:
 
     def get_articles_metadata(self):
         raise NotImplemented
+
+    def get_encoding(self):
+        return None

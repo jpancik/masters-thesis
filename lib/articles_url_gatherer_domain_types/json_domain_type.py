@@ -29,6 +29,9 @@ class JsonDomainType(DomainType):
     def get_articles_metadata(self):
         raise NotImplemented
 
+    def get_encoding(self):
+        return self.data_dict['encoding'] if 'encoding' in self.data_dict else None
+
     @classmethod
     def get_json_domain_types(cls, loaded_json):
         out = []
