@@ -58,14 +58,31 @@ class ProcessArticles:
                 with open(filename, 'r') as file:
                     html_extractor = HtmlExtractor(domain_type, file, created_at, self.args.debug)
 
-                    out = {
-                        'title': html_extractor.get_title(),
-                        'author': html_extractor.get_author(),
-                        'publication_date': str(html_extractor.get_date()),
-                        'prerex': html_extractor.get_prerex(),
-                        'keywords': html_extractor.get_keywords(),
-                        'article_content': html_extractor.get_article_content()
-                    }
+                    out = dict()
+
+                    article_title = html_extractor.get_title()
+                    if article_title:
+                        out['title'] = article_title
+
+                    article_author = html_extractor.get_author()
+                    if article_author:
+                        out['author'] = article_author
+
+                    article_publication_date = str(html_extractor.get_date())
+                    if article_publication_date:
+                        out['publication_date'] = article_publication_date
+
+                    article_prerex = html_extractor.get_prerex()
+                    if article_prerex:
+                        out['prerex'] = article_prerex
+
+                    article_keywords = html_extractor.get_keywords()
+                    if article_keywords:
+                        out['keywords'] = article_keywords
+
+                    article_content =  html_extractor.get_article_content()
+                    if article_content:
+                        out['article_content'] = article_content
 
                     json_data = json.dumps(out, indent=4, ensure_ascii=False)
                     if self.args.dry_run:
@@ -102,9 +119,10 @@ class ProcessArticles:
                  'www.alternativnimagazin.cz', 'wertyzreport.cz', 'veksvetla.cz',
                  'tadesco.cz', 'svobodnenoviny.eu', 'stredoevropan.cz',
                  'stalo-se.cz', 'proevropu.com', 'procproto.cz',
-                 'pravyprostor.cz', 'pravdive.eu', 'outsidermedia.cz'
+                 'pravyprostor.cz', 'pravdive.eu', 'outsidermedia.cz',
+                 'www.halonoviny.cz', 'orgo-net.blogspot.com',
                  ]
-        name_index = 35
+        name_index = 37
         debugging_domain = names[name_index]
 
         begin_id = None

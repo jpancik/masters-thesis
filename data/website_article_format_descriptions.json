@@ -382,6 +382,22 @@
     }
   },
 
+  "www.halonoviny.cz": {
+    "title": {
+      "selector": "#obsah h3"
+    },
+    "date": {
+      "selector": "#print_link span",
+      "date_format": "%d. %m. %Y"
+    },
+    "article": {
+      "selector": "#obsah",
+      "remove_selectors": [
+        "h3"
+      ]
+    }
+  },
+
   "www.freepub.cz": {
     "title": {
       "selector": "#content .title"
@@ -881,6 +897,33 @@
     },
     "article": {
       "selector": "div.entry-content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "orgo-net.blogspot.com": {
+    "title": {
+      "selector": "h3.post-title"
+    },
+    "author": {
+      "selector": ".post-author span"
+    },
+    "date": {
+      "selector": ".post-timestamp .published",
+      "regex_raw_html": "title=\"([^\"]*)\\+\\d{2}:\\d{2}\"",
+      "date_format": "%Y-%m-%dT%H:%M:%S"
+    },
+    "prerex": {
+      "selector": ""
+    },
+    "keywords": {
+      "selector": ".post-labels",
+      "regex_text": "Štítky:((.|\\s)*)"
+    },
+    "article": {
+      "selector": "div.post-body",
       "remove_selectors": [
 
       ]
