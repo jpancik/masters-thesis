@@ -3,4 +3,5 @@ venv/
 *.iml
 *.pyc
 data/raw_articles/
+data/processed_articles/
 .DS_Store

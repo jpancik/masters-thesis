@@ -10,11 +10,13 @@ import requests
 from bs4 import BeautifulSoup
 
 from lib.article_data_extractors.html_extractor import HtmlExtractor
+from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
 from lib.articles_processor_domain_type.json_domain_type import JsonDomainType
 
 
 class ProcessArticles:
-    FOLDER_PREFIX = 'data/raw_articles/'
+    RAW_HTML_FOLDER_PREFIX = 'data/raw_articles/'
+    PROCESSED_HTML_FOLDER_PREFIX = 'data/processed_articles/'
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -25,35 +27,26 @@ class ProcessArticles:
     def parse_commandline():
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--debug', action='store_true', default=False, help='Debug HTML parsing.')
+        parser.add_argument('--domain', type=str, default=None, help='Specify domain to gather.')
+        parser.add_argument('--limit', type=int, default=None, help='Specify limit of how many articles to process.')
+        parser.add_argument('--sql-conditions', type=str, default=None, help='Specify custom SQL conditions. (a is article_metadata and r is article_raw_html, e.g. "AND a.id = 15")')
+        parser.add_argument('--dry-run', action='store_true', default=False, help='Don\'t store output and print it to stdout.')
+        parser.add_argument('--process-new', action='store_true', default=False, help='Process only new articles.')
+        parser.add_argument('--begin-id', type=int, default=None, help='Specify begin id of articles to process.')
+        parser.add_argument('--end-id', type=int, default=None, help='Specify end if of articles to process.')
         return parser.parse_args()
 
     def run(self):
-        with open('data/website_article_format_descriptions.json', 'r') as file:
-            json_data = json.load(file)
-            self.domain_types.update(JsonDomainType.get_json_domain_types(json_data))
+        self._load_json_descriptions()
 
         cur = self.db_con.cursor()
+        sql_query, article_begin_id = self._construct_query(cur)
+        print('Executing query "%s".' % sql_query)
 
-        names = [ 'parlamentnilisty.cz', 'nwoo.org', 'www.zvedavec.org',
-                  'www.vlasteneckenoviny.cz', 'www.svetkolemnas.info','www.skrytapravda.cz',
-                  'www.securitymagazin.cz', 'www.rukojmi.cz', 'www.prvnizpravy.cz',
-                  'www.protiproud.cz', 'www.nejvic-info.cz', 'www.mikan.cz',
-                  'www.lajkit.cz', 'www.krajskelisty.cz', 'www.isstras.eu/cs',
-                  'www.freepub.cz', 'www.freeglobe.cz', 'www.euserver.cz',
-                  'www.euportal.cz', 'www.eportal.cz', 'www.czechfreepress.cz',
-                  'www.ctusi.info', 'www.casopis-sifra.cz', 'www.bezpolitickekorektnosti.cz',
-                  'www.alternativnimagazin.cz', 'wertyzreport.cz', 'veksvetla.cz',
-                  'tadesco.cz', 'svobodnenoviny.eu', 'stredoevropan.cz',
-                  'stalo-se.cz', 'proevropu.com', 'procproto.cz',
-                  'pravyprostor.cz', 'pravdive.eu', 'outsidermedia.cz'
-        ]
-        name_index = 35
-
-        cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
-                    'FROM article_metadata a '
-                    'JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                    'WHERE a.website_domain = \'%s\' LIMIT 10 OFFSET 0' % names[name_index])
+        cur.execute(sql_query)
         articles_raw_data = cur.fetchall()
+        processed_articles_count = 0
+        processed_articles_last_id = 0
         for index, (id, website_domain, url, title, publication_date, filename, created_at) in enumerate(
                 articles_raw_data):
             print('(%s/%s) Started processing: %s from %s.' % (index + 1, len(articles_raw_data), filename, url))
@@ -76,16 +69,88 @@ class ProcessArticles:
                         'article_content': html_extractor.get_article_content()
                     }
 
-                    print(json.dumps(out, indent=4, ensure_ascii=False))
+                    json_data = json.dumps(out, indent=4, ensure_ascii=False)
+                    if self.args.dry_run:
+                        print(json_data)
+                    else:
+                        self._store_processed_article(id, domain_type, json_data)
 
+                processed_articles_count += 1
+                processed_articles_last_id = id
                 print('(%s/%s) Finished processing: %s from %s.' % (index + 1, len(articles_raw_data), filename, url))
             except Exception as e:
                 print('(%s/%s) Error processing %s from %s with message: %s.'
                       % (index + 1, len(articles_raw_data), filename, url, e))
                 traceback.print_exc()
 
+        if self.args.process_new:
+            cur.execute('INSERT INTO article_processing_summary(total_articles_processed_count, start_article_id, end_article_id) VALUES (%s, %s, %s)',
+                        (processed_articles_count, article_begin_id, processed_articles_last_id))
+            self.db_con.commit()
+
         cur.close()
         self._close_db_connection()
+
+    def _load_json_descriptions(self):
+        with open('data/website_article_format_descriptions.json', 'r') as file:
+            json_data = json.load(file)
+            self.domain_types.update(JsonDomainType.get_json_domain_types(json_data))
+
+    def _construct_query(self, cur):
+        # ONLY FOR DEBUGGING
+        names = ['parlamentnilisty.cz', 'nwoo.org', 'www.zvedavec.org',
+                 'www.vlasteneckenoviny.cz', 'www.svetkolemnas.info', 'www.skrytapravda.cz',
+                 'www.securitymagazin.cz', 'www.rukojmi.cz', 'www.prvnizpravy.cz',
+                 'www.protiproud.cz', 'www.nejvic-info.cz', 'www.mikan.cz',
+                 'www.lajkit.cz', 'www.krajskelisty.cz', 'www.isstras.eu/cs',
+                 'www.freepub.cz', 'www.freeglobe.cz', 'www.euserver.cz',
+                 'www.euportal.cz', 'www.eportal.cz', 'www.czechfreepress.cz',
+                 'www.ctusi.info', 'www.casopis-sifra.cz', 'www.bezpolitickekorektnosti.cz',
+                 'www.alternativnimagazin.cz', 'wertyzreport.cz', 'veksvetla.cz',
+                 'tadesco.cz', 'svobodnenoviny.eu', 'stredoevropan.cz',
+                 'stalo-se.cz', 'proevropu.com', 'procproto.cz',
+                 'pravyprostor.cz', 'pravdive.eu', 'outsidermedia.cz'
+                 ]
+        name_index = 35
+        debugging_domain = names[name_index]
+
+        begin_id = None
+        end_id = None
+        if self.args.process_new:
+            cur.execute('SELECT s.end_article_id FROM article_processing_summary s ORDER BY s.end_id DESC LIMIT 1')
+            row = cur.fetchone()
+            if row:
+                begin_id = row[0] + 1
+            else:
+                begin_id = 0
+        begin_id = self.args.begin_id if self.args.begin_id else begin_id
+        end_id = self.args.end_id if self.args.end_id else end_id
+
+        base_query = (
+            'SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename, r.created_at '
+            'FROM article_metadata a '
+            'JOIN article_raw_html r ON r.article_metadata_id = a.id '
+            'WHERE 1=1%s'
+        )
+        sql_conditions = ' AND a.website_domain = \'%s\'' % self.args.domain if self.args.domain else ' AND a.website_domain = \'%s\'' % debugging_domain
+        sql_conditions += ' AND a.id >= %s' % begin_id if begin_id else ''
+        sql_conditions += ' AND a.id <= %s' % end_id if end_id else ''
+        sql_conditions += self.args.sql_conditions if self.args.sql_conditions else ''
+        sql_conditions += ' LIMIT %s' % self.args.limit if self.args.limit else ''
+
+        return base_query % sql_conditions, begin_id
+
+    def _store_processed_article(self, id, domain_type: DomainType, json_data):
+        folder_name = os.path.join(self.PROCESSED_HTML_FOLDER_PREFIX, domain_type.get_name())
+
+        if not os.path.isdir(folder_name):
+            os.makedirs(folder_name)
+
+        filename = '%s_%s.json' % (id, domain_type.get_name().replace('/', '-'))
+        full_path = os.path.join(folder_name, filename)
+
+        with open(full_path, 'w') as file:
+            file.write(json_data)
 
     def _init_domain_types(self):
         return dict()

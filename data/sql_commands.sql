@@ -21,4 +21,12 @@ CREATE TABLE article_raw_html (
   article_metadata_id INT NOT NULL,
   filename TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
-)
+);
+
+CREATE TABLE article_processing_summary (
+  id SERIAL PRIMARY KEY,
+  total_articles_processed_count INT NOT NULL,
+  start_article_id INT NOT NULL,
+  end_article_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
