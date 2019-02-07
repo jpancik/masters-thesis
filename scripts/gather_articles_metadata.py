@@ -1,12 +1,13 @@
 import argparse
 import json
-from multiprocessing.pool import Pool
+from concurrent.futures import TimeoutError
 
 import psycopg2
+from pebble import ProcessPool
 
+from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainType
 from lib.articles_url_retrievers.regex_parser import RegexParser
 from lib.articles_url_retrievers.rss_parser import RssParser
-from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainType
 
 
 class GatherArticlesMetadata:
@@ -25,7 +26,7 @@ class GatherArticlesMetadata:
         return parser.parse_args()
 
     def run(self):
-        with Pool(self.args.processes) as pool:
+        with ProcessPool(max_workers=self.args.processes) as pool:
             domain_types_to_process = []
             for domain_type in self.domain_types:
                 if self.args.domain and domain_type.get_name() != self.args.domain:
@@ -33,18 +34,26 @@ class GatherArticlesMetadata:
 
                 domain_types_to_process.append(domain_type)
 
-            results = pool.map(self._gather_articles_metadata, domain_types_to_process)
+            future = pool.map(self._gather_articles_metadata, domain_types_to_process, timeout=180)
 
-            for domain_type, articles_metadata in results:
-                if self.args.dry_run:
-                    import pprint
-                    pprint.pprint(articles_metadata)
-                    uploaded_count = 0
-                else:
-                    uploaded_count = self._upload_articles(domain_type, articles_metadata)
+            iterator = future.result()
+            while True:
+                try:
+                    domain_type, articles_metadata = next(iterator)
 
-                print('%s: Number of articles uploaded/retrieved: %s/%s.'
-                      % (domain_type.get_name(), uploaded_count, len(articles_metadata)))
+                    if self.args.dry_run:
+                        import pprint
+                        pprint.pprint(articles_metadata)
+                        uploaded_count = 0
+                    else:
+                        uploaded_count = self._upload_articles(domain_type, articles_metadata)
+
+                    print('%s: Number of articles uploaded/retrieved: %s/%s.'
+                          % (domain_type.get_name(), uploaded_count, len(articles_metadata)))
+                except StopIteration:
+                    break
+                except TimeoutError as error:
+                    print("Function took longer than %d seconds." % error.args[1])
 
         self._close_db_connection()
 
