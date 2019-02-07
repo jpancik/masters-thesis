@@ -50,8 +50,8 @@ class HtmlExtractor:
             traceback.print_exc()
             return parsed
 
-    def get_prerex(self):
-        selector_info = self.domain_type.get_attribute_selector_info('prerex')
+    def get_perex(self):
+        selector_info = self.domain_type.get_attribute_selector_info('perex')
         return self.get_attribute_with_selector_info(selector_info) if selector_info else None
 
     def get_keywords(self):

@@ -1,13 +1,9 @@
 import argparse
 import json
 import os
-import re
 import traceback
-from datetime import datetime
 
 import psycopg2
-import requests
-from bs4 import BeautifulSoup
 
 from lib.article_data_extractors.html_extractor import HtmlExtractor
 from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
@@ -68,13 +64,13 @@ class ProcessArticles:
                     if article_author:
                         out['author'] = article_author
 
-                    article_publication_date = str(html_extractor.get_date())
+                    article_publication_date = html_extractor.get_date()
                     if article_publication_date:
-                        out['publication_date'] = article_publication_date
+                        out['publication_date'] = str(article_publication_date)
 
-                    article_prerex = html_extractor.get_prerex()
-                    if article_prerex:
-                        out['prerex'] = article_prerex
+                    article_perex = html_extractor.get_perex()
+                    if article_perex:
+                        out['perex'] = article_perex
 
                     article_keywords = html_extractor.get_keywords()
                     if article_keywords:
@@ -120,9 +116,17 @@ class ProcessArticles:
                  'tadesco.cz', 'svobodnenoviny.eu', 'stredoevropan.cz',
                  'stalo-se.cz', 'proevropu.com', 'procproto.cz',
                  'pravyprostor.cz', 'pravdive.eu', 'outsidermedia.cz',
-                 'www.halonoviny.cz', 'orgo-net.blogspot.com',
-                 ]
-        name_index = 37
+                 'www.halonoviny.cz', 'orgo-net.blogspot.com', 'news.e-republika.cz',
+                 'morezprav.cz', 'megazine.cz', 'jackings.net',
+                 'ipribeh.cz', 'instory.cz', 'farmazdravi.cz',
+                 'www.eurasia24.cz', 'cz.sputniknews.com', 'ceskozdrave.cz',
+                 'ceskoaktualne.cz', 'aeronet.cz', 'ac24.cz',
+                 'www.duchdoby.cz', 'zpravy.dt24.cz', 'e-republika.cz',
+                 'www.eurabia.cz', 'eurodenik.cz', 'eurozpravy.cz',
+                 'leva-net.webnode.cz', 'www.necenzurujeme.cz', 'www.novaburzoazie.com',
+                 'vasevec.parlamentnilisty.cz'
+             ]
+        name_index = len(names) - 1
         debugging_domain = names[name_index]
 
         begin_id = None

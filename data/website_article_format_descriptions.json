@@ -11,7 +11,7 @@
       "selector": "#main div div div article section div div div.time",
       "date_format": "%d.%m.%Y %H:%M"
     },
-    "prerex": {
+    "perex": {
       "selector": "#main div div div article section p strong"
     },
     "article": {
@@ -57,7 +57,7 @@
       "selector": "article#clanek div.det p span.detaily span",
       "date_format": "%d.%m.%Y"
     },
-    "prerex": {
+    "perex": {
       "selector": "article#clanek section.perex p"
     },
     "keywords": {
@@ -177,7 +177,7 @@
       "selector": "#article-detail-header div div div.author",
       "regex_text": "Článek od (.*)"
     },
-    "prerex": {
+    "perex": {
       "selector": "#article-text div h3"
     },
     "article": {
@@ -214,7 +214,7 @@
       ],
       "date_format": "%d. %m. %Y - %H:%M"
     },
-    "prerex": {
+    "perex": {
       "selector": "#mainContent div div div div p b"
     },
     "keywords": {
@@ -238,7 +238,7 @@
     "date": {
       "selector": ".clkDtm"
     },
-    "prerex": {
+    "perex": {
       "selector": ".clkPerex"
     },
     "keywords": {
@@ -283,7 +283,7 @@
       "selector": "#pageFrame div.wsw",
       "regex_raw_html": "(\\d{2}.\\d{2}.\\d{4} \\d{2}:\\d{2})"
     },
-    "prerex": {
+    "perex": {
       "selector": "#pageFrame div.wsw h2 span"
     },
     "article": {
@@ -344,7 +344,7 @@
       "selector": "span#info-datum.mini-info-item",
       "date_format": "%d.%m.%Y"
     },
-    "prerex": {
+    "perex": {
       "selector": "#article p.clk-perex"
     },
     "keywords": {
@@ -553,7 +553,7 @@
       ],
       "date_format": "%d. %m. %Y"
     },
-    "prerex": {
+    "perex": {
       "selector": "#isotope-detail-container p"
     },
     "article": {
@@ -573,7 +573,7 @@
       "regex_text": "Publikováno: (.*)",
       "date_format": "%d.%m.%Y %H:%M"
     },
-    "prerex": {
+    "perex": {
       "selector": "div.messText h2"
     },
     "article": {
@@ -636,7 +636,7 @@
       "selector": "#page section article p time.published",
       "date_format": "%d.%m.%Y"
     },
-    "prerex": {
+    "perex": {
       "selector": ""
     },
     "keywords": {
@@ -677,7 +677,7 @@
       "selector": "time.entry-date",
       "date_format": "%d.%m.%Y"
     },
-    "prerex": {
+    "perex": {
       "selector": ""
     },
     "keywords": {
@@ -915,7 +915,7 @@
       "regex_raw_html": "title=\"([^\"]*)\\+\\d{2}:\\d{2}\"",
       "date_format": "%Y-%m-%dT%H:%M:%S"
     },
-    "prerex": {
+    "perex": {
       "selector": ""
     },
     "keywords": {
@@ -926,6 +926,611 @@
       "selector": "div.post-body",
       "remove_selectors": [
 
+      ]
+    }
+  },
+
+  "news.e-republika.cz": {
+    "title": {
+      "selector": "#col1 article header h1"
+    },
+    "author": {
+      "selector": "#col1 article header span.titleb",
+      "regex_text": "Autor: ([^-]*) -"
+    },
+    "date": {
+      "selector": "#col1 article header span.titleb",
+      "regex_text": "Zveřejněno ([^-]*) -",
+      "date_format": "%d.%m.%Y %H:%M"
+    },
+    "perex": {
+      "selector": "#col1 article div.articleheadingtext.media-body"
+    },
+    "keywords": {
+      "selector": "#col1 div.freetaglist"
+    },
+    "article": {
+      "selector": "#col1 article div.articlebody",
+      "remove_selectors": [
+      ]
+    }
+  },
+
+  "morezprav.cz": {
+    "title": {
+      "selector": "html body main section h1"
+    },
+    "author": {
+      "selector": "html body main section a"
+    },
+    "date": {
+      "selector": "html body main section span.c-article__date-span",
+      "date_format": "%d. %m. %Y"
+    },
+    "perex": {
+      "selector": "html body main section p strong"
+    },
+    "keywords": {
+      "selector": ""
+    },
+    "article": {
+      "selector": ".c-article__content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "megazine.cz": {
+    "title": {
+      "selector": "header h1"
+    },
+    "author": {
+      "selector": "header .meta-info .td-post-author-name a"
+    },
+    "date": {
+      "selector": "header .meta-info .td-post-date",
+      "replace": [
+        { "old": "Led", "new": "01."},
+        { "old": "Úno", "new": "02."},
+        { "old": "Bře", "new": "03."},
+        { "old": "Dub", "new": "04."},
+        { "old": "Kvě", "new": "05."},
+        { "old": "Čen", "new": "06."},
+        { "old": "Čec", "new": "07."},
+        { "old": "Srp", "new": "08."},
+        { "old": "Zář", "new": "09."},
+        { "old": "Říj", "new": "10."},
+        { "old": "Lis", "new": "11."},
+        { "old": "Pro", "new": "12."}
+      ],
+      "date_format": "%m. %d, %Y"
+    },
+    "article": {
+      "selector": ".td-post-content",
+      "remove_selectors": [
+        ".td-post-featured-image",
+        ".sharify-container",
+        ".SC_TBlock"
+      ]
+    }
+  },
+
+  "jackings.net": {
+    "title": {
+      "selector": "#post-title"
+    },
+    "author": {
+      "selector": ".post-info a:nth-child(1)"
+    },
+    "article": {
+      "selector": ".postcontent",
+      "remove_selectors": [
+        ".nocomments"
+      ]
+    }
+  },
+
+  "ipribeh.cz": {
+    "title": {
+      "selector": "div#article h1"
+    },
+    "author": {
+      "selector": ""
+    },
+    "date": {
+      "selector": "div#article div.kategory strong",
+      "regex_text": "([^/]*) /",
+      "date_format": "%d.%m.%Y %H:%M"
+    },
+    "perex": {
+      "selector": ""
+    },
+    "keywords": {
+      "selector": "div#article div.kategory strong a"
+    },
+    "article": {
+      "selector": "",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "instory.cz": {
+    "title": {
+      "selector": "div#article-content div.title"
+    },
+    "author": {
+      "selector": "div#article-content span.redaktor",
+      "regex_text": "/\\s*(.*)"
+    },
+    "date": {
+      "selector": "div#article-content div.datum",
+      "regex_text": "([^/]*)",
+      "replace": [
+        { "old": "ledna", "new": "01."},
+        { "old": "února", "new": "02."},
+        { "old": "března", "new": "03."},
+        { "old": "dubna", "new": "04."},
+        { "old": "května", "new": "05."},
+        { "old": "června", "new": "06."},
+        { "old": "července", "new": "07."},
+        { "old": "srpna", "new": "08."},
+        { "old": "září", "new": "09."},
+        { "old": "října", "new": "10."},
+        { "old": "listopadu", "new": "11."},
+        { "old": "prosince", "new": "12."}
+      ],
+      "date_format": "%d. %m. %Y %H:%M"
+    },
+    "perex": {
+      "selector": ".perex"
+    },
+    "keywords": {
+      "selector": ".tema",
+      "regex_text": "Témata: \n(.*)"
+    },
+    "article": {
+      "selector": ".text",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "farmazdravi.cz": {
+    "title": {
+      "selector": ".entry-title"
+    },
+    "author": {
+      "selector": ".td-post-author-name a"
+    },
+    "date": {
+      "selector": ".td-post-date time",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": ".td-tags",
+      "regex_text": "TAGY(.*)"
+    },
+    "article": {
+      "selector": ".td-post-content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.eurasia24.cz": {
+    "title": {
+      "selector": "#k2Container h2"
+    },
+    "author": {
+      "selector": "#k2Container p span.itemAuthor",
+      "regex_text": "Napsal/přeložil:\\s*(.*)"
+    },
+    "date": {
+      "selector": "#k2Container p span.itemDateCreated",
+      "replace": [
+        { "old": "leden", "new": "01."},
+        { "old": "únor", "new": "02."},
+        { "old": "březen", "new": "03."},
+        { "old": "duben", "new": "04."},
+        { "old": "květen", "new": "05."},
+        { "old": "červen", "new": "06."},
+        { "old": "červenec", "new": "07."},
+        { "old": "srpen", "new": "08."},
+        { "old": "září", "new": "09."},
+        { "old": "říjen", "new": "10."},
+        { "old": "listopad", "new": "11."},
+        { "old": "prosinec", "new": "12."}
+      ],
+      "date_format": "%d. %m. %Y"
+    },
+    "keywords": {
+      "selector": "#k2Container ul.itemTags"
+    },
+    "article": {
+      "selector": ".itemBody",
+      "remove_selectors": [
+        ".itemHits",
+        ".itemDateModified",
+        ".itemTags"
+      ]
+    }
+  },
+
+  "cz.sputniknews.com": {
+    "title": {
+      "selector": "html body h1"
+    },
+    "author": {
+      "selector": "html body div.b-article__refs-date"
+    },
+    "date": {
+      "selector": ".b-article__refs-date",
+      "date_format": "%H:%M %d.%m.%Y"
+    },
+    "perex": {
+      "selector": ".b-article__lead"
+    },
+    "keywords": {
+      "selector": ".b-article__refs-tags"
+    },
+    "article": {
+      "selector": ".b-article",
+      "remove_selectors": [
+        ".b-article__refs-rubric",
+        ".b-article__refs-credits",
+        ".b-article__refs",
+        ".b-counters",
+        "section.comments"
+      ]
+    }
+  },
+
+  "ceskozdrave.cz": {
+    "title": {
+      "selector": ".entry-title"
+    },
+    "author": {
+      "selector": ".meta-item.author a"
+    },
+    "date": {
+      "selector": ".meta-item.date",
+      "date_format": "%d.%m.%Y"
+    },
+    "perex": {
+      "selector": ".entry-headline"
+    },
+    "keywords": {
+      "selector": ".meta-tags"
+    },
+    "article": {
+      "selector": ".entry-content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "ceskoaktualne.cz": {
+    "title": {
+      "selector": ".entry-title"
+    },
+    "date": {
+      "selector": ".td-post-date time",
+      "date_format": "%d.%m.%Y"
+    },
+    "keywords": {
+      "selector": ".td-category"
+    },
+    "article": {
+      "selector": ".td-post-content",
+      "remove_selectors": [
+        ".sharedaddy"
+      ]
+    }
+  },
+
+  "aeronet.cz": {
+    "title": {
+      "selector": ".entry-title"
+    },
+    "author": {
+      "selector": "div.author-box-wrap"
+    },
+    "date": {
+      "selector": "time.entry-date",
+      "replace": [
+        { "old": "Led", "new": "01."},
+        { "old": "Úno", "new": "02."},
+        { "old": "Bře", "new": "03."},
+        { "old": "Dub", "new": "04."},
+        { "old": "Kvě", "new": "05."},
+        { "old": "Čen", "new": "06."},
+        { "old": "Čec", "new": "07."},
+        { "old": "Srp", "new": "08."},
+        { "old": "Zář", "new": "09."},
+        { "old": "Říj", "new": "10."},
+        { "old": "Lis", "new": "11."},
+        { "old": "Pro", "new": "12."}
+      ],
+      "date_format": "%m. %d, %Y"
+    },
+    "perex": {
+      "selector": "h4"
+    },
+    "keywords": {
+      "selector": "ul.td-tags",
+      "regex_text": "TAGS(.*)"
+    },
+    "article": {
+      "selector": ".pf-content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "ac24.cz": {
+    "title": {
+      "selector": "#ac24_article div.title"
+    },
+    "author": {
+      "selector": "#ac24_article div.ac24-portlet-badge-sm div div span:nth-child(2)"
+    },
+    "perex": {
+      "selector": "#ac24_article div.ac24-summary"
+    },
+    "keywords": {
+      "selector": "#ac24_article div.ac24-portlet-badge-sm div div span:nth-child(3)"
+    },
+    "article": {
+      "selector": ".ac24-article-content",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.duchdoby.cz": {
+    "title": {
+      "selector": ".entry-title"
+    },
+    "author": {
+      "selector": "span.byline"
+    },
+    "date": {
+      "selector": "span.posted-on",
+      "regex_text": "([^,]*)",
+      "date_format": "%d.%m.%Y"
+    },
+    "article": {
+      "selector": ".entry-content",
+      "remove_selectors": [
+        "center",
+        "table",
+        ".abh_box"
+      ]
+    }
+  },
+
+  "zpravy.dt24.cz": {
+    "title": {
+      "selector": "#content header.entry-header-title"
+    },
+    "article": {
+      "selector": ".entry-content-inner",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "e-republika.cz": {
+    "title": {
+      "selector": "#col1 article header h1"
+    },
+    "author": {
+      "selector": "#col1 article header span.titleb"
+    },
+    "date": {
+      "selector": "#col1 article header span.titleb"
+    },
+    "perex": {
+      "selector": "#col1 article div.articleheadingtext.media-body"
+    },
+    "keywords": {
+      "selector": "#col1 div.freetaglist"
+    },
+    "article": {
+      "selector": "",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "www.eurabia.cz": {
+    "title": {
+      "selector": ".al_Article h2"
+    },
+    "author": {
+      "selector": "#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_hlAutor"
+    },
+    "keywords": {
+      "selector": "#ctl00_ctl00_MasterContent_MainContent_ArtDetailMain_hlCategory"
+    },
+    "article": {
+      "selector": ".al_Article",
+      "remove_selectors": [
+        "h2",
+        ".al_Head"
+      ]
+    }
+  },
+
+  "eurodenik.cz": {
+    "title": {
+      "selector": "#main-content h1.news_title"
+    },
+    "author": {
+      "selector": "#primary-content p"
+    },
+    "perex": {
+      "selector": ".news-preview"
+    },
+    "article": {
+      "selector": "article",
+      "remove_selectors": [
+
+      ]
+    }
+  },
+
+  "eurozpravy.cz": {
+    "title": {
+      "selector": "#main h1.article_head.js-article-selectable"
+    },
+    "author": {
+      "selector": "#main p.article_meta_main span.colophon",
+      "regex_text": "— Autor: (.*)"
+    },
+    "date": {
+      "selector": "#main p.article_meta_main span.date",
+      "replace": [
+        { "old": "ledna", "new": "01."},
+        { "old": "února", "new": "02."},
+        { "old": "března", "new": "03."},
+        { "old": "dubna", "new": "04."},
+        { "old": "května", "new": "05."},
+        { "old": "června", "new": "06."},
+        { "old": "července", "new": "07."},
+        { "old": "srpna", "new": "08."},
+        { "old": "září", "new": "09."},
+        { "old": "října", "new": "10."},
+        { "old": "listopadu", "new": "11."},
+        { "old": "prosince", "new": "12."}
+      ],
+      "date_format": "%d. %m. %Y, %H:%M"
+    },
+    "perex": {
+      "selector": "#main p.article_perex"
+    },
+    "keywords": {
+      "selector": ".articles_next_to_topic",
+      "regex_text": "Témata:([\\w\\s|]*)"
+    },
+    "article": {
+      "selector": ".article_body",
+      "remove_selectors": [
+        ".ad"
+      ]
+    }
+  },
+
+  "leva-net.webnode.cz": {
+    "title": {
+      "selector": "#content h1"
+    },
+    "author": {
+      "selector": ""
+    },
+    "date": {
+      "selector": ".articleDetail ins",
+      "date_format": "%d.%m.%Y %H:%M"
+    },
+    "perex": {
+      "selector": ""
+    },
+    "keywords": {
+      "selector": "#content div.rbcTags"
+    },
+    "article": {
+      "selector": ".articleDetail",
+      "remove_selectors": [
+        "ins"
+      ]
+    }
+  },
+
+  "www.necenzurujeme.cz": {
+    "title": {
+      "selector": "#main article header h2"
+    },
+    "author": {
+      "selector": "section#author h3"
+    },
+    "date": {
+      "selector": "#stat time",
+      "regex_raw_html": "datetime=\"([^\"]*)\"",
+      "date_format": "%Y-%m-%dT%H:%M:%S"
+    },
+    "keywords": {
+      "selector": "footer",
+      "regex_text": "Štítky článku: \\n((?:[\\w]* • \\n)*)"
+    },
+    "article": {
+      "selector": "article",
+      "remove_selectors": [
+        "header",
+        "footer",
+        ".boxik"
+      ]
+    }
+  },
+
+  "www.novaburzoazie.com": {
+    "title": {
+      "selector": ".heading h1"
+    },
+    "date": {
+      "selector": "#left span.date-text",
+      "replace": [
+        { "old": "led", "new": "01."},
+        { "old": "úno", "new": "02."},
+        { "old": "bře", "new": "03."},
+        { "old": "dub", "new": "04."},
+        { "old": "kvě", "new": "05."},
+        { "old": "čen", "new": "06."},
+        { "old": "čec", "new": "07."},
+        { "old": "srp", "new": "08."},
+        { "old": "zář", "new": "09."},
+        { "old": "říj", "new": "10."},
+        { "old": "lis", "new": "11."},
+        { "old": "pro", "new": "12."}
+      ],
+      "date_format": "%d. %m., %Y"
+    },
+    "perex": {
+      "selector": "#left  p strong"
+    },
+    "article": {
+      "selector": ".content .content",
+      "remove_selectors": [
+      ]
+    }
+  },
+
+  "vasevec.parlamentnilisty.cz": {
+    "title": {
+      "selector": "h1.title"
+    },
+    "date": {
+      "selector": "div.date",
+      "date_format": "%d.%m.%Y %H:%M"
+    },
+    "perex": {
+      "selector": ".perex"
+    },
+    "article": {
+      "selector": "#content-area .content",
+      "remove_selectors":  [
+        ".footer-nav",
+        ".footer-nav-right",
+        ".block"
       ]
     }
   }
