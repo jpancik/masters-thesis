@@ -32,6 +32,8 @@ class HtmlExtractor:
             return None
 
         parsed = self.get_attribute_with_selector_info(selector_info)
+        if not parsed:
+            return None
 
         replace = selector_info.get_extra('replace')
         if replace:
