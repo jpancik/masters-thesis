@@ -636,9 +636,6 @@
       "selector": "#page section article p time.published",
       "date_format": "%d.%m.%Y"
     },
-    "perex": {
-      "selector": ""
-    },
     "keywords": {
       "selector": "#page section div.pad.group p.post-tags",
       "regex_text": "Štítky: (.*)"
@@ -676,9 +673,6 @@
     "date": {
       "selector": "time.entry-date",
       "date_format": "%d.%m.%Y"
-    },
-    "perex": {
-      "selector": ""
     },
     "keywords": {
       "selector": "span.tag-links"
@@ -915,9 +909,6 @@
       "regex_raw_html": "title=\"([^\"]*)\\+\\d{2}:\\d{2}\"",
       "date_format": "%Y-%m-%dT%H:%M:%S"
     },
-    "perex": {
-      "selector": ""
-    },
     "keywords": {
       "selector": ".post-labels",
       "regex_text": "Štítky:((.|\\s)*)"
@@ -970,9 +961,6 @@
     "perex": {
       "selector": "html body main section p strong"
     },
-    "keywords": {
-      "selector": ""
-    },
     "article": {
       "selector": ".c-article__content",
       "remove_selectors": [
@@ -1021,7 +1009,7 @@
       "selector": "#post-title"
     },
     "author": {
-      "selector": ".post-info a:nth-child(1)"
+      "selector": ".post_info a:nth-child(1)"
     },
     "article": {
       "selector": ".postcontent",
@@ -1035,24 +1023,18 @@
     "title": {
       "selector": "div#article h1"
     },
-    "author": {
-      "selector": ""
-    },
     "date": {
       "selector": "div#article div.kategory strong",
       "regex_text": "([^/]*) /",
       "date_format": "%d.%m.%Y %H:%M"
     },
-    "perex": {
-      "selector": ""
-    },
     "keywords": {
       "selector": "div#article div.kategory strong a"
     },
     "article": {
-      "selector": "",
+      "selector": "#article",
       "remove_selectors": [
-
+        ".gal-btn-hld"
       ]
     }
   },
@@ -1435,15 +1417,9 @@
     "title": {
       "selector": "#content h1"
     },
-    "author": {
-      "selector": ""
-    },
     "date": {
       "selector": ".articleDetail ins",
       "date_format": "%d.%m.%Y %H:%M"
-    },
-    "perex": {
-      "selector": ""
     },
     "keywords": {
       "selector": "#content div.rbcTags"

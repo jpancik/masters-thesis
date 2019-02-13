@@ -111,8 +111,6 @@ class ProcessArticles:
                           % (index + 1, len(articles_raw_data), filename, url, e))
                     traceback.print_exc()
 
-
-
             if self.args.process_new and not self.args.dry_run and processed_articles_count > 0:
                 cur.execute('INSERT INTO article_processing_summary'
                             '(website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
@@ -179,7 +177,8 @@ class ProcessArticles:
             file.write(json_data)
         return full_path
 
-    def _init_domain_types(self):
+    @staticmethod
+    def _init_domain_types():
         out = dict()
 
         with open('data/website_article_format_descriptions.json', 'r') as file:
