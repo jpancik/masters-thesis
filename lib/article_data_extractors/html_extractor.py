@@ -1,6 +1,7 @@
 import re
 import traceback
 from datetime import datetime
+from urllib.parse import urlparse, urljoin
 
 from bs4 import BeautifulSoup
 
@@ -8,11 +9,19 @@ from lib.articles_processor_domain_type.json_domain_type import JsonDomainType, 
 
 
 class HtmlExtractor:
-    def __init__(self, domain_type: JsonDomainType, file, parsed_at, debug):
+    def __init__(self, domain_type: JsonDomainType, file, url, parsed_at, debug):
         self.domain_type = domain_type
         self.soup = BeautifulSoup(file, 'html.parser')
+        self.url = url
         self.parsed_at = parsed_at
         self.debug = debug
+
+    @staticmethod
+    def _extract_text_from_html(html_content, split_paragraphs=False):
+        content = html_content
+        if split_paragraphs:
+            content = re.sub(r'<p[^>]*>', '\n', content)
+        return re.sub(r'<[^>]*>', ' ', content)
 
     def _log_debug(self, msg):
         if self.debug:
@@ -60,6 +69,24 @@ class HtmlExtractor:
         selector_info = self.domain_type.get_attribute_selector_info('keywords')
         return self.get_attribute_with_selector_info(selector_info) if selector_info else None
 
+    def get_all_hyperlinks(self):
+        parsed_url = urlparse(self.url)
+        domain = '%s://%s' % (parsed_url.scheme, parsed_url.netloc)
+
+        out = set()
+        hyperlinks = self.soup.find_all('a')
+        for hyperlink in hyperlinks:
+            url = hyperlink.get('href')
+            if not url:
+                continue
+
+            if not url.startswith('http://') or not url.startswith('https://'):
+                url = 'http://%s' % url
+
+            out.add(urljoin(domain, url))
+
+        return [i for i in out]
+
     def get_article_content(self):
         selector = self.domain_type.get_article_content_selector()
         if not selector:
@@ -82,9 +109,14 @@ class HtmlExtractor:
                     self._log_debug('Selector to remove %s removed: "%s".' % (selector_to_remove, removed))
         self._log_debug(article)
 
-        text = ' '.join([a.get_text() for a in article])
+        raw_texts = []
+        for a in article:
+            html_content = str(a).replace('\n', ' ')
+            raw_texts.append(self._extract_text_from_html(html_content, split_paragraphs=True))
+
+        text = ' '.join(raw_texts)
         # print(text)
-        text_no_tabs_and_new_lines = text.replace('\n', ' ').replace('\t', ' ').replace(str(chr(160)), ' ')
+        text_no_tabs_and_new_lines = text.replace('\t', ' ').replace(str(chr(160)), ' ')
         remove_spaces_regex = re.compile(r'([ ][ ]+)', flags=re.MULTILINE)
         text_processed = remove_spaces_regex.sub(' ', text_no_tabs_and_new_lines)
         return text_processed.strip()
@@ -116,7 +148,7 @@ class HtmlExtractor:
             if select_index < len(selected_tags):
                 self._log_debug('Extracted %s "%s".'
                                 % (attribute_name, selected_tags[select_index]))
-                text = selected_tags[select_index].get_text()
+                text = self._extract_text_from_html(str(selected_tags[select_index]))
             else:
                 self._log_debug('Select index is out of bounds.')
                 text = None

@@ -30,6 +30,7 @@ class ProcessArticles:
         parser.add_argument('--process-new', action='store_true', default=False, help='Process only new articles.')
         parser.add_argument('--begin-id', type=int, default=None, help='Specify begin id of articles to process.')
         parser.add_argument('--end-id', type=int, default=None, help='Specify end if of articles to process.')
+        parser.add_argument('--skip-hyperlinks', action='store_true', default=False, help='Don\'t gather all hyperlinks from article.')
         return parser.parse_args()
 
     def run(self):
@@ -59,8 +60,9 @@ class ProcessArticles:
 
                 try:
                     with open(filename, 'r') as file:
-                        html_extractor = HtmlExtractor(domain_type, file, created_at, self.args.debug)
+                        html_extractor = HtmlExtractor(domain_type, file, url, created_at, self.args.debug)
 
+                    article_hyperlinks = html_extractor.get_all_hyperlinks()
                     article_title = html_extractor.get_title()
                     article_author = html_extractor.get_author()
                     article_publication_date = html_extractor.get_date()
@@ -82,6 +84,8 @@ class ProcessArticles:
                         out['keywords'] = article_keywords
                     if article_content:
                         out['article_content'] = article_content
+                    if article_hyperlinks and not self.args.skip_hyperlinks:
+                        out['hyperlinks'] = article_hyperlinks
 
                     json_data = json.dumps(out, indent=4, ensure_ascii=False)
                     if self.args.dry_run:
