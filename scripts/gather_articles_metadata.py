@@ -1,5 +1,7 @@
 import argparse
+import csv
 import json
+import sys
 from concurrent.futures import TimeoutError
 
 import psycopg2
@@ -23,17 +25,27 @@ class GatherArticlesMetadata:
         parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
         parser.add_argument('--dry-run', action='store_true', default=False,
                             help='Doesn\'t store results into DB and instead it prints them to stdout.')
+        parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
         return parser.parse_args()
 
     def run(self):
+        allowed_domains = None
+        if self.args.domain:
+            allowed_domains = [self.args.domain]
+        if self.args.pipeline:
+            allowed_domains = []
+            for line in sys.stdin:
+                allowed_domains.append(line[:-1])
+            print('Gathering article metadata for domains %s.' % allowed_domains, file=sys.stderr)
+
+        domain_types_to_process = []
+        for domain_type in self.domain_types:
+            if allowed_domains is not None and domain_type.get_name() not in allowed_domains:
+                continue
+
+            domain_types_to_process.append(domain_type)
+
         with ProcessPool(max_workers=self.args.processes) as pool:
-            domain_types_to_process = []
-            for domain_type in self.domain_types:
-                if self.args.domain and domain_type.get_name() != self.args.domain:
-                    continue
-
-                domain_types_to_process.append(domain_type)
-
             future = pool.map(self._gather_articles_metadata, domain_types_to_process, timeout=180)
 
             iterator = future.result()
@@ -44,6 +56,9 @@ class GatherArticlesMetadata:
                     if self.args.dry_run:
                         import pprint
                         pprint.pprint(articles_metadata)
+                        uploaded_count = 0
+                    elif self.args.pipeline:
+                        self._pipeline_out_articles(domain_type, articles_metadata)
                         uploaded_count = 0
                     else:
                         uploaded_count = self._upload_articles(domain_type, articles_metadata)
@@ -70,6 +85,16 @@ class GatherArticlesMetadata:
 
         return domain_type, articles_metadata
 
+    @staticmethod
+    def _pipeline_out_articles(domain_type, articles_metadata):
+        writer = csv.writer(sys.stdout)
+        for metadata in articles_metadata:
+            writer.writerow(
+                   ('OUTPUT:',
+                    domain_type.get_name(),
+                    metadata['link'],
+                    metadata['title'] if 'title' in metadata else None,
+                    metadata['published_parsed'] if 'published_parsed' in metadata else None))
 
     def _upload_articles(self, domain_type, articles_metadata):
         cur = self.db_con.cursor()

@@ -9,9 +9,9 @@ from lib.articles_processor_domain_type.json_domain_type import JsonDomainType, 
 
 
 class HtmlExtractor:
-    def __init__(self, domain_type: JsonDomainType, file, url, parsed_at, debug):
+    def __init__(self, domain_type: JsonDomainType, html_markup, url, parsed_at, debug):
         self.domain_type = domain_type
-        self.soup = BeautifulSoup(file, 'html.parser')
+        self.soup = BeautifulSoup(html_markup, 'html.parser')
         self.url = url
         self.parsed_at = parsed_at
         self.debug = debug
