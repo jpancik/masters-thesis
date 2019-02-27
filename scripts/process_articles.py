@@ -11,10 +11,11 @@ import psycopg2
 from lib.article_data_extractors.html_extractor import HtmlExtractor
 from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
 from lib.articles_processor_domain_type.json_domain_type import JsonDomainType
+from scripts.download_articles import DownloadArticles
 
 
 class ProcessArticles:
-    RAW_HTML_FOLDER_PREFIX = 'data/raw_articles/'
+    RAW_HTML_FOLDER_PREFIX = DownloadArticles.FOLDER_PREFIX
     PROCESSED_HTML_FOLDER_PREFIX = 'data/processed_articles/'
 
     def __init__(self):
@@ -30,7 +31,7 @@ class ProcessArticles:
         parser.add_argument('--limit', type=int, default=None, help='Specify limit of how many articles to process per domain.')
         parser.add_argument('--sql-conditions', type=str, default=None, help='Specify custom SQL conditions. (a is article_metadata and r is article_raw_html, e.g. "AND a.id = 15")')
         parser.add_argument('--dry-run', action='store_true', default=False, help='Don\'t store output and print it to stdout.')
-        parser.add_argument('--process-new', action='store_true', default=False, help='Process only new articles.')
+        parser.add_argument('--manual', action='store_true', default=False, help='Process articles manually.')
         parser.add_argument('--begin-id', type=int, default=None, help='Specify begin id of articles to process.')
         parser.add_argument('--end-id', type=int, default=None, help='Specify end if of articles to process.')
         parser.add_argument('--skip-hyperlinks', action='store_true', default=False, help='Don\'t gather all hyperlinks from article.')
@@ -97,7 +98,7 @@ class ProcessArticles:
                 to_process = []
                 for id, url, title, publication_date, filename, created_at in article_rows:
                     with open(filename, 'r') as file:
-                        to_process.append(((id, url, title, publication_date, created_at), file))
+                        to_process.append(((id, url, title, publication_date, created_at), file.read()))
 
                 (processed_articles,
                  processed_articles_count,
@@ -109,16 +110,16 @@ class ProcessArticles:
                  empty_keywords_count,
                  empty_article_content_count) = self._process_article(domain_type, to_process)
 
-                if self.args.process_new and not self.args.dry_run and processed_articles_count > 0:
+                if not self.args.manual and not self.args.dry_run and processed_articles_count > 0:
                     cur.execute('INSERT INTO article_processing_summary'
                                 '(website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
                                 'empty_perex_count, empty_keywords_count, empty_article_content_count, '
                                 'total_articles_processed_count, start_article_id, end_article_id) '
-                                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
                                 (website_domain_name, empty_title_count, empty_author_count, empty_publication_date_count,
                                  empty_perex_count, empty_keywords_count, empty_article_content_count,
                                  processed_articles_count, article_begin_id, processed_articles_last_id))
-                    processing_summary_id = cur.lastrowid
+                    processing_summary_id = cur.fetchone()[0]
 
                     for article_metadata_id, file_path in processed_articles:
                         cur.execute('INSERT INTO article_processed_data'
@@ -212,7 +213,7 @@ class ProcessArticles:
     def _construct_query(self, cur, domain):
         begin_id = None
         end_id = None
-        if self.args.process_new:
+        if not self.args.manual:
             cur.execute(
                 ('SELECT s.end_article_id '
                  'FROM article_processing_summary s '

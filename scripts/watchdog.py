@@ -5,7 +5,7 @@ import psycopg2
 from scripts.process_articles import ProcessArticles
 
 
-class DownloadArticles:
+class Watchdog:
     def __init__(self):
         self.args = self.parse_commandline()
         self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
@@ -79,5 +79,5 @@ class DownloadArticles:
 
 
 if __name__ == '__main__':
-    download_articles = DownloadArticles()
-    download_articles.run()
+    watchdog = Watchdog()
+    watchdog.run()

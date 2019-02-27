@@ -4,4 +4,5 @@ venv/
 *.pyc
 data/raw_articles/
 data/processed_articles/
+data/vertical_files/
 .DS_Store
