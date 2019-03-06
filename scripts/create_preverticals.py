@@ -7,8 +7,9 @@ from xml.sax.saxutils import quoteattr
 import psycopg2
 
 
-class CreateVertical:
-    VERTICAL_FILES_FOLDER = 'data/vertical_files/pre_vertical/'
+class CreatePreverticals:
+    VERTICAL_FILES_FOLDER = 'data/vertical_files/'
+    PRE_VERTICAL_FILES_FOLDER = '%sprevertical/' % VERTICAL_FILES_FOLDER
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -36,7 +37,7 @@ class CreateVertical:
             dates = cur.fetchall()
             for date in dates:
                 file_name = '%s-%s-%s.pvert' % (date[0].year, date[0].month, date[0].day)
-                if os.path.exists('%s/%s' % (self.VERTICAL_FILES_FOLDER, file_name)) and not self.args.dont_skip:
+                if os.path.exists('%s/%s' % (self.PRE_VERTICAL_FILES_FOLDER, file_name)) and not self.args.dont_skip:
                     print('Skipping "%s" because it already exists.' % file_name, file=sys.stderr)
                     continue
 
@@ -50,10 +51,10 @@ class CreateVertical:
 
     def create_vertical(self, file_name, article_processed_data_rows):
         if not self.args.dry_run:
-            if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
-                os.makedirs(self.VERTICAL_FILES_FOLDER)
+            if not os.path.isdir(self.PRE_VERTICAL_FILES_FOLDER):
+                os.makedirs(self.PRE_VERTICAL_FILES_FOLDER)
 
-        output_filename = '%s%s' % (self.VERTICAL_FILES_FOLDER, file_name)
+        output_filename = '%s%s' % (self.PRE_VERTICAL_FILES_FOLDER, file_name)
         output_file = None
         if not self.args.dry_run:
             output_file = open(output_filename, 'w')
@@ -125,5 +126,5 @@ class CreateVertical:
 
 
 if __name__ == '__main__':
-    create_vertical = CreateVertical()
-    create_vertical.run()
+    create_preverticals = CreatePreverticals()
+    create_preverticals.run()
