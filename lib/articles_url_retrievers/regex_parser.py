@@ -1,4 +1,5 @@
 import re
+import sys
 import urllib.parse
 from datetime import datetime
 
@@ -43,7 +44,7 @@ class RegexParser:
                     for link in soup.find_all('a'):
                         possible_articles.add(link.get('href'))
             except Exception as e:
-                print(e)
+                print(e, file=sys.stderr)
 
         article_regex = re.compile(regex_parser_args.regex)
 

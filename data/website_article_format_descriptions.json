@@ -9,7 +9,7 @@
     },
     "date": {
       "selector": "#main div div div article section div div div.time",
-      "date_format": "%d.%m.%Y %H:%M"
+      "date_format": "%d. %m. %Y %H:%M"
     },
     "perex": {
       "selector": "#main div div div article section p strong"

@@ -1,4 +1,5 @@
 import re
+import sys
 import traceback
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
@@ -25,7 +26,7 @@ class HtmlExtractor:
 
     def _log_debug(self, msg):
         if self.debug:
-            print(msg)
+            print(msg, file=sys.stderr)
 
     def get_title(self):
         selector_info = self.domain_type.get_attribute_selector_info('title')
@@ -80,7 +81,7 @@ class HtmlExtractor:
             if not url:
                 continue
 
-            if not url.startswith('http://') or not url.startswith('https://'):
+            if not url.startswith('http://') and not url.startswith('https://'):
                 url = 'http://%s' % url
 
             out.add(urljoin(domain, url))

@@ -90,7 +90,7 @@ class ProcessArticles:
                     continue
 
                 sql_query, article_begin_id = self._construct_query(cur, website_domain_name)
-                print('Executing query "%s".' % sql_query)
+                print('Executing query "%s".' % sql_query, file=sys.stderr)
 
                 cur.execute(sql_query)
                 article_rows = cur.fetchall()
@@ -143,7 +143,8 @@ class ProcessArticles:
         empty_article_content_count = 0
         processed_articles = []
         for index, ((id, url, title, publication_date, created_at), article_html) in enumerate(articles_raw_data):
-            print('(%s/%s) Started processing article from %s.' % (index + 1, len(articles_raw_data), url))
+            print('(%s/%s) Started processing article from %s.' % (index + 1, len(articles_raw_data), url),
+                  file=sys.stderr)
 
             try:
                 html_extractor = HtmlExtractor(domain_type, article_html, url, created_at, self.args.debug)
@@ -184,11 +185,11 @@ class ProcessArticles:
                     file_path = self._store_processed_article(id, domain_type, json_data)
                     processed_articles.append((id, file_path))
 
-                if not article_title:
+                if not (title or article_title):
                     empty_title_count += 1
                 if not article_author:
                     empty_author_count += 1
-                if not article_publication_date:
+                if not (publication_date or article_publication_date):
                     empty_publication_date_count += 1
                 if not article_perex:
                     empty_perex_count += 1
@@ -199,10 +200,12 @@ class ProcessArticles:
 
                 processed_articles_count += 1
                 processed_articles_last_id = id
-                print('(%s/%s) Finished processing article from %s.' % (index + 1, len(articles_raw_data), url))
+                print('(%s/%s) Finished processing article from %s.' % (index + 1, len(articles_raw_data), url),
+                      file=sys.stderr)
             except Exception as e:
                 print('(%s/%s) Error processing article from %s with message: %s.'
-                      % (index + 1, len(articles_raw_data), url, e))
+                      % (index + 1, len(articles_raw_data), url, e),
+                      file=sys.stderr)
                 traceback.print_exc()
 
         return (processed_articles, processed_articles_count, processed_articles_last_id, empty_title_count,

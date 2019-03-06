@@ -64,17 +64,17 @@ class GatherArticlesMetadata:
                         uploaded_count = self._upload_articles(domain_type, articles_metadata)
 
                     print('%s: Number of articles uploaded/retrieved: %s/%s.'
-                          % (domain_type.get_name(), uploaded_count, len(articles_metadata)))
+                          % (domain_type.get_name(), uploaded_count, len(articles_metadata)), file=sys.stderr)
                 except StopIteration:
                     break
                 except TimeoutError as error:
-                    print("Function took longer than %d seconds." % error.args[1])
+                    print("Function took longer than %d seconds." % error.args[1], file=sys.stderr)
 
         self._close_db_connection()
 
     @staticmethod
     def _gather_articles_metadata(domain_type):
-        print('Gathering for: %s' % domain_type.get_name())
+        print('Gathering for: %s' % domain_type.get_name(), file=sys.stderr)
 
         if domain_type.has_rss():
             articles_metadata = RssParser.get_article_metadata(domain_type)

@@ -96,10 +96,12 @@ class DownloadArticles:
                         'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
                         (id, full_path))
                     self.db_con.commit()
-                print('(%s/%s) Finished downloading: %s.' % (index + 1, len(articles_metadata), url))
+                print('(%s/%s) Finished downloading: %s.' % (index + 1, len(articles_metadata), url), file=sys.stderr)
             except Exception as e:
                 traceback.print_exc()
-                print('(%s/%s) Error downloading: %s with message %s.' % (index + 1, len(articles_metadata), url, e))
+                print(
+                    '(%s/%s) Error downloading: %s with message %s.' % (index + 1, len(articles_metadata), url, e),
+                    file=sys.stderr)
 
         if cur:
             cur.close()

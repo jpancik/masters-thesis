@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 import psycopg2
 
@@ -22,7 +23,7 @@ class Watchdog:
 
         cur = self.db_con.cursor()
 
-        print('Checking article gathering summaries for possible errors.')
+        print('Checking article gathering summaries for possible errors.', file=sys.stderr)
         cur.execute(
             'SELECT s.website_domain, s.total_articles_count FROM article_metadata_gathering_summary s '
             'WHERE DATE(s.created_at) = (SELECT MAX(DATE(s.created_at)) FROM article_metadata_gathering_summary s);')
@@ -32,10 +33,12 @@ class Watchdog:
         for website_domain, total_articles_count in article_metadata_gathering_summaries:
             if total_articles_count == 0:
                 faulty += 1
-                print('Error: No articles found for domain %s.' % website_domain)
-        print('Checked %s domains and found %s possible errors.' % (len(article_metadata_gathering_summaries), faulty))
+                print('Error: No articles found for domain %s.' % website_domain, file=sys.stderr)
+        print('Checked %s domains and found %s possible errors.' % (len(article_metadata_gathering_summaries), faulty),
+              file=sys.stderr)
 
-        print('Checking article processing summaries for possible errors.')
+        print('Checking article processing summaries for possible errors.',
+              file=sys.stderr)
         cur.execute(
             'SELECT website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
             'empty_perex_count, empty_keywords_count, empty_article_content_count, total_articles_processed_count '
@@ -47,7 +50,8 @@ class Watchdog:
              empty_keywords_count, empty_article_content_count,
              total_articles_processed_count) in article_processing_summaries:
             if website_domain not in domain_types:
-                print('Warning: Unknown website_domain %s.' % website_domain)
+                print('Warning: Unknown website_domain %s.' % website_domain,
+                      file=sys.stderr)
                 continue
 
             domain = domain_types[website_domain]
@@ -63,11 +67,13 @@ class Watchdog:
                 if domain.get_attribute_selector_info(name):
                     percentage = float(empty_count) / float(total_articles_processed_count)
                     if percentage > self.args.threshold:
-                        print('Warning: %s has %.0f%% %s empty.' % (website_domain, percentage * 100, message_text))
+                        print('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, message_text),
+                              file=sys.stderr)
 
             percentage = float(empty_article_content_count) / float(total_articles_processed_count)
             if percentage > self.args.threshold_articles:
-                print('Warning: %s has %.0f%% %s empty.' % (website_domain, percentage * 100, 'articles'))
+                print('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, 'articles'),
+                      file=sys.stderr)
 
 
         cur.close()
