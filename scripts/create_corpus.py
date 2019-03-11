@@ -30,20 +30,22 @@ class CreateCorpus:
         for file_name in os.listdir(self.PRE_VERTICAL_FILES_FOLDER):
             pre_vertical_file_path = os.path.join(self.PRE_VERTICAL_FILES_FOLDER, file_name)
             vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name.replace('.pvert', '.vert'))
-            if os.path.isfile(pre_vertical_file_path) and (not os.path.exists(vertical_file_path) or not self.args.dont_skip):
+            if os.path.isfile(pre_vertical_file_path) and (not os.path.exists(vertical_file_path) or self.args.dont_skip):
                 # Process .pvert file into .vert using "cat *.pvert | /opt/majka_pipe/majka-czech.sh > *.vert".
                 print('Processing pre-vertical %s file into %s.' % (pre_vertical_file_path, vertical_file_path), file=sys.stderr)
 
                 cat_process = subprocess.Popen(['cat', pre_vertical_file_path], stdout=subprocess.PIPE)
                 with open(vertical_file_path, 'w') as vertical_file:
                     if self.args.debug:
-                        subprocess.Popen(['tee'], stdin=cat_process.stdout, stdout=vertical_file)
+                        tee_process = subprocess.Popen(['tee'], stdin=cat_process.stdout, stdout=vertical_file)
+                        tee_process.wait()
                     else:
-                        my_env = os.environ.copy()
-                        my_env['PATH'] = '/usr/bin:' + my_env['PATH']
-                        subprocess.Popen(
+                        env_with_py2 = os.environ.copy()
+                        env_with_py2['PATH'] = '/usr/bin:' + env_with_py2['PATH']
+                        majka_pipe_process = subprocess.Popen(
                             ['/opt/majka_pipe/majka-czech.sh'],
-                            stdin=cat_process.stdout, stdout=vertical_file, env=my_env)
+                            stdin=cat_process.stdout, stdout=vertical_file, stderr=sys.stderr, env=env_with_py2)
+                        majka_pipe_process.wait()
             else:
                 print('Skipping already existing pre-vertical file %s.' % (pre_vertical_file_path))
 
