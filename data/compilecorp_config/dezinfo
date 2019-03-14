@@ -1,9 +1,9 @@
-# crawlercorpus
+# dezinfo
 
 MAINTAINER "jpancik@gmail.com"
-NAME "crawlercorpus"
+NAME "dezinfo"
 INFO "TODO."
-PATH "/home/xpancik2/crawlercorpus/"
+PATH "/home/xpancik2/dezinfo/"
 VERTICAL "| cat /home/xpancik2/masters-thesis/data/vertical_files/*.vert"
 ENCODING "utf-8"
 LANGUAGE "Czech"
