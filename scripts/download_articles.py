@@ -7,6 +7,7 @@ from datetime import datetime
 
 import psycopg2
 import requests
+from pebble import ProcessPool
 
 from scripts.gather_articles_metadata import GatherArticlesMetadata
 
@@ -25,6 +26,7 @@ class DownloadArticles:
                             help='Don\'t store output and print it to stdout.')
         parser.add_argument('--id', type=int, default=None, help='Specify id of article to download.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
+        parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
         return parser.parse_args()
 
     def run(self):
@@ -70,43 +72,74 @@ class DownloadArticles:
                             'WHERE r.article_metadata_id IS NULL')
             articles_metadata = cur.fetchall()
 
-        for index, (id, website_domain_name, url, title, publication_date) in enumerate(articles_metadata):
+        input_data = []
+        for index, article_metadata in enumerate(articles_metadata):
+            id, website_domain_name, url, title, publication_date = article_metadata
+
             filename = '%s_%s.html' % (id, website_domain_name.replace('/', '-'))
             full_path = os.path.join(folder_name, filename)
 
-            try:
-                response = requests.get(url, timeout=15, headers={
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-                })
-                for domain_type in domain_types:
-                    if domain_type.get_name() == website_domain_name:
-                        response.encoding = domain_type.get_encoding()
-                        break
+            input_data.append((index + 1, len(articles_metadata), full_path, domain_types, article_metadata))
 
-                if self.args.dry_run:
-                    print(response.text)
-                    print(response.encoding)
-                    print(full_path)
-                elif self.args.pipeline:
-                    self._pipeline_out_downloaded_articles(website_domain_name, url, title, publication_date, response.text)
-                else:
-                    with open(full_path, 'w') as file:
-                        file.write(response.text)
+        with ProcessPool(max_workers=self.args.processes) as pool:
+            future = pool.map(self._download_article, input_data, timeout=180)
 
-                    cur.execute(
-                        'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
-                        (id, full_path))
-                    self.db_con.commit()
-                print('(%s/%s) Finished downloading: %s.' % (index + 1, len(articles_metadata), url), file=sys.stderr)
-            except Exception as e:
-                traceback.print_exc()
-                print(
-                    '(%s/%s) Error downloading: %s with message %s.' % (index + 1, len(articles_metadata), url, e),
-                    file=sys.stderr)
+            iterator = future.result()
+            while True:
+                try:
+                    index, total_count, file_path, metadata, response = next(iterator)
+                    if file_path is None or metadata is None or response is None:
+                        continue
+
+                    id, website_domain_name, url, title, publication_date = metadata
+
+                    if self.args.dry_run:
+                        print(response.text)
+                        print(response.encoding)
+                        print(file_path)
+                    elif self.args.pipeline:
+                        self._pipeline_out_downloaded_articles(website_domain_name, url, title, publication_date,
+                                                               response.text)
+                    else:
+                        with open(file_path, 'w') as file:
+                            file.write(response.text)
+
+                        cur.execute(
+                            'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
+                            (id, file_path))
+                        self.db_con.commit()
+                        print('(%s/%s) Stored response in %s.' % (index, total_count, file_path), file=sys.stderr)
+                except StopIteration:
+                    break
+                except TimeoutError as error:
+                    print("Function took longer than %d seconds." % error.args[1], file=sys.stderr)
 
         if cur:
             cur.close()
         self._close_db_connection()
+
+    @staticmethod
+    def _download_article(input_data):
+        index, total_count, file_path, domain_types, article_metadata = input_data
+        id, website_domain_name, url, title, publication_date = article_metadata
+
+        try:
+            response = requests.get(url, timeout=15, headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+            })
+            for domain_type in domain_types:
+                if domain_type.get_name() == website_domain_name:
+                    response.encoding = domain_type.get_encoding()
+                    break
+
+            print('(%s/%s) Finished downloading: %s.' % (index, total_count, url), file=sys.stderr)
+            return index, total_count, file_path, article_metadata, response
+        except Exception as e:
+            traceback.print_exc()
+            print(
+                '(%s/%s) Error downloading: %s with message %s.' % (index, total_count, url, e),
+                file=sys.stderr)
+            return None, None, None, None, None
 
     @staticmethod
     def _pipeline_out_downloaded_articles(website_domain, url, title, publication_date, article_raw_html):
