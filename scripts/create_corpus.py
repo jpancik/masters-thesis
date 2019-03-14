@@ -28,6 +28,9 @@ class CreateCorpus:
             print('Path for pre-verticals does not exist %s.' % self.PRE_VERTICAL_FILES_FOLDER, file=sys.stderr)
             return
 
+        env_with_py2 = os.environ.copy()
+        env_with_py2['PATH'] = '/usr/bin:' + env_with_py2['PATH']
+
         for file_name in os.listdir(self.PRE_VERTICAL_FILES_FOLDER):
             pre_vertical_file_path = os.path.join(self.PRE_VERTICAL_FILES_FOLDER, file_name)
             vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name.replace('.pvert', '.vert'))
@@ -43,30 +46,31 @@ class CreateCorpus:
                         tee_process = subprocess.Popen(['tee'], stdin=cat_process.stdout, stdout=vertical_file)
                         tee_process.wait()
                     else:
-                        env_with_py2 = os.environ.copy()
-                        env_with_py2['PATH'] = '/usr/bin:' + env_with_py2['PATH']
-                        majka_pipe_process = subprocess.Popen(
+                        compilecorp_process = subprocess.Popen(
                             ['/opt/majka_pipe/majka-czech.sh'],
                             stdin=cat_process.stdout, stdout=vertical_file, env=env_with_py2)
-                        majka_pipe_process.wait()
+                        compilecorp_process.wait()
             else:
                 print('Skipping already existing pre-vertical file %s.' % (pre_vertical_file_path))
 
-        print('Creating a combined vertical file into %s.' % self.CONCATENATED_VERTICAL_FILE_PATH)
-        with open(self.CONCATENATED_VERTICAL_FILE_PATH, 'w') as concatenated_vert_file:
-            for file_name in os.listdir(self.VERTICAL_FILES_FOLDER):
-                vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name)
+        # print('Creating a combined vertical file into %s.' % self.CONCATENATED_VERTICAL_FILE_PATH)
+        # with open(self.CONCATENATED_VERTICAL_FILE_PATH, 'w') as concatenated_vert_file:
+        #     for file_name in os.listdir(self.VERTICAL_FILES_FOLDER):
+        #         vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name)
+        #
+        #         if (vertical_file_path != self.CONCATENATED_VERTICAL_FILE_PATH
+        #                 and os.path.isfile(vertical_file_path)
+        #                 and vertical_file_path.endswith('.vert')):
+        #             print('Concatenating file %s.' % vertical_file_path)
+        #             with open(vertical_file_path, 'r') as vertical_file:
+        #                 for line in vertical_file:
+        #                     concatenated_vert_file.write(line)
 
-                if (vertical_file_path != self.CONCATENATED_VERTICAL_FILE_PATH
-                        and os.path.isfile(vertical_file_path)
-                        and vertical_file_path.endswith('.vert')):
-                    print('Concatenating file %s.' % vertical_file_path)
-                    with open(vertical_file_path, 'r') as vertical_file:
-                        for line in vertical_file:
-                            concatenated_vert_file.write(line)
-
-        # TODO: Compile corpora.
-
+        print('Running compilecorp')
+        if not self.args.debug:
+            compilecorp_process = subprocess.Popen(
+                ['compilecorp', 'masters-thesis/data/compilecorp_config/dezinfo'], env=env_with_py2)
+            compilecorp_process.wait()
 
 
 if __name__ == '__main__':
