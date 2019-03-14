@@ -83,7 +83,8 @@ class ProcessArticles:
                  empty_article_content_count) = self._process_article(domain_type, to_process)
 
                 json_data = processed_articles[0]
-                # TODO: Add output here when script for creating Vertical file is done.
+                json_data['url'] = url
+                print(json.dumps(json_data, ensure_ascii=False))
         else:
             for website_domain_name, domain_type in self.domain_types.items():
                 if self.args.domain is not None and self.args.domain != website_domain_name:
@@ -178,8 +179,7 @@ class ProcessArticles:
                     json_data = json.dumps(out, indent=4, ensure_ascii=False)
                     print(json_data)
                 elif self.args.pipeline:
-                    json_data = json.dumps(out, ensure_ascii=False)
-                    processed_articles.append(json_data)
+                    processed_articles.append(out)
                 else:
                     json_data = json.dumps(out, indent=4, ensure_ascii=False)
                     file_path = self._store_processed_article(id, domain_type, json_data)
@@ -261,7 +261,7 @@ class ProcessArticles:
     def _init_domain_types():
         out = dict()
 
-        with open('data/website_article_format_descriptions.json', 'r') as file:
+        with open('files/website_article_format_descriptions.json', 'r') as file:
             json_data = json.load(file)
             out.update(JsonDomainType.get_json_domain_types(json_data))
 

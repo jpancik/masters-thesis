@@ -28,7 +28,23 @@ class CreatePreverticals:
     def run(self):
         cur = self.db_con.cursor()
 
-        if self.args.all:
+        if self.args.pipeline:
+            parsed_data = []
+            for line in sys.stdin:
+                data = json.loads(line)
+                parsed_data.append(data)
+
+            for data in parsed_data:
+                self.print_to_vertical(
+                    sys.stdout,
+                    -1,
+                    data['url'] if 'url' in data else None,
+                    data['title'] if 'title' in data else None,
+                    data['author'] if 'author' in data else None,
+                    data['publication_date'] if 'publication_date' in data else None,
+                    data['perex'] if 'perex' in data else None,
+                    data['article_content'] if 'article_content' in data else None)
+        elif self.args.all:
             cur.execute('SELECT m.id, m.url, d.filename FROM article_processed_data d '
                         'JOIN article_metadata m ON m.id = d.article_metadata_id')
             article_processed_data_rows = cur.fetchall()
@@ -88,8 +104,9 @@ class CreatePreverticals:
         if output_file:
             output_file.close()
 
+    @staticmethod
     def print_to_vertical(
-            self, output_file, article_metadata_id, article_url,
+            output_file, article_metadata_id, article_url,
             title, author, publication_date, perex, article_content):
 
         output_file.write('<doc')

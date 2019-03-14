@@ -127,7 +127,7 @@ class GatherArticlesMetadata:
     def _init_domain_types():
         out = []
 
-        with open('data/website_article_urls_descriptions.json', 'r') as file:
+        with open('files/website_article_urls_descriptions.json', 'r') as file:
             json_data = json.load(file)
             out += JsonDomainType.get_json_domain_types(json_data)
 
