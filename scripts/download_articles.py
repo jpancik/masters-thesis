@@ -69,6 +69,7 @@ class DownloadArticles:
                             'LEFT OUTER JOIN article_raw_html r ON r.article_metadata_id = a.id '
                             'WHERE r.article_metadata_id IS NULL')
             articles_metadata = cur.fetchall()
+
         for index, (id, website_domain_name, url, title, publication_date) in enumerate(articles_metadata):
             filename = '%s_%s.html' % (id, website_domain_name.replace('/', '-'))
             full_path = os.path.join(folder_name, filename)

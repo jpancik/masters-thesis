@@ -29,7 +29,8 @@ class CreatePreverticals:
         cur = self.db_con.cursor()
 
         if self.args.all:
-            cur.execute('SELECT * FROM article_processed_data')
+            cur.execute('SELECT m.id, m.url, d.filename FROM article_processed_data d '
+                        'JOIN article_metadata m ON m.id = d.article_metadata_id')
             article_processed_data_rows = cur.fetchall()
             self.create_vertical('all_articles.pvert', article_processed_data_rows)
         else:
@@ -41,7 +42,9 @@ class CreatePreverticals:
                     print('Skipping "%s" because it already exists.' % file_name, file=sys.stderr)
                     continue
 
-                cur.execute('SELECT * FROM article_processed_data d WHERE DATE(d.created_at) = %s', date)
+                cur.execute('SELECT m.id, m.url, d.filename FROM article_processed_data d '
+                            'JOIN article_metadata m ON m.id = d.article_metadata_id '
+                            'WHERE DATE(d.created_at) = %s', date)
                 article_processed_data_rows = cur.fetchall()
                 self.create_vertical(file_name, article_processed_data_rows)
 
@@ -63,8 +66,7 @@ class CreatePreverticals:
         print('Started processing %s articles into vertical file "%s".' % (total_count, output_filename),
               file=sys.stderr)
 
-        for index, (id, website_domain_name, article_metadata_id, article_processing_summary_id, filename,
-                    created_at) in enumerate(article_processed_data_rows):
+        for index, (article_metadata_id, article_url, filename) in enumerate(article_processed_data_rows):
             if not os.path.exists(filename):
                 print('Filename %s does not exist.' % filename, file=sys.stderr)
 
@@ -73,7 +75,7 @@ class CreatePreverticals:
                 self.print_to_vertical(
                     output_file,
                     article_metadata_id,
-                    website_domain_name,
+                    article_url,
                     data['title'] if 'title' in data else None,
                     data['author'] if 'author' in data else None,
                     data['publication_date'] if 'publication_date' in data else None,
@@ -87,18 +89,19 @@ class CreatePreverticals:
             output_file.close()
 
     def print_to_vertical(
-            self, output_file, article_metadata_id, website_domain_name,
+            self, output_file, article_metadata_id, article_url,
             title, author, publication_date, perex, article_content):
 
         output_file.write('<doc')
-        output_file.write(' id=%s' % quoteattr(str(article_metadata_id)))
-        output_file.write(' domain=%s' % quoteattr(website_domain_name))
+        output_file.write(' dbid=%s' % quoteattr(str(article_metadata_id)))
+        output_file.write(' url=%s' % quoteattr(article_url))
         if title:
             output_file.write(' title=%s' % quoteattr(title))
         if author:
             output_file.write(' author=%s' % quoteattr(author))
         if publication_date:
             output_file.write(' date=%s' % quoteattr(publication_date))
+            output_file.write(' yearmonth=%s' % quoteattr(publication_date[0:7]))
         output_file.write('>\n')
 
         if perex:

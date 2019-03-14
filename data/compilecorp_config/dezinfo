@@ -1,0 +1,156 @@
+# crawlercorpus
+
+MAINTAINER "jpancik@gmail.com"
+NAME "crawlercorpus"
+INFO "TODO."
+PATH "/home/xpancik2/crawlercorpus/"
+VERTICAL "| cat /home/xpancik2/masters-thesis/data/vertical_files/*.vert"
+ENCODING "utf-8"
+LANGUAGE "Czech"
+
+INFOHREF "http://TODO"
+TAGSETDOC "https://www.sketchengine.eu/tagset-reference-for-czech/"
+
+WSATTR lemma
+WSDEF "/corpora/wsdef/czech-ajka-6.1.wsdef.txt"
+TERMDEF "/corpora/wsdef/czech-majka-terms-1.0.wsdef.m4"
+TERMBASE "/home/xpancik2/crawlercorpus/terms-ws"
+
+WPOSLIST ",noun,k1.*,adjective,k2.*,pronoun,k3.*,numeral,k4.*,verb,k5.*,adverb,k6.*,preposition,k7.*,conjunction,k8.*"
+GDEXDEFAULTCONF "/corpora/gdex/configurations/Slavic_non_lemmatized"
+
+DIACHRONIC "doc.yearmonth"
+ATTRIBUTE word {
+    TYPE "FD_FGD"
+}
+ATTRIBUTE   lemma {
+    LOCALE  "cs_CZ.UTF-8"
+    TYPE "FD_FGD"
+}
+ATTRIBUTE   tag {
+    TYPE "FD_FGD"
+}
+ATTRIBUTE   gender_lemma {
+    TYPE "FD_FGD"
+}
+ATTRIBUTE   lc {
+    LABEL   "word (lowercase)"
+    DYNAMIC  utf8lowercase
+    DYNLIB   internal
+    ARG1     "cs_CZ.UTF-8"
+    FUNTYPE  s
+    FROMATTR word
+    TYPE     index
+    TRANSQUERY      yes
+}
+ATTRIBUTE   lemma_lc {
+    LABEL   "lemma (lowercase)"
+    DYNAMIC  utf8lowercase
+    DYNLIB   internal
+    ARG1     "cs_CZ.UTF-8"
+    FUNTYPE  s
+    FROMATTR lemma
+    TYPE     index
+    TRANSQUERY      yes
+}
+ATTRIBUTE   k {
+    DYNAMIC getnextchar
+    DYNLIB  internal
+    ARG1    "k"
+    FUNTYPE c
+    FROMATTR tag
+    DYNTYPE freq
+}
+ATTRIBUTE   g {
+    DYNAMIC getnextchar
+    DYNLIB  internal
+    ARG1    "g"
+    FUNTYPE c
+    FROMATTR tag
+    DYNTYPE freq
+}
+ATTRIBUTE   n {
+    DYNAMIC getnextchar
+    DYNLIB  internal
+    ARG1    "n"
+    FUNTYPE c
+    FROMATTR tag
+    DYNTYPE freq
+}
+ATTRIBUTE   c {
+    DYNAMIC getnextchar
+    DYNLIB  internal
+    ARG1    "c"
+    FUNTYPE c
+    FROMATTR tag
+    DYNTYPE freq
+}
+ATTRIBUTE   p {
+    DYNAMIC getnextchar
+    DYNLIB  internal
+    ARG1    "p"
+    FUNTYPE c
+    FROMATTR tag
+    DYNTYPE freq
+}
+ATTRIBUTE   m {
+    DYNAMIC getnextchar
+    DYNLIB  internal
+    ARG1    "m"
+    FUNTYPE c
+    FROMATTR tag
+    DYNTYPE freq
+}
+
+STRUCTURE doc {
+    TYPE "map64"
+    ATTRIBUTE dbid
+    ATTRIBUTE title
+    ATTRIBUTE author
+    ATTRIBUTE date
+    ATTRIBUTE url {
+        TYPE "UNIQUE"
+    }
+    ATTRIBUTE t2ld {
+        LABEL "Second level domain"
+        DYNAMIC url2domain
+        DYNLIB   internal
+        ARG1     "2"
+        FUNTYPE  i
+        FROMATTR url
+        TYPE     freq
+    }
+    ATTRIBUTE tld {
+        LABEL "Top level domain"
+        DYNAMIC url2domain
+        DYNLIB   internal
+        ARG1     "1"
+        FUNTYPE  i
+        FROMATTR url
+        DYNTYPE freq
+    }
+    ATTRIBUTE urldomain {
+        LABEL "Web domain"
+        DYNAMIC url2domain
+        DYNLIB   internal
+        ARG1     "0"
+        FUNTYPE  i
+        FROMATTR url
+        TYPE     freq
+    }
+    ATTRIBUTE wordcount
+}
+STRUCTURE p {
+    TYPE "map64"
+    ATTRIBUTE perex {
+        DEFAULTVALUE 0
+    }
+}
+STRUCTURE s {
+    TYPE "file64"
+}
+STRUCTURE g {
+    TYPE "file64"
+    DISPLAYTAG 0
+    DISPLAYBEGIN "_EMPTY_"
+}
