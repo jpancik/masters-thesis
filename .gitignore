@@ -2,7 +2,5 @@ venv/
 .idea/
 *.iml
 *.pyc
-data/raw_articles/
-data/processed_articles/
-data/vertical_files/
+data/
 .DS_Store
