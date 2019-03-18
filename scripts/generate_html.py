@@ -46,14 +46,14 @@ class GenerateHtml:
         shutil.copy2('files/html_templates/plagiarism.js', os.path.join(self.args.output, 'plagiarism.js'))
 
         with open(by_articles_file_path, 'w') as html_file,\
-                open('data/analysis/plagiarism/plagiarism_graph_1.json', 'r') as graph_json:
+                open('data/analysis/plagiarism/plagiarism_graph_by_articles.json', 'r') as graph_json:
             html_file.write(self._load_template('files/html_templates/plagiarism.html', {
                 'graph_json': graph_json.read(),
                 'type_selector': 'by articles | <a href="%s">by words</a>' % self.ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME
             }))
 
         with open(by_words_file_path, 'w') as html_file,\
-                open('data/analysis/plagiarism/plagiarism_graph_1.json', 'r') as graph_json:
+                open('data/analysis/plagiarism/plagiarism_graph_by_words.json', 'r') as graph_json:
             html_file.write(self._load_template('files/html_templates/plagiarism.html', {
                 'graph_json': graph_json.read(),
                 'type_selector': '<a href="%s">by articles</a> | by words' % self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME

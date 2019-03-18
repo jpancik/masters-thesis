@@ -7,7 +7,8 @@ from urllib.parse import urlparse
 class PlagiarismOutputProcessor:
     OUTPUT_FILE_PLAGIARISM_HTML = 'data/analysis/plagiarism/plagiarism_debug.html'
     OUTPUT_FILE_PLAGIARISM_JSON = 'data/analysis/plagiarism/plagiarism.json'
-    GRAPH_LINK_THRESHOLD = 5
+    GRAPH_LINK_BY_ARTICLES_THRESHOLD = 5
+    GRAPH_LINK_BY_WORDS_THRESHOLD = 500
 
     def __init__(self, dup_pos_file, plag_id_file, input_vertical_files,
                  doc_struct, doc_id, sent_struct, n=7, min_source_ngrs=10, plagiate_threshold_word_ratio=0.25,
@@ -422,7 +423,8 @@ class PlagiarismOutputProcessor:
     def _write_graph_jsons(self, plagiates):
         # Graph with number of articles taken from other domain.
         domains = set()
-        links = dict()
+        links_by_article = dict()
+        links_by_words = dict()
 
         for plagiate in plagiates:
             plagiate_domain = urlparse(plagiate['url']).netloc
@@ -433,10 +435,16 @@ class PlagiarismOutputProcessor:
                 domains.add(source_domain)
 
                 key = (source_domain, plagiate_domain)
-                if key in links:
-                    links[key] += 1
+                if key in links_by_article:
+                    links_by_article[key] += 1
                 else:
-                    links[key] = 1
+                    links_by_article[key] = 1
+
+                key = (source_domain, plagiate_domain)
+                if key in links_by_words:
+                    links_by_words[key] += source['plagiated_words_count']
+                else:
+                    links_by_words[key] = source['plagiated_words_count']
 
         json_data = {
             'nodes': [],
@@ -452,17 +460,29 @@ class PlagiarismOutputProcessor:
                 'color': '#%02x%02x%02x' % colors[index]
             })
 
-        for (source_domain, plagiate_domain), count in links.items():
-            if count >= self.GRAPH_LINK_THRESHOLD:
+        for (source_domain, plagiate_domain), count in links_by_article.items():
+            if count >= self.GRAPH_LINK_BY_ARTICLES_THRESHOLD:
                 json_data['links'].append({
                     'value': count,
                     'source': source_domain,
                     'target': plagiate_domain
                 })
 
-        with open('data/analysis/plagiarism/plagiarism_graph_1.json', 'w') as json_file:
+        with open('data/analysis/plagiarism/plagiarism_graph_by_articles.json', 'w') as json_file:
             json_file.write(json.dumps(json_data, indent=4))
 
+        json_data['links'] = []
+        for (source_domain, plagiate_domain), count in links_by_words.items():
+            json_data['links'].append({
+                'value': count,
+                'source': source_domain,
+                'target': plagiate_domain
+            })
+
+        with open('data/analysis/plagiarism/plagiarism_graph_by_words.json', 'w') as json_file:
+            json_file.write(json.dumps(json_data, indent=4))
+
+    # Source: https://www.quora.com/How-do-I-generate-n-visually-distinct-RGB-colours-in-Python
     @staticmethod
     def get_spaced_colors(n):
         max_value = 255**3
