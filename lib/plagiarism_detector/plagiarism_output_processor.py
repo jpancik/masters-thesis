@@ -1,13 +1,16 @@
+import json
 import sys, re
+from datetime import datetime
 from urllib.parse import urlparse
 
 
 class PlagiarismOutputProcessor:
-    OUTPUT_FILE_PLAGIARISM_HTML = 'data/analysis/plagiarism_debug.html'
-    OUTPUT_FILE_PLAGIARISM_JSON = 'data/analysis/plagiarism.json'
+    OUTPUT_FILE_PLAGIARISM_HTML = 'data/analysis/plagiarism/plagiarism_debug.html'
+    OUTPUT_FILE_PLAGIARISM_JSON = 'data/analysis/plagiarism/plagiarism.json'
+    GRAPH_LINK_THRESHOLD = 5
 
     def __init__(self, dup_pos_file, plag_id_file, input_vertical_files,
-                 doc_struct, doc_id, sent_struct, n=7, min_source_ngrs=10,
+                 doc_struct, doc_id, sent_struct, n=7, min_source_ngrs=10, plagiate_threshold_word_ratio=0.25,
                  output_html_file_path=None, output_json_file_path=None):
         self.dup_pos_file = dup_pos_file
         self.plag_id_file = plag_id_file
@@ -17,6 +20,7 @@ class PlagiarismOutputProcessor:
         self.sent_struct= sent_struct
         self.n = n
         self.min_source_ngrs = min_source_ngrs
+        self.plagiate_threshold_word_ratio = plagiate_threshold_word_ratio
         self.output_html_file_path = output_html_file_path if output_html_file_path else self.OUTPUT_FILE_PLAGIARISM_HTML
         self.output_json_file_path = output_json_file_path if output_json_file_path else self.OUTPUT_FILE_PLAGIARISM_JSON
 
@@ -96,7 +100,7 @@ class PlagiarismOutputProcessor:
         doc_ids_required.update(dup_doc_ids)
 
         print(
-            '%d duplicate positions read, %d major sources determined\n' % (dup_pos_counter, len(source_ranges)),
+            '%d duplicate positions read, %d major sources determined' % (dup_pos_counter, len(source_ranges)),
             file=sys.stderr)
 
         id_to_doc_attrs_map = dict()
@@ -120,13 +124,16 @@ class PlagiarismOutputProcessor:
                     try:
                         doc_id = doc_id_re.search(doc_header).group(1)
                         doc_url = doc_url_re.search(doc_header).group(1)
-                        doc_date = doc_date_re.search(doc_header).group(1)
+                        doc_date = doc_date_re.search(doc_header)
+                        if doc_date:
+                            doc_date = doc_date.group(1)
                         id_to_doc_attrs_map[doc_id] = {
                             'domain': urlparse(doc_url).netloc,
+                            'url': doc_url,
                             'date': doc_date
                         }
                     except AttributeError:
-                        print('%s\n' % doc_header, file=sys.stderr)
+                        print('%s' % doc_header, file=sys.stderr)
                         raise
                     if not doc_id in doc_ids_required:
                         continue
@@ -146,14 +153,15 @@ class PlagiarismOutputProcessor:
                                 this_doc_sentences.append(sent_words)
                             sent_words, in_sent = [], True
 
-        print('%d source documents read\n' % doc_counter, file=sys.stderr)
+        print('%d source documents read' % doc_counter, file=sys.stderr)
 
         self._write_html_output(
             dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
             doc_sentences, duplicate_ranges, doc_attrs, dup_doc_info, source_ranges)
-        self._write_json_output(
+        plagiates = self._write_json_output(
             dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
             doc_sentences, duplicate_ranges, doc_attrs, dup_doc_info, source_ranges)
+        self._write_graph_jsons(plagiates)
 
     def _write_html_output(
             self, dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
@@ -288,7 +296,7 @@ class PlagiarismOutputProcessor:
                 html_file.write('<div class="panel">\n%s\n</div>\n' % '\n'.join(marked_doc_content))
                 html_file.write('<div class="clear"></div>\n')
             html_file.write('</body>\n</html>\n')
-            print('%d candidate documents visualised\n' % dup_doc_len, file=sys.stderr)
+            print('%d candidate documents visualised' % dup_doc_len, file=sys.stderr)
 
     def _write_json_output(self, dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
             doc_sentences, duplicate_ranges, doc_attrs, dup_doc_info, source_ranges):
@@ -315,22 +323,22 @@ class PlagiarismOutputProcessor:
             dup_doc_plagiated_word_count = 0
             for doc_sent_id, sent_words in enumerate(doc_sentences[dup_doc_id]):
                 marked_sentence, marked_range_end = [], -1
-                plagiates = False
+                plagiated_words = False
                 for word_offset, word in enumerate(sent_words):
                     src_doc_id = duplicate_ranges[dup_doc_id].get((doc_sent_id, word_offset))
                     if src_doc_id in src_doc_ids and src_doc_id:  # range start
                         if marked_range_end < word_offset:
-                            plagiates = True
+                            plagiated_words = True
                         marked_range_end = word_offset + self.n - 1
-                    if plagiates:
+                    if plagiated_words:
                         dup_doc_plagiated_word_count += 1
                     dup_doc_total_word_count += 1
                     if marked_range_end == word_offset:  # range end
-                        plagiates = False
+                        plagiated_words = False
 
             plagiate_info['total_words_count'] = dup_doc_total_word_count
             plagiate_info['plagiated_words_count'] = dup_doc_plagiated_word_count
-            plagiate_info['source_articles'] = dict()
+            plagiate_info['source_articles'] = []
 
             for src_doc_id_i, src_doc_id in enumerate(src_doc_ids):
                 article_info = dict()
@@ -344,17 +352,17 @@ class PlagiarismOutputProcessor:
                 src_doc_plagiated_word_count = 0
                 for doc_sent_id, sent_words in enumerate(doc_sentences[src_doc_id]):
                     marked_sentence, marked_range_end = [], -1
-                    plagiates = False
+                    plagiated_words = False
                     for word_offset, word in enumerate(sent_words):
                         if (doc_sent_id, word_offset) in doc_source_ranges:  # range start
                             if marked_range_end < word_offset:
-                                plagiates = True
+                                plagiated_words = True
                             marked_range_end = word_offset + self.n - 1
-                        if plagiates:
+                        if plagiated_words:
                             src_doc_plagiated_word_count += 1
                         src_doc_total_word_count += 1
                         if marked_range_end == word_offset:  # range end
-                            plagiates = False
+                            plagiated_words = False
 
                 article_info['total_words_count'] = src_doc_total_word_count
                 article_info['plagiated_words_count'] = src_doc_plagiated_word_count
@@ -365,8 +373,100 @@ class PlagiarismOutputProcessor:
 
         # Now we have a list of {plagiate_article, [source_articles]}, but we need to verify it's not the other way
         # around i.e. source_articles are actually sourcing from plagiate_article. We can use date information for that.
+        checked_plagiates = []
+        for plagiate in plagiates:
+            parsed_plagiate_date = datetime.strptime(plagiate['date'], '%Y-%m-%d %H:%M:%S') if plagiate['date'] else None
 
+            parsed_oldest_source_date = None
+            for source in plagiate['source_articles']:
+                parsed_source_date = datetime.strptime(source['date'], '%Y-%m-%d %H:%M:%S') if source['date'] else None
+                if parsed_source_date and parsed_oldest_source_date:
+                    parsed_oldest_source_date = min(parsed_oldest_source_date, parsed_source_date)
+                elif parsed_source_date:
+                    parsed_oldest_source_date = parsed_source_date
 
+            if parsed_plagiate_date and parsed_oldest_source_date and parsed_plagiate_date < parsed_oldest_source_date:
+                # We found a case when it's other way around.
+                for source in plagiate['source_articles']:
+                    new_source = {
+                        'dbid': plagiate['dbid'],
+                        'url': plagiate['url'],
+                        'date': plagiate['date'],
+                        'total_words_count': plagiate['total_words_count'],
+                        'plagiated_words_count': plagiate['plagiated_words_count']
+                    }
+
+                    new_plagiate = {
+                        'dbid': source['dbid'],
+                        'url': source['url'],
+                        'date': source['date'],
+                        'total_words_count': source['total_words_count'],
+                        'plagiated_words_count': source['plagiated_words_count'],
+                        'source_articles': [new_source]
+                    }
+                    checked_plagiates.append(new_plagiate)
+            else:
+                checked_plagiates.append(plagiate)
+        plagiates = checked_plagiates
+
+        # Remove cases where plagiates are not above % treshold.
+        plagiates = list(filter(
+            lambda plagiate: (plagiate['plagiated_words_count']/plagiate['total_words_count']) > self.plagiate_threshold_word_ratio,
+            plagiates))
 
         with open(self.output_json_file_path, 'w') as json_file:
-            pass
+            json_file.write(json.dumps(plagiates, indent=4, ensure_ascii=False))
+
+        return plagiates
+
+    def _write_graph_jsons(self, plagiates):
+        # Graph with number of articles taken from other domain.
+        domains = set()
+        links = dict()
+
+        for plagiate in plagiates:
+            plagiate_domain = urlparse(plagiate['url']).netloc
+            domains.add(plagiate_domain)
+
+            for source in plagiate['source_articles']:
+                source_domain = urlparse(source['url']).netloc
+                domains.add(source_domain)
+
+                key = (source_domain, plagiate_domain)
+                if key in links:
+                    links[key] += 1
+                else:
+                    links[key] = 1
+
+        json_data = {
+            'nodes': [],
+            'links': []
+        }
+
+        colors = self.get_spaced_colors(len(domains))
+        for index, domain in enumerate(domains):
+            json_data['nodes'].append({
+                'domain': domain,
+                'name': domain,
+                'id': domain,
+                'color': '#%02x%02x%02x' % colors[index]
+            })
+
+        for (source_domain, plagiate_domain), count in links.items():
+            if count >= self.GRAPH_LINK_THRESHOLD:
+                json_data['links'].append({
+                    'value': count,
+                    'source': source_domain,
+                    'target': plagiate_domain
+                })
+
+        with open('data/analysis/plagiarism/plagiarism_graph_1.json', 'w') as json_file:
+            json_file.write(json.dumps(json_data, indent=4))
+
+    @staticmethod
+    def get_spaced_colors(n):
+        max_value = 255**3
+        interval = int(max_value / n)
+        colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
+
+        return [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]

@@ -11,6 +11,7 @@ from scripts.create_preverticals import CreatePreverticals
 class DoAnalysis:
     VERTICAL_FILES_FOLDER = CreatePreverticals.VERTICAL_FILES_FOLDER
     NGRAM_FILES_FOLDER = CreateCorpus.NGRAM_FILES_FOLDER
+    ANALYSIS_PLAGIARISM_FOLDER = 'data/analysis/plagiarism'
     WORK_TYPES = [
         'plagiates'
     ]
@@ -37,6 +38,9 @@ class DoAnalysis:
         if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
             print('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER, file=sys.stderr)
             return
+
+        if not os.path.isdir(self.ANALYSIS_PLAGIARISM_FOLDER):
+            os.makedirs(self.ANALYSIS_PLAGIARISM_FOLDER)
 
         input_ngrams_files = []
         input_vertical_files = []

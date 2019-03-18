@@ -2,8 +2,8 @@ import sys
 
 
 class PlagiarismDetector:
-    OUTPUT_FILE_PATH_DUPLICATE_POSITIONS = 'data/analysis/duplicates_output'
-    OUTPUT_FILE_PATH_PLAGIATES = 'data/analysis/plagiates_output'
+    OUTPUT_FILE_PATH_DUPLICATE_POSITIONS = 'data/analysis/plagiarism/duplicates_output'
+    OUTPUT_FILE_PATH_PLAGIATES = 'data/analysis/plagiarism/plagiates_output'
 
     def __init__(self, input_ngram_files,
                  doc_dup_sent_count=10, sent_dup_ngr_ratio=0.67, doc_dup_ngr_ratio=0.25,

@@ -1,0 +1,25 @@
+body {
+    padding-top: 5rem;
+}
+.centered-index {
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+text {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+svg {
+    width: 100%;
+}
+
+.link {
+    fill: none;
+    stroke: #ddd;
+}
+
+.node {
+    stroke: #000;
+    stroke-width: 1px;
+}
