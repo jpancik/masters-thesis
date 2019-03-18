@@ -236,7 +236,8 @@
       "selector": ".clkAutor"
     },
     "date": {
-      "selector": ".clkDtm"
+      "selector": ".clkDtm",
+      "date_format": "%d. %m. %Y"
     },
     "perex": {
       "selector": ".clkPerex"
@@ -265,7 +266,8 @@
       "selector": "div.single-post div.info ul li:nth-child(1) a"
     },
     "date": {
-      "selector": "div.single-post div.info ul li:nth-child(2) a"
+      "selector": "div.single-post div.info ul li:nth-child(2) a",
+      "date_format": "%d.%m.%Y"
     },
     "article": {
       "selector": "div.post-content article",
@@ -281,7 +283,8 @@
     },
     "date": {
       "selector": "#pageFrame div.wsw",
-      "regex_raw_html": "(\\d{2}.\\d{2}.\\d{4} \\d{2}:\\d{2})"
+      "regex_raw_html": "(\\d{2}.\\d{2}.\\d{4} \\d{2}:\\d{2})",
+      "date_format": "%d.%m.%Y %H:%M"
     },
     "perex": {
       "selector": "#pageFrame div.wsw h2 span"

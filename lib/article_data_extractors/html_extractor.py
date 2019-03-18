@@ -57,10 +57,14 @@ class HtmlExtractor:
 
         date_format = selector_info.get_extra('date_format')
         try:
+            if not date_format:
+                raise Exception(
+                    'Missing date_format for domain %s, extracted string "%s".' % (self.domain_type.get_name(), parsed))
+
             return datetime.strptime(parsed, date_format) if date_format else parsed
         except Exception as e:
             traceback.print_exc()
-            return parsed
+            return None
 
     def get_perex(self):
         selector_info = self.domain_type.get_attribute_selector_info('perex')
