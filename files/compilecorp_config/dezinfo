@@ -2,13 +2,13 @@
 
 MAINTAINER "jpancik@gmail.com"
 NAME "dezinfo"
-INFO "TODO."
+INFO "This corpora contains articles from propaganda websites that are download regularly."
 PATH "/home/xpancik2/dezinfo/"
 VERTICAL "| cat /home/xpancik2/masters-thesis/data/vertical_files/*.vert"
 ENCODING "utf-8"
 LANGUAGE "Czech"
 
-INFOHREF "http://TODO"
+INFOHREF "https://github.com/jpancik/masters-thesis/blob/master/files/compilecorp_config/dezinfo_doc.md"
 TAGSETDOC "https://www.sketchengine.eu/tagset-reference-for-czech/"
 
 WSATTR lemma
