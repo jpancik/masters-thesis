@@ -1,15 +1,14 @@
 import argparse
 import sys
 
-import psycopg2
-
+from lib.crawler_db import connector
 from scripts.process_articles import ProcessArticles
 
 
 class Watchdog:
     def __init__(self):
         self.args = self.parse_commandline()
-        self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
+        self.db_con = connector.get_db_connection()
 
     @staticmethod
     def parse_commandline():

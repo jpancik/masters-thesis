@@ -6,11 +6,10 @@ import sys
 import traceback
 from datetime import datetime
 
-import psycopg2
-
 from lib.article_data_extractors.html_extractor import HtmlExtractor
 from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
 from lib.articles_processor_domain_type.json_domain_type import JsonDomainType
+from lib.crawler_db import connector
 from scripts.download_articles import DownloadArticles
 
 
@@ -21,7 +20,7 @@ class ProcessArticles:
     def __init__(self):
         self.args = self.parse_commandline()
         self.domain_types = self._init_domain_types()
-        self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
+        self.db_con = connector.get_db_connection()
 
     @staticmethod
     def parse_commandline():

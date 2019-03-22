@@ -4,7 +4,7 @@ import os
 import sys
 from xml.sax.saxutils import quoteattr
 
-import psycopg2
+from lib.crawler_db import connector
 
 
 class CreatePreverticals:
@@ -13,7 +13,7 @@ class CreatePreverticals:
 
     def __init__(self):
         self.args = self.parse_commandline()
-        self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
+        self.db_con = connector.get_db_connection()
 
     @staticmethod
     def parse_commandline():
