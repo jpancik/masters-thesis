@@ -45,4 +45,4 @@ CREATE TABLE article_processed_data (
   article_processing_summary_id INT,
   filename TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
-)
+);

@@ -4,19 +4,21 @@ import json
 import sys
 from concurrent.futures import TimeoutError
 
-import psycopg2
 from pebble import ProcessPool
 
 from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainType
 from lib.articles_url_retrievers.regex_parser import RegexParser
 from lib.articles_url_retrievers.rss_parser import RssParser
+from lib.crawler_db import connector
 
 
 class GatherArticlesMetadata:
     def __init__(self):
         self.args = self.parse_commandline()
         self.domain_types = self._init_domain_types()
-        self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
+
+        self.db_con = connector.get_db_connection()
+
 
     @staticmethod
     def parse_commandline():

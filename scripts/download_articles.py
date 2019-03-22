@@ -5,10 +5,10 @@ import sys
 import traceback
 from datetime import datetime
 
-import psycopg2
 import requests
 from pebble import ProcessPool
 
+from lib.crawler_db import connector
 from scripts.gather_articles_metadata import GatherArticlesMetadata
 
 
@@ -17,7 +17,7 @@ class DownloadArticles:
 
     def __init__(self):
         self.args = self.parse_commandline()
-        self.db_con = psycopg2.connect("dbname=crawlerdb user=jurajpancik")
+        self.db_con = connector.get_db_connection()
 
     @staticmethod
     def parse_commandline():

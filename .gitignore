@@ -4,3 +4,4 @@ venv/
 *.pyc
 data/
 .DS_Store
+files/db_password

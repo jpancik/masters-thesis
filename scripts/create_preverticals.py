@@ -118,7 +118,7 @@ class CreatePreverticals:
             output_file.write(' author=%s' % quoteattr(author))
         if publication_date:
             output_file.write(' date=%s' % quoteattr(publication_date))
-            output_file.write(' yearmonth=%s' % quoteattr(publication_date[0:7]))
+            output_file.write(' yearmonth=%s' % quoteattr(publication_date[0:7].replace('-', '')))
         output_file.write('>\n')
 
         if perex:
