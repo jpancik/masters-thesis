@@ -14,12 +14,12 @@ TAGSETDOC "https://www.sketchengine.eu/tagset-reference-for-czech/"
 WSATTR lemma
 WSDEF "/corpora/wsdef/czech-ajka-6.1.wsdef.txt"
 TERMDEF "/corpora/wsdef/czech-majka-terms-1.0.wsdef.m4"
-TERMBASE "/home/xpancik2/crawlercorpus/terms-ws"
 
 WPOSLIST ",noun,k1.*,adjective,k2.*,pronoun,k3.*,numeral,k4.*,verb,k5.*,adverb,k6.*,preposition,k7.*,conjunction,k8.*"
 GDEXDEFAULTCONF "/corpora/gdex/configurations/Slavic_non_lemmatized"
 
 DIACHRONIC "doc.yearmonth"
+
 ATTRIBUTE word {
     TYPE "FD_FGD"
 }
@@ -108,6 +108,7 @@ STRUCTURE doc {
     ATTRIBUTE title
     ATTRIBUTE author
     ATTRIBUTE date
+    ATTRIBUTE yearmonth
     ATTRIBUTE url {
         TYPE "UNIQUE"
     }
