@@ -8,8 +8,8 @@ import shutil
 
 class GenerateHtml:
     INDEX_PAGE_FILENAME = 'index.html'
-    ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME = 'plagiarism_by_articles.html'
-    ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME = 'plagiarism_by_words.html'
+    ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_ALL_TIME = 'plagiarism_by_articles_all_time.html'
+    ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_ALL_TIME = 'plagiarism_by_words_all_time.html'
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -40,23 +40,40 @@ class GenerateHtml:
             }))
 
     def _prepare_analysis_plagiarism_page(self):
-        by_articles_file_path = os.path.join(self.args.output, self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME)
-        by_words_file_path = os.path.join(self.args.output, self.ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME)
+        by_articles_file_path_all_time = os.path.join(self.args.output, self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_ALL_TIME)
+        by_words_file_path_all_time = os.path.join(self.args.output, self.ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_ALL_TIME)
 
         shutil.copy2('files/html_templates/plagiarism.js', os.path.join(self.args.output, 'plagiarism.js'))
+        shutil.copy2('data/analysis/plagiarism/plagiarism_all_time.json', os.path.join(self.args.output, 'plagiarism_all_time.json'))
 
-        with open(by_articles_file_path, 'w') as html_file,\
-                open('data/analysis/plagiarism/plagiarism_graph_by_articles.json', 'r') as graph_json:
+        with open(by_articles_file_path_all_time, 'w') as html_file,\
+                open('data/analysis/plagiarism/plagiarism_graph_by_articles_all_time.json', 'r') as graph_json:
             html_file.write(self._load_template('files/html_templates/plagiarism.html', {
                 'graph_json': graph_json.read(),
-                'type_selector': 'by articles | <a href="%s">by words</a>' % self.ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME
+                'type_selector':
+                    'by articles all time | '
+                    '<a href="%s">by words all time</a> | '
+                    '<a href="%s">JSON data all time</a> | '
+                    '<a href="#">by articles 2 weeks</a> | '
+                    '<a href="#">by words 2 weeks</a> | '
+                    '<a href="#">JSON data 2 weeks</a>'
+                    % (self.ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_ALL_TIME,
+                       'plagiarism_all_time.json')
             }))
 
-        with open(by_words_file_path, 'w') as html_file,\
-                open('data/analysis/plagiarism/plagiarism_graph_by_words.json', 'r') as graph_json:
+        with open(by_words_file_path_all_time, 'w') as html_file,\
+                open('data/analysis/plagiarism/plagiarism_graph_by_words_all_time.json', 'r') as graph_json:
             html_file.write(self._load_template('files/html_templates/plagiarism.html', {
                 'graph_json': graph_json.read(),
-                'type_selector': '<a href="%s">by articles</a> | by words' % self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME
+                'type_selector':
+                    '<a href="%s">by articles all time</a> | '
+                    'by words all time | '
+                    '<a href="%s">JSON data all time</a> | '
+                    '<a href="#">by articles 2 weeks</a> | '
+                    '<a href="#">by words 2 weeks</a> | '
+                    '<a href="#">JSON data 2 weeks</a>'
+                    % (self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_ALL_TIME,
+                       'plagiarism_all_time.json')
             }))
 
     @staticmethod

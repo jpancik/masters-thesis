@@ -206,3 +206,21 @@ loadGraph = function(graph) {
         link.style("stroke", "#ddd");
     }
 };
+
+loadStatistics = function(graph) {
+    tbody = document.querySelector("#statistics-tbody");
+    statistics = graph.statistics;
+
+    statistics_html = '';
+    for(var i = 0; i < statistics.length; i++) {
+        var item = statistics[i];
+        statistics_html += "<tr>"
+            + "<td>" + item[0] + "</td>"
+            + "<td class='text-center'>" + item[1] + "</td>"
+            + "<td class='text-center'>" + item[2] + "</td>"
+            + "<td class='text-center'>" + item[3] + " %</td>"
+            + "<td>" + item[4][0] + " (" + item[4][1] + " articles)</td>"
+            + "</tr>";
+    }
+    tbody.innerHTML = statistics_html;
+};

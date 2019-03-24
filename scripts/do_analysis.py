@@ -9,6 +9,13 @@ from scripts.create_preverticals import CreatePreverticals
 
 
 class DoAnalysis:
+    OUTPUT_FILE_PATH_DUPLICATE_POSITIONS = 'data/analysis/plagiarism/duplicates_output'
+    OUTPUT_FILE_PATH_PLAGIATES = 'data/analysis/plagiarism/plagiates_output'
+    OUTPUT_FILE_PATH_PLAGIARISM_HTML = 'data/analysis/plagiarism/plagiarism_debug'
+    OUTPUT_FILE_PATH_PLAGIARISM_JSON = 'data/analysis/plagiarism/plagiarism'
+    OUTPUT_FILE_PATH_JSON_GRAPH_BY_ARTICLES = 'data/analysis/plagiarism/plagiarism_graph_by_articles'
+    OUTPUT_FILE_PATH_JSON_GRAPH_BY_WORDS = 'data/analysis/plagiarism/plagiarism_graph_by_words'
+
     VERTICAL_FILES_FOLDER = CreatePreverticals.VERTICAL_FILES_FOLDER
     NGRAM_FILES_FOLDER = CreateCorpus.NGRAM_FILES_FOLDER
     ANALYSIS_PLAGIARISM_FOLDER = 'data/analysis/plagiarism'
@@ -57,15 +64,25 @@ class DoAnalysis:
                 input_ngrams_files.append(ngrams_file_path)
                 input_vertical_files.append(vertical_file_path)
 
+        output_file_path_duplicate_position_all_time = '%s%s' % (self.OUTPUT_FILE_PATH_DUPLICATE_POSITIONS, '_all_time')
+        output_file_path_plagiates_all_time = '%s%s' % (self.OUTPUT_FILE_PATH_PLAGIATES, '_all_time')
+
         print('Running plagiarism detector.', file=sys.stderr)
-        plagiarism_detector = PlagiarismDetector(input_ngrams_files)
+        plagiarism_detector = PlagiarismDetector(
+            input_ngrams_files,
+            output_file_duplicate_positions=output_file_path_duplicate_position_all_time,
+            output_file_plagiates=output_file_path_plagiates_all_time)
         plagiarism_detector.run()
 
         print('Processing plagiarism detector output.', file=sys.stderr)
         plagiarism_output_processor = PlagiarismOutputProcessor(
-            PlagiarismDetector.OUTPUT_FILE_PATH_DUPLICATE_POSITIONS,
-            PlagiarismDetector.OUTPUT_FILE_PATH_PLAGIATES,
+            output_file_path_duplicate_position_all_time,
+            output_file_path_plagiates_all_time,
             input_vertical_files,
+            '%s%s.html' % (self.OUTPUT_FILE_PATH_PLAGIARISM_HTML, '_all_time'),
+            '%s%s.json' % (self.OUTPUT_FILE_PATH_PLAGIARISM_JSON, '_all_time'),
+            '%s%s.json' % (self.OUTPUT_FILE_PATH_JSON_GRAPH_BY_ARTICLES, '_all_time'),
+            '%s%s.json' % (self.OUTPUT_FILE_PATH_JSON_GRAPH_BY_WORDS, '_all_time'),
             'doc', 'dbid', 's'
         )
         plagiarism_output_processor.run()

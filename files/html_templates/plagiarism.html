@@ -28,13 +28,31 @@
     <div class="row">
         <div id="graph" class="col-md-12">
         </div>
-        <script src="plagiarism.js"></script>
-        <script>
-            graph_json = {{graph_json}};
-            loadGraph(graph_json);
-        </script>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Website</th>
+                <th scope="col">Articles count</th>
+                <th scope="col">Plagiates count</th>
+                <th scope="col">Percentual plagiates</th>
+                <th scope="col">Main source</th>
+            </tr>
+            </thead>
+            <tbody id="statistics-tbody">
+            </tbody>
+            </table>
+        </div>
     </div>
 </main><!-- /.container -->
+<script src="plagiarism.js"></script>
+<script>
+    graphJson = {{graph_json}};
+    loadGraph(graphJson);
+    loadStatistics(graphJson);
+</script>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

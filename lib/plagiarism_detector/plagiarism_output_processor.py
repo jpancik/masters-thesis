@@ -5,14 +5,14 @@ from urllib.parse import urlparse
 
 
 class PlagiarismOutputProcessor:
-    OUTPUT_FILE_PLAGIARISM_HTML = 'data/analysis/plagiarism/plagiarism_debug.html'
-    OUTPUT_FILE_PLAGIARISM_JSON = 'data/analysis/plagiarism/plagiarism.json'
     GRAPH_LINK_BY_ARTICLES_THRESHOLD = 5
     GRAPH_LINK_BY_WORDS_THRESHOLD = 500
 
     def __init__(self, dup_pos_file, plag_id_file, input_vertical_files,
-                 doc_struct, doc_id, sent_struct, n=7, min_source_ngrs=10, plagiate_threshold_word_ratio=0.25,
-                 output_html_file_path=None, output_json_file_path=None):
+                 output_html_file_path, output_json_file_path,
+                 output_json_graph_by_articles_file_path,
+                 output_json_graph_by_words_file_path,
+                 doc_struct, doc_id, sent_struct, n=7, min_source_ngrs=10, plagiate_threshold_word_ratio=0.25):
         self.dup_pos_file = dup_pos_file
         self.plag_id_file = plag_id_file
         self.input_vertical_files = input_vertical_files
@@ -22,8 +22,10 @@ class PlagiarismOutputProcessor:
         self.n = n
         self.min_source_ngrs = min_source_ngrs
         self.plagiate_threshold_word_ratio = plagiate_threshold_word_ratio
-        self.output_html_file_path = output_html_file_path if output_html_file_path else self.OUTPUT_FILE_PLAGIARISM_HTML
-        self.output_json_file_path = output_json_file_path if output_json_file_path else self.OUTPUT_FILE_PLAGIARISM_JSON
+        self.output_html_file_path = output_html_file_path
+        self.output_json_file_path = output_json_file_path
+        self.output_json_graph_by_articles_file_path = output_json_graph_by_articles_file_path
+        self.output_json_graph_by_words_file_path = output_json_graph_by_words_file_path
 
     @staticmethod
     def read_big_structures(fp, structure_tag, buffer_size=10000000):
@@ -162,7 +164,7 @@ class PlagiarismOutputProcessor:
         plagiates = self._write_json_output(
             dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
             doc_sentences, duplicate_ranges, doc_attrs, dup_doc_info, source_ranges)
-        self._write_graph_jsons(plagiates)
+        self._write_graph_jsons(plagiates, id_to_doc_attrs_map)
 
     def _write_html_output(
             self, dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
@@ -420,7 +422,7 @@ class PlagiarismOutputProcessor:
 
         return plagiates
 
-    def _write_graph_jsons(self, plagiates):
+    def _write_graph_jsons(self, plagiates, id_to_doc_attrs_map):
         # Graph with number of articles taken from other domain.
         domains = set()
         links_by_article = dict()
@@ -446,9 +448,53 @@ class PlagiarismOutputProcessor:
                 else:
                     links_by_words[key] = source['plagiated_words_count']
 
+        # Compute statistics.
+        article_count_per_domain = dict()
+        for article_id, doc_attrs in id_to_doc_attrs_map.items():
+            domain = doc_attrs['domain']
+            if domain in article_count_per_domain:
+                article_count_per_domain[domain] += 1
+            else:
+                article_count_per_domain[domain] = 1
+
+        plagiated_article_count_per_domain = dict()
+        for plagiate in plagiates:
+            plagiate_domain = urlparse(plagiate['url']).netloc
+            if plagiate_domain in plagiated_article_count_per_domain:
+                plagiated_article_count_per_domain[plagiate_domain] += 1
+            else:
+                plagiated_article_count_per_domain[plagiate_domain] = 1
+
+        main_source_per_domain = dict()
+        for (source_domain, plagiate_domain), count in links_by_article.items():
+            if plagiate_domain not in main_source_per_domain:
+                main_source_per_domain[plagiate_domain] = (source_domain, count)
+            else:
+                current_source_domain, current_count = main_source_per_domain[plagiate_domain]
+                if current_count < count:
+                    main_source_per_domain[plagiate_domain] = (source_domain, count)
+
+        plagiates_statistics = []
+        for domain, article_count in article_count_per_domain.items():
+            ratio = 'N/A'
+            plagiated_count = 'N/A'
+            if domain in plagiated_article_count_per_domain:
+                plagiated_count = plagiated_article_count_per_domain[domain]
+                ratio = '%.2f' % ((plagiated_count/article_count) * 100.0)
+            main_source = 'N/A'
+            if domain in main_source_per_domain:
+                main_source = main_source_per_domain[domain]
+
+            plagiates_statistics.append((domain, article_count, plagiated_count, ratio, main_source))
+
+        # Sort by ratio.
+        plagiates_statistics.sort(key=lambda x: -(float(x[3]) if x[3] != 'N/A' else -0.01))
+        # End of statistics.
+
         json_data = {
             'nodes': [],
-            'links': []
+            'links': [],
+            'statistics': plagiates_statistics,
         }
 
         colors = self.get_spaced_colors(len(domains))
@@ -468,7 +514,7 @@ class PlagiarismOutputProcessor:
                     'target': plagiate_domain
                 })
 
-        with open('data/analysis/plagiarism/plagiarism_graph_by_articles.json', 'w') as json_file:
+        with open(self.output_json_graph_by_articles_file_path, 'w') as json_file:
             json_file.write(json.dumps(json_data, indent=4))
 
         json_data['links'] = []
@@ -479,7 +525,7 @@ class PlagiarismOutputProcessor:
                 'target': plagiate_domain
             })
 
-        with open('data/analysis/plagiarism/plagiarism_graph_by_words.json', 'w') as json_file:
+        with open(self.output_json_graph_by_words_file_path, 'w') as json_file:
             json_file.write(json.dumps(json_data, indent=4))
 
     # Source: https://www.quora.com/How-do-I-generate-n-visually-distinct-RGB-colours-in-Python

@@ -2,16 +2,13 @@ import sys
 
 
 class PlagiarismDetector:
-    OUTPUT_FILE_PATH_DUPLICATE_POSITIONS = 'data/analysis/plagiarism/duplicates_output'
-    OUTPUT_FILE_PATH_PLAGIATES = 'data/analysis/plagiarism/plagiates_output'
-
     def __init__(self, input_ngram_files,
-                 doc_dup_sent_count=10, sent_dup_ngr_ratio=0.67, doc_dup_ngr_ratio=0.25,
                  output_file_duplicate_positions=None,
-                 output_file_plagiates=None):
+                 output_file_plagiates=None,
+                 doc_dup_sent_count=10, sent_dup_ngr_ratio=0.67, doc_dup_ngr_ratio=0.25):
         self.input_ngram_files = input_ngram_files
-        self.output_file_duplicate_positions = output_file_duplicate_positions if output_file_duplicate_positions else self.OUTPUT_FILE_PATH_DUPLICATE_POSITIONS
-        self.output_file_plagiates = output_file_plagiates if output_file_plagiates else self.OUTPUT_FILE_PATH_PLAGIATES
+        self.output_file_duplicate_positions = output_file_duplicate_positions
+        self.output_file_plagiates = output_file_plagiates
         self.doc_dup_sent_count = doc_dup_sent_count
         self.sent_dup_ngr_ratio = sent_dup_ngr_ratio
         self.doc_dup_ngr_ratio = doc_dup_ngr_ratio
