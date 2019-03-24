@@ -71,7 +71,7 @@ class GatherArticlesMetadata:
                 except StopIteration:
                     break
                 except TimeoutError as error:
-                    print("Function took longer than 180 seconds.", file=sys.stderr)
+                    print('Function took longer than 180 seconds.', file=sys.stderr)
 
         self._close_db_connection()
 

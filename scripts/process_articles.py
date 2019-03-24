@@ -6,6 +6,8 @@ import sys
 import traceback
 from datetime import datetime
 
+from pebble import ProcessPool
+
 from lib.article_data_extractors.html_extractor import HtmlExtractor
 from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
 from lib.articles_processor_domain_type.json_domain_type import JsonDomainType
@@ -36,6 +38,7 @@ class ProcessArticles:
         parser.add_argument('--skip-hyperlinks', action='store_true', default=False, help='Don\'t gather all hyperlinks from article.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
         parser.add_argument('--config', type=str, default='files/website_article_format_descriptions.json', help='Specify path to the articles format JSON configuration file.')
+        parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
         return parser.parse_args()
 
     def run(self):
@@ -80,7 +83,7 @@ class ProcessArticles:
                  empty_publication_date_count,
                  empty_perex_count,
                  empty_keywords_count,
-                 empty_article_content_count) = self._process_article(domain_type, to_process)
+                 empty_article_content_count) = self._process_articles(domain_type, to_process)
 
                 json_data = processed_articles[0]
                 json_data['url'] = url
@@ -109,7 +112,7 @@ class ProcessArticles:
                  empty_publication_date_count,
                  empty_perex_count,
                  empty_keywords_count,
-                 empty_article_content_count) = self._process_article(domain_type, to_process)
+                 empty_article_content_count) = self._process_articles(domain_type, to_process)
 
                 if not self.args.manual and not self.args.dry_run and processed_articles_count > 0:
                     cur.execute('INSERT INTO article_processing_summary'
@@ -133,7 +136,15 @@ class ProcessArticles:
         cur.close()
         self._close_db_connection()
 
-    def _process_article(self, domain_type, articles_raw_data):
+    def _process_articles(self, domain_type, articles_raw_data):
+        input_data = []
+        for index, ((article_id, url, title, publication_date, created_at), article_html) in enumerate(articles_raw_data):
+            input_data.append((
+                index + 1, len(articles_raw_data),
+                article_id, url, title, publication_date, created_at,
+                domain_type, article_html, self.args.debug, self.args.skip_hyperlinks
+            ))
+
         processed_articles_count = 0
         processed_articles_last_id = 0
         empty_title_count = 0
@@ -143,74 +154,113 @@ class ProcessArticles:
         empty_keywords_count = 0
         empty_article_content_count = 0
         processed_articles = []
-        for index, ((id, url, title, publication_date, created_at), article_html) in enumerate(articles_raw_data):
-            print('(%s/%s) Started processing article from %s.' % (index + 1, len(articles_raw_data), url),
-                  file=sys.stderr)
 
-            try:
-                html_extractor = HtmlExtractor(domain_type, article_html, url, created_at, self.args.debug)
+        with ProcessPool(max_workers=self.args.processes) as pool:
+            future = pool.map(self._process_article, input_data, timeout=180)
 
-                article_hyperlinks = html_extractor.get_all_hyperlinks()
-                article_title = html_extractor.get_title()
-                article_author = html_extractor.get_author()
-                article_publication_date = html_extractor.get_date()
-                article_perex = html_extractor.get_perex()
-                article_keywords = html_extractor.get_keywords()
-                article_content = html_extractor.get_article_content()
+            iterator = future.result()
+            while True:
+                try:
+                    (index, total_count, article_id, article_out,
+                     article_empty_title_count, article_empty_author_count, article_empty_publication_date_count,
+                     article_empty_perex_count, article_empty_keywords_count, article_empty_article_content_count) = next(iterator)
+                    if article_out is None:
+                        continue
 
-                out = dict()
-                if title or article_title:
-                    out['title'] = title if title else article_title
-                if article_author:
-                    out['author'] = article_author
-                if publication_date or article_publication_date:
-                    out['publication_date'] = \
-                        str(publication_date) if publication_date else str(article_publication_date)
-                if article_perex:
-                    out['perex'] = article_perex
-                if article_keywords:
-                    out['keywords'] = article_keywords
-                if article_content:
-                    out['article_content'] = article_content
-                if article_hyperlinks and not self.args.skip_hyperlinks:
-                    out['hyperlinks'] = article_hyperlinks
+                    if self.args.dry_run:
+                        json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
+                        print(json_data)
+                    elif self.args.pipeline:
+                        processed_articles.append(article_out)
+                    else:
+                        json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
+                        file_path = self._store_processed_article(article_id, domain_type, json_data)
+                        processed_articles.append((article_id, file_path))
+                        print('(%s/%s) Stored response in %s.' % (index, total_count, file_path), file=sys.stderr)
 
-                if self.args.dry_run:
-                    json_data = json.dumps(out, indent=4, ensure_ascii=False)
-                    print(json_data)
-                elif self.args.pipeline:
-                    processed_articles.append(out)
-                else:
-                    json_data = json.dumps(out, indent=4, ensure_ascii=False)
-                    file_path = self._store_processed_article(id, domain_type, json_data)
-                    processed_articles.append((id, file_path))
-
-                if not (title or article_title):
-                    empty_title_count += 1
-                if not article_author:
-                    empty_author_count += 1
-                if not (publication_date or article_publication_date):
-                    empty_publication_date_count += 1
-                if not article_perex:
-                    empty_perex_count += 1
-                if not article_keywords:
-                    empty_keywords_count += 1
-                if not article_content:
-                    empty_article_content_count += 1
-
-                processed_articles_count += 1
-                processed_articles_last_id = id
-                print('(%s/%s) Finished processing article from %s.' % (index + 1, len(articles_raw_data), url),
-                      file=sys.stderr)
-            except Exception as e:
-                print('(%s/%s) Error processing article from %s with message: %s.'
-                      % (index + 1, len(articles_raw_data), url, e),
-                      file=sys.stderr)
-                traceback.print_exc()
+                    processed_articles_count += 1
+                    processed_articles_last_id = max(processed_articles_last_id, article_id)
+                    empty_title_count += article_empty_title_count
+                    empty_author_count += article_empty_author_count
+                    empty_publication_date_count += article_empty_publication_date_count
+                    empty_perex_count += article_empty_perex_count
+                    empty_keywords_count += article_empty_keywords_count
+                    empty_article_content_count += article_empty_article_content_count
+                except StopIteration:
+                    break
+                except TimeoutError as error:
+                    print('Function took longer than 180 seconds.', file=sys.stderr)
 
         return (processed_articles, processed_articles_count, processed_articles_last_id, empty_title_count,
                 empty_author_count, empty_publication_date_count, empty_perex_count, empty_keywords_count,
                 empty_article_content_count)
+
+    @staticmethod
+    def _process_article(input_data):
+        index, total_count, id, url, title, publication_date, created_at, domain_type, article_html, debug, skip_hyperlinks = input_data
+
+        print('(%s/%s) Started processing article from %s.' % (index, total_count, url), file=sys.stderr)
+
+        out = None
+        empty_title_count = 0
+        empty_author_count = 0
+        empty_publication_date_count = 0
+        empty_perex_count = 0
+        empty_keywords_count = 0
+        empty_article_content_count = 0
+
+        try:
+            html_extractor = HtmlExtractor(domain_type, article_html, url, created_at, debug)
+
+            article_hyperlinks = html_extractor.get_all_hyperlinks()
+            article_title = html_extractor.get_title()
+            article_author = html_extractor.get_author()
+            article_publication_date = html_extractor.get_date()
+            article_perex = html_extractor.get_perex()
+            article_keywords = html_extractor.get_keywords()
+            article_content = html_extractor.get_article_content()
+
+            out = dict()
+            if title or article_title:
+                out['title'] = title if title else article_title
+            if article_author:
+                out['author'] = article_author
+            if publication_date or article_publication_date:
+                out['publication_date'] = \
+                    str(publication_date) if publication_date else str(article_publication_date)
+            if article_perex:
+                out['perex'] = article_perex
+            if article_keywords:
+                out['keywords'] = article_keywords
+            if article_content:
+                out['article_content'] = article_content
+            if article_hyperlinks and not skip_hyperlinks:
+                out['hyperlinks'] = article_hyperlinks
+
+            if not (title or article_title):
+                empty_title_count += 1
+            if not article_author:
+                empty_author_count += 1
+            if not (publication_date or article_publication_date):
+                empty_publication_date_count += 1
+            if not article_perex:
+                empty_perex_count += 1
+            if not article_keywords:
+                empty_keywords_count += 1
+            if not article_content:
+                empty_article_content_count += 1
+
+            print('(%s/%s) Finished processing article from %s.' % (index, total_count, url), file=sys.stderr)
+        except Exception as e:
+            print(
+                '(%s/%s) Error processing article from %s with message: %s.' % (index, total_count, url, e),
+                file=sys.stderr)
+            traceback.print_exc()
+
+        return (
+            index, total_count, id, out,
+            empty_title_count, empty_author_count, empty_publication_date_count,
+            empty_perex_count, empty_keywords_count, empty_article_content_count)
 
 
     def _construct_query(self, cur, domain):

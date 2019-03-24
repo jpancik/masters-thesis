@@ -113,7 +113,7 @@ class DownloadArticles:
                 except StopIteration:
                     break
                 except TimeoutError as error:
-                    print("Function took longer than %d seconds." % error.args[1], file=sys.stderr)
+                    print('Function took longer than 180 seconds.', file=sys.stderr)
 
         if cur:
             cur.close()
