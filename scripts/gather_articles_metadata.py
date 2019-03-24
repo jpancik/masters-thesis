@@ -15,7 +15,7 @@ from lib.crawler_db import connector
 class GatherArticlesMetadata:
     def __init__(self):
         self.args = self.parse_commandline()
-        self.domain_types = self._init_domain_types()
+        self.domain_types = self._init_domain_types(self.args.config)
 
         self.db_con = connector.get_db_connection()
 
@@ -28,6 +28,7 @@ class GatherArticlesMetadata:
         parser.add_argument('--dry-run', action='store_true', default=False,
                             help='Doesn\'t store results into DB and instead it prints them to stdout.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
+        parser.add_argument('--config', type=str, default='files/website_article_urls_descriptions.json', help='Specify path to the articles urls JSON configuration file.')
         return parser.parse_args()
 
     def run(self):
@@ -126,10 +127,10 @@ class GatherArticlesMetadata:
         return uploaded_count
 
     @staticmethod
-    def _init_domain_types():
+    def _init_domain_types(path_to_config):
         out = []
 
-        with open('files/website_article_urls_descriptions.json', 'r') as file:
+        with open(path_to_config, 'r') as file:
             json_data = json.load(file)
             out += JsonDomainType.get_json_domain_types(json_data)
 

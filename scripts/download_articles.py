@@ -27,10 +27,11 @@ class DownloadArticles:
         parser.add_argument('--id', type=int, default=None, help='Specify id of article to download.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
         parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
+        parser.add_argument('--config', type=str, default='files/website_article_urls_descriptions.json', help='Specify path to the articles urls JSON configuration file.')
         return parser.parse_args()
 
     def run(self):
-        domain_types = GatherArticlesMetadata._init_domain_types()
+        domain_types = GatherArticlesMetadata._init_domain_types(self.args.config)
         cur = None
         folder_name = '/tmp/'
 

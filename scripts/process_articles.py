@@ -19,7 +19,7 @@ class ProcessArticles:
 
     def __init__(self):
         self.args = self.parse_commandline()
-        self.domain_types = self._init_domain_types()
+        self.domain_types = self._init_domain_types(self.args.config)
         self.db_con = connector.get_db_connection()
 
     @staticmethod
@@ -35,6 +35,7 @@ class ProcessArticles:
         parser.add_argument('--end-id', type=int, default=None, help='Specify end if of articles to process.')
         parser.add_argument('--skip-hyperlinks', action='store_true', default=False, help='Don\'t gather all hyperlinks from article.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
+        parser.add_argument('--config', type=str, default='files/website_article_format_descriptions.json', help='Specify path to the articles format JSON configuration file.')
         return parser.parse_args()
 
     def run(self):
@@ -257,10 +258,10 @@ class ProcessArticles:
         return full_path
 
     @staticmethod
-    def _init_domain_types():
+    def _init_domain_types(path_to_config):
         out = dict()
 
-        with open('files/website_article_format_descriptions.json', 'r') as file:
+        with open(path_to_config, 'r') as file:
             json_data = json.load(file)
             out.update(JsonDomainType.get_json_domain_types(json_data))
 

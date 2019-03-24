@@ -15,10 +15,11 @@ class Watchdog:
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--threshold', type=float, default=0.3, help='Specify threshold for warnings.')
         parser.add_argument('--threshold-articles', type=float, default=0.0, help='Specify threshold for warnings for article contents.')
+        parser.add_argument('--config', type=str, default='files/website_article_format_descriptions.json', help='Specify path to the articles format JSON configuration file.')
         return parser.parse_args()
 
     def run(self):
-        domain_types = ProcessArticles._init_domain_types()
+        domain_types = ProcessArticles._init_domain_types(self.args.config)
 
         cur = self.db_con.cursor()
 
