@@ -53,25 +53,12 @@ class CreateCorpus:
                         # tee_process = subprocess.Popen(['tee'], stdin=cat_process.stdout, stdout=vertical_file)
                         # tee_process.wait()
                     else:
-                        compilecorp_process = subprocess.Popen(
+                        majka_process = subprocess.Popen(
                             ['/opt/majka_pipe/majka-czech.sh'],
                             stdin=cat_process.stdout, stdout=vertical_file, env=env_with_py2)
-                        compilecorp_process.wait()
+                        majka_process.wait()
             else:
                 print('Skipping already existing pre-vertical file %s.' % (pre_vertical_file_path))
-
-        # print('Creating a combined vertical file into %s.' % self.CONCATENATED_VERTICAL_FILE_PATH)
-        # with open(self.CONCATENATED_VERTICAL_FILE_PATH, 'w') as concatenated_vert_file:
-        #     for file_name in os.listdir(self.VERTICAL_FILES_FOLDER):
-        #         vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name)
-        #
-        #         if (vertical_file_path != self.CONCATENATED_VERTICAL_FILE_PATH
-        #                 and os.path.isfile(vertical_file_path)
-        #                 and vertical_file_path.endswith('.vert')):
-        #             print('Concatenating file %s.' % vertical_file_path)
-        #             with open(vertical_file_path, 'r') as vertical_file:
-        #                 for line in vertical_file:
-        #                     concatenated_vert_file.write(line)
 
         # Generate n-grams for plagiates analysis.
         if not os.path.isdir(self.NGRAM_FILES_FOLDER):
@@ -99,7 +86,8 @@ class CreateCorpus:
         if not self.args.debug:
             print('Running compilecorp')
             compilecorp_process = subprocess.Popen(
-                ['compilecorp', '/home/xpancik2/masters-thesis/files/compilecorp_config/dezinfo'], env=env_with_py2)
+                ['compilecorp', '--recompile-corpus','/home/xpancik2/masters-thesis/files/compilecorp_config/dezinfo'],
+                env=env_with_py2)
             compilecorp_process.wait()
 
 

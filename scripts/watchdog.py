@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 
 from lib.crawler_db import connector
@@ -6,6 +7,8 @@ from scripts.process_articles import ProcessArticles
 
 
 class Watchdog:
+    WATCHDOG_OUTPUT_FILE_PATH = 'data/watchdog_output.json'
+
     def __init__(self):
         self.args = self.parse_commandline()
         self.db_con = connector.get_db_connection()
@@ -25,15 +28,20 @@ class Watchdog:
 
         print('Checking article gathering summaries for possible errors.', file=sys.stderr)
         cur.execute(
-            'SELECT s.website_domain, s.total_articles_count FROM article_metadata_gathering_summary s '
+            'SELECT s.website_domain, s.total_articles_count, s.created_at FROM article_metadata_gathering_summary s '
             'WHERE DATE(s.created_at) = (SELECT MAX(DATE(s.created_at)) FROM article_metadata_gathering_summary s);')
         article_metadata_gathering_summaries = cur.fetchall()
 
+        no_articles_found = []
         faulty = 0
-        for website_domain, total_articles_count in article_metadata_gathering_summaries:
+        for website_domain, total_articles_count, created_at in article_metadata_gathering_summaries:
             if total_articles_count == 0:
                 faulty += 1
                 print('Error: No articles found for domain %s.' % website_domain, file=sys.stderr)
+                no_articles_found.append({
+                    'created_at': str(created_at),
+                    'website_domain': website_domain
+                })
         print('Checked %s domains and found %s possible errors.' % (len(article_metadata_gathering_summaries), faulty),
               file=sys.stderr)
 
@@ -41,14 +49,15 @@ class Watchdog:
               file=sys.stderr)
         cur.execute(
             'SELECT website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
-            'empty_perex_count, empty_keywords_count, empty_article_content_count, total_articles_processed_count '
+            'empty_perex_count, empty_keywords_count, empty_article_content_count, total_articles_processed_count, created_at '
             'FROM article_processing_summary s '
             'WHERE DATE(s.created_at) = (SELECT MAX(DATE(s.created_at)) FROM article_processing_summary s);')
         article_processing_summaries = cur.fetchall()
 
+        processing_problems = []
         for (website_domain, empty_title_count, empty_author_count, empty_publication_date_count, empty_perex_count,
              empty_keywords_count, empty_article_content_count,
-             total_articles_processed_count) in article_processing_summaries:
+             total_articles_processed_count, created_at) in article_processing_summaries:
             if website_domain not in domain_types:
                 print('Warning: Unknown website_domain %s.' % website_domain,
                       file=sys.stderr)
@@ -69,15 +78,32 @@ class Watchdog:
                     if percentage > self.args.threshold:
                         print('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, message_text),
                               file=sys.stderr)
+                        processing_problems.append({
+                            'created_at': str(created_at),
+                            'website_domain': website_domain,
+                            'text': '%.0f%% of %s empty.' % (percentage * 100, message_text)
+                        })
 
             percentage = float(empty_article_content_count) / float(total_articles_processed_count)
             if percentage > self.args.threshold_articles:
                 print('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, 'articles'),
                       file=sys.stderr)
-
+                processing_problems.append({
+                    'created_at': str(created_at),
+                    'website_domain': website_domain,
+                    'text': '%.0f%% of articles empty.' % (percentage * 100)
+                })
 
         cur.close()
         self._close_db_connection()
+
+        no_articles_found.sort(key=lambda x: x['website_domain'])
+        processing_problems.sort(key=lambda x: x['website_domain'])
+        with open(self.WATCHDOG_OUTPUT_FILE_PATH, 'w') as file:
+            file.write(json.dumps({
+                'no_articles_found': no_articles_found,
+                'processing_problems': processing_problems
+            }, indent=4, ensure_ascii=False))
 
     def _close_db_connection(self):
         if self.db_con:

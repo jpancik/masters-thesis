@@ -12,13 +12,15 @@ class PlagiarismOutputProcessor:
                  output_html_file_path, output_json_file_path,
                  output_json_graph_by_articles_file_path,
                  output_json_graph_by_words_file_path,
-                 doc_struct, doc_id, sent_struct, n=7, min_source_ngrs=10, plagiate_threshold_word_ratio=0.25):
+                 doc_struct, doc_id, sent_struct,
+                 use_threshold=True, n=7, min_source_ngrs=10, plagiate_threshold_word_ratio=0.25):
         self.dup_pos_file = dup_pos_file
         self.plag_id_file = plag_id_file
         self.input_vertical_files = input_vertical_files
         self.doc_struct = doc_struct
         self.doc_id = doc_id
-        self.sent_struct= sent_struct
+        self.sent_struct = sent_struct
+        self.use_threshold = use_threshold
         self.n = n
         self.min_source_ngrs = min_source_ngrs
         self.plagiate_threshold_word_ratio = plagiate_threshold_word_ratio
@@ -507,7 +509,7 @@ class PlagiarismOutputProcessor:
             })
 
         for (source_domain, plagiate_domain), count in links_by_article.items():
-            if count >= self.GRAPH_LINK_BY_ARTICLES_THRESHOLD:
+            if count >= self.GRAPH_LINK_BY_ARTICLES_THRESHOLD or not self.use_threshold:
                 json_data['links'].append({
                     'value': count,
                     'source': source_domain,
@@ -519,11 +521,12 @@ class PlagiarismOutputProcessor:
 
         json_data['links'] = []
         for (source_domain, plagiate_domain), count in links_by_words.items():
-            json_data['links'].append({
-                'value': count,
-                'source': source_domain,
-                'target': plagiate_domain
-            })
+            if count >= self.GRAPH_LINK_BY_WORDS_THRESHOLD or not self.use_threshold:
+                json_data['links'].append({
+                    'value': count,
+                    'source': source_domain,
+                    'target': plagiate_domain
+                })
 
         with open(self.output_json_graph_by_words_file_path, 'w') as json_file:
             json_file.write(json.dumps(json_data, indent=4))

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Dezinfo crawler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+{{header}}
+
+<main role="main" class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Watchdog possible errors</h2>
+            <div class="">
+                <h5>No articles found for these website domains</h5>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Website domain</th>
+                    <th scope="col">Gathering date</th>
+                </tr>
+                </thead>
+                <tbody id="gathering-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <div class="">
+                <h5>Problems with processing articles</h5>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Website domain</th>
+                    <th scope="col">Problem description</th>
+                    <th scope="col">Processed at</th>
+                </tr>
+                </thead>
+                <tbody id="processing-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        watchdogJson = {{watchdog_json}};
+
+        tbody = document.querySelector("#gathering-tbody");
+        no_articles_found = watchdogJson.no_articles_found;
+
+        no_articles_found_html = '';
+        for(var i = 0; i < no_articles_found.length; i++) {
+            var item = no_articles_found[i];
+            no_articles_found_html += "<tr>"
+                + "<td>" + item.website_domain + "</td>"
+                + "<td>" + item.created_at + "</td>"
+                + "</tr>";
+        }
+        tbody.innerHTML = no_articles_found_html;
+
+        tbody = document.querySelector("#processing-tbody");
+        processing_problems = watchdogJson.processing_problems;
+
+        processing_problems_html = '';
+        for(var i = 0; i < processing_problems.length; i++) {
+            var item = processing_problems[i];
+            processing_problems_html += "<tr>"
+                + "<td>" + item.website_domain + "</td>"
+                + "<td>" + item.text + "</td>"
+                + "<td>" + item.created_at + "</td>"
+                + "</tr>";
+        }
+        tbody.innerHTML = processing_problems_html;
+    </script>
+
+</main><!-- /.container -->
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
