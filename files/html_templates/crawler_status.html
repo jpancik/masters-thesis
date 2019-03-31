@@ -11,14 +11,45 @@
 
     <title>Dezinfo crawler</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Load d3.js & color scale -->
+    <script src="http://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 </head>
 <body>
 {{header}}
 
 <main role="main" class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h5>Distribution of articles by their website domains over last 24 hours:</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" id="my_dataviz">
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
+            <h5>Articles count gathered by day:</h5>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Article count</th>
+                </tr>
+                </thead>
+                <tbody id="articles-count-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <br />
             <h2>Watchdog possible errors</h2>
             <div class="">
                 <h5>No articles found for these website domains</h5>
@@ -26,7 +57,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -48,7 +79,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -62,35 +93,57 @@
             </table>
         </div>
     </div>
+    <script src="crawler_status.js"></script>
     <script>
         watchdogJson = {{watchdog_json}};
 
-        tbody = document.querySelector("#gathering-tbody");
-        no_articles_found = watchdogJson.no_articles_found;
+        (function() {
+            tbody = document.querySelector("#gathering-tbody");
+            no_articles_found = watchdogJson.no_articles_found;
 
-        no_articles_found_html = '';
-        for(var i = 0; i < no_articles_found.length; i++) {
-            var item = no_articles_found[i];
-            no_articles_found_html += "<tr>"
-                + "<td>" + item.website_domain + "</td>"
-                + "<td>" + item.created_at + "</td>"
-                + "</tr>";
-        }
-        tbody.innerHTML = no_articles_found_html;
+            no_articles_found_html = '';
+            for (var i = 0; i < no_articles_found.length; i++) {
+                var item = no_articles_found[i];
+                no_articles_found_html += "<tr>"
+                    + "<td>" + item.website_domain + "</td>"
+                    + "<td>" + item.created_at + "</td>"
+                    + "</tr>";
+            }
+            tbody.innerHTML = no_articles_found_html;
+        })();
 
-        tbody = document.querySelector("#processing-tbody");
-        processing_problems = watchdogJson.processing_problems;
+        (function() {
+            tbody = document.querySelector("#processing-tbody");
+            processing_problems = watchdogJson.processing_problems;
 
-        processing_problems_html = '';
-        for(var i = 0; i < processing_problems.length; i++) {
-            var item = processing_problems[i];
-            processing_problems_html += "<tr>"
-                + "<td>" + item.website_domain + "</td>"
-                + "<td>" + item.text + "</td>"
-                + "<td>" + item.created_at + "</td>"
-                + "</tr>";
-        }
-        tbody.innerHTML = processing_problems_html;
+            processing_problems_html = '';
+            for(var i = 0; i < processing_problems.length; i++) {
+                var item = processing_problems[i];
+                processing_problems_html += "<tr>"
+                    + "<td>" + item.website_domain + "</td>"
+                    + "<td>" + item.text + "</td>"
+                    + "<td>" + item.created_at + "</td>"
+                    + "</tr>";
+            }
+            tbody.innerHTML = processing_problems_html;
+        })();
+
+        (function() {
+            tbody = document.querySelector("#articles-count-tbody");
+            articles_count_per_day = watchdogJson.articles_count_per_day;
+
+            articles_count_per_day_html = '';
+            for(var i = 0; i < articles_count_per_day.length; i++) {
+                var item = articles_count_per_day[i];
+                articles_count_per_day_html += "<tr>"
+                    + "<td>" + item.date + "</td>"
+                    + "<td>" + item.count + "</td>"
+                    + "</tr>";
+            }
+            tbody.innerHTML = articles_count_per_day_html;
+        })();
+
+        createChart(watchdogJson.website_domain_last_24_hours);
     </script>
 
 </main><!-- /.container -->

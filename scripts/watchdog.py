@@ -94,6 +94,23 @@ class Watchdog:
                     'text': '%.0f%% of articles empty.' % (percentage * 100)
                 })
 
+        cur.execute('SELECT DATE(a.created_at), COUNT(*) FROM article_metadata a '
+                    'GROUP BY DATE(a.created_at) '
+                    'ORDER BY DATE(a.created_at) DESC LIMIT 10;')
+        articles_count_per_day = []
+        for date, count in cur.fetchall():
+            articles_count_per_day.append({
+                'date': str(date),
+                'count': count
+            })
+
+        cur.execute('SELECT a.website_domain, COUNT(*) FROM article_metadata a '
+                    'WHERE a.created_at >= (NOW() - INTERVAL \'24 HOUR\') '
+                    'GROUP BY a.website_domain;')
+        website_domains_last_24_hours = dict()
+        for website_domain, count in cur.fetchall():
+            website_domains_last_24_hours[website_domain] = count
+
         cur.close()
         self._close_db_connection()
 
@@ -102,7 +119,9 @@ class Watchdog:
         with open(self.WATCHDOG_OUTPUT_FILE_PATH, 'w') as file:
             file.write(json.dumps({
                 'no_articles_found': no_articles_found,
-                'processing_problems': processing_problems
+                'processing_problems': processing_problems,
+                'articles_count_per_day': articles_count_per_day,
+                'website_domain_last_24_hours': website_domains_last_24_hours
             }, indent=4, ensure_ascii=False))
 
     def _close_db_connection(self):

@@ -46,6 +46,8 @@ class GenerateHtml:
     def _prepare_crawler_status_page(self):
         html_file_path = os.path.join(self.args.output, self.CRAWLER_STATUS_FILENAME)
 
+        shutil.copy2('files/html_templates/crawler_status.js', os.path.join(self.args.output, 'crawler_status.js'))
+
         with open(html_file_path, 'w') as html_file, open('data/watchdog_output.json', 'r') as watchdog_json:
             html_file.write(self._load_template('files/html_templates/crawler_status.html', {
                 'watchdog_json': watchdog_json.read()
@@ -159,7 +161,6 @@ class GenerateHtml:
 
         for tag in re.findall('{{([^}]+)}}', content):
             if tag in args_dict:
-                print('Replacing %s tag.' % (tag), file=sys.stderr)
                 content = content.replace('{{%s}}' % tag, args_dict[tag])
 
         return content
