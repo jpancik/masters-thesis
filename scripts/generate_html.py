@@ -13,6 +13,7 @@ class GenerateHtml:
     ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_ALL_TIME = 'plagiarism_by_words_all_time.html'
     ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_TWO_WEEKS = 'plagiarism_by_articles_two_weeks.html'
     ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_TWO_WEEKS = 'plagiarism_by_words_two_weeks.html'
+    ANALYSIS_HYPERLINKS_ALL_TIME = 'hyperlinks_all_time.html'
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -30,10 +31,12 @@ class GenerateHtml:
             os.makedirs(self.args.output)
 
         shutil.copy2('files/html_templates/style.css', os.path.join(self.args.output, 'style.css'))
+        shutil.copy2('files/html_templates/directed_graph.js', os.path.join(self.args.output, 'directed_graph.js'))
 
         self._prepare_index_page()
         self._prepare_crawler_status_page()
         self._prepare_analysis_plagiarism_page()
+        self._prepare_analysis_hyperlinks_page()
 
     def _prepare_index_page(self):
         html_file_path = os.path.join(self.args.output, self.INDEX_PAGE_FILENAME)
@@ -59,7 +62,6 @@ class GenerateHtml:
         by_articles_file_path_two_weeks = os.path.join(self.args.output, self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_TWO_WEEKS)
         by_words_file_path_two_weeks = os.path.join(self.args.output, self.ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_TWO_WEEKS)
 
-        shutil.copy2('files/html_templates/plagiarism.js', os.path.join(self.args.output, 'plagiarism.js'))
         shutil.copy2('data/analysis/plagiarism/plagiarism_all_time.json', os.path.join(self.args.output, 'plagiarism_all_time.json'))
         shutil.copy2('data/analysis/plagiarism/plagiarism_two_weeks.json', os.path.join(self.args.output, 'plagiarism_two_weeks.json'))
 
@@ -135,6 +137,22 @@ class GenerateHtml:
                        self.ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_TWO_WEEKS,
                        'plagiarism_two_weeks.json')
             }, active_tab='dropdown'))
+
+    def _prepare_analysis_hyperlinks_page(self):
+        hyperlinks_file_path_all_time = os.path.join(self.args.output, self.ANALYSIS_HYPERLINKS_ALL_TIME)
+
+        shutil.copy2('data/analysis/hyperlinks/data_all_time.json', os.path.join(self.args.output, 'data_all_time.json'))
+
+        with open(hyperlinks_file_path_all_time, 'w') as html_file,\
+                open('data/analysis/hyperlinks/graph_all_time.json', 'r') as graph_json:
+            html_file.write(self._load_template('files/html_templates/hyperlinks.html', {
+                'graph_json': graph_json.read(),
+                'type_selector':
+                    'graph | '
+                    '<a href="%s">JSON data</a> '
+                    % ('data_all_time.json')
+            }, active_tab='dropdown'))
+
 
     @staticmethod
     def _load_template(filename, args_dict, active_tab=None):

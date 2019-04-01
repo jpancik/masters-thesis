@@ -1,53 +1,54 @@
 // Source from: https://bl.ocks.org/martinjc/e4c013dab1fabb2e02e2ee3bc6e1b49d
 // Released under the The MIT License.
 
-// dimensions
-var width = 1000;
-var height = 1000;
-
-var margin = {
-    top: 50,
-    bottom: 50,
-    left: 50,
-    right: 50,
-};
-
-// create an svg to draw in
-var svg = d3.select("#graph")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append('g')
-    .attr('transform', 'translate(' + margin.top + ',' + margin.left + ')');
-
-width = width - margin.left - margin.right;
-height = height - margin.top - margin.bottom;
-
-var linkWidthScale = d3.scaleLinear()
-    .range([1, 15]);
-var linkStrengthScale = d3.scaleLinear()
-    .range([0, 0.45]);
-
-var simulation = d3.forceSimulation()
-    // pull nodes together based on the links between them
-    .force("link", d3.forceLink()
-        .id(function(d) {
-            return d.id;
-        })
-        .strength(function(d) {
-            return linkStrengthScale(d.value);
-        }))
-    // push nodes apart to space them out
-    .force("charge", d3.forceManyBody()
-        .strength(-20))
-    // add some collision detection so they don't overlap
-    .force("collide", d3.forceCollide()
-        .radius(70))
-    // and draw them around the centre of the space
-    .force("center", d3.forceCenter(width / 2, height / 2));
-
 // load the graph
 loadGraph = function(graph) {
+    // dimensions
+    var width = document.getElementById('graph').clientWidth;
+    var height = width;
+
+    var margin = {
+        top: 50,
+        bottom: 50,
+        left: 50,
+        right: 250,
+    };
+
+    // create an svg to draw in
+    var svg = d3.select("#graph")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append('g')
+        .attr('transform', 'translate(' + margin.top + ',' + margin.left + ')');
+
+    width = width - margin.left - margin.right;
+    height = height - margin.top - margin.bottom;
+
+    var linkWidthScale = d3.scaleLinear()
+        .range([1, 15]);
+    var linkStrengthScale = d3.scaleLinear()
+        .range([0, 0.45]);
+
+    var simulation = d3.forceSimulation()
+        // pull nodes together based on the links between them
+        .force("link", d3.forceLink()
+            .id(function(d) {
+                return d.id;
+            })
+            .strength(function(d) {
+                return linkStrengthScale(d.value);
+            }))
+        // push nodes apart to space them out
+        .force("charge", d3.forceManyBody()
+            .strength(-20))
+        // add some collision detection so they don't overlap
+        .force("collide", d3.forceCollide()
+            .radius(70))
+        // and draw them around the centre of the space
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+
     // set the nodes
     var nodes = graph.nodes;
     // links between nodes
@@ -97,7 +98,7 @@ loadGraph = function(graph) {
 
     // add a label to each node
     node.append("text")
-        .attr("dx", 12)
+        .attr("dx", 15)
         .attr("dy", ".35em")
         .text(function(d) {
             return d.name;
@@ -205,22 +206,4 @@ loadGraph = function(graph) {
         link.style("stroke-opacity", 1);
         link.style("stroke", "#ddd");
     }
-};
-
-loadStatistics = function(graph) {
-    tbody = document.querySelector("#statistics-tbody");
-    statistics = graph.statistics;
-
-    statistics_html = '';
-    for(var i = 0; i < statistics.length; i++) {
-        var item = statistics[i];
-        statistics_html += "<tr>"
-            + "<td>" + item[0] + "</td>"
-            + "<td class='text-center'>" + item[1] + "</td>"
-            + "<td class='text-center'>" + item[2] + "</td>"
-            + "<td class='text-center'>" + item[3] + " %</td>"
-            + "<td>" + item[4][0] + " (" + item[4][1] + " articles)</td>"
-            + "</tr>";
-    }
-    tbody.innerHTML = statistics_html;
 };

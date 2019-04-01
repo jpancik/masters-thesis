@@ -1,9 +1,13 @@
 import argparse
+import json
+import math
 import os
 import sys
 import ntpath
 from datetime import datetime, timedelta
+from urllib.parse import urlparse
 
+from lib.crawler_db import connector
 from lib.plagiarism_detector.plagiarism_detector import PlagiarismDetector
 from lib.plagiarism_detector.plagiarism_output_processor import PlagiarismOutputProcessor
 from scripts.create_corpus import CreateCorpus
@@ -11,22 +15,29 @@ from scripts.create_preverticals import CreatePreverticals
 
 
 class DoAnalysis:
-    OUTPUT_FILE_PATH_DUPLICATE_POSITIONS = 'data/analysis/plagiarism/duplicates_output'
-    OUTPUT_FILE_PATH_PLAGIATES = 'data/analysis/plagiarism/plagiates_output'
-    OUTPUT_FILE_PATH_PLAGIARISM_HTML = 'data/analysis/plagiarism/plagiarism_debug'
-    OUTPUT_FILE_PATH_PLAGIARISM_JSON = 'data/analysis/plagiarism/plagiarism'
-    OUTPUT_FILE_PATH_JSON_GRAPH_BY_ARTICLES = 'data/analysis/plagiarism/plagiarism_graph_by_articles'
-    OUTPUT_FILE_PATH_JSON_GRAPH_BY_WORDS = 'data/analysis/plagiarism/plagiarism_graph_by_words'
-
     VERTICAL_FILES_FOLDER = CreatePreverticals.VERTICAL_FILES_FOLDER
     NGRAM_FILES_FOLDER = CreateCorpus.NGRAM_FILES_FOLDER
-    ANALYSIS_PLAGIARISM_FOLDER = 'data/analysis/plagiarism'
+    PLAGIARISM_FOLDER = 'data/analysis/plagiarism/'
+    PLAGIARISM_OUTPUT_DUPLICATE_POSITIONS = os.path.join(PLAGIARISM_FOLDER, 'duplicates_output')
+    PLAGIARISM_OUTPUT_PLAGIATES = os.path.join(PLAGIARISM_FOLDER, 'plagiates_output')
+    PLAGIARISM_OUTPUT_PLAGIARISM_HTML = os.path.join(PLAGIARISM_FOLDER, 'plagiarism_debug')
+    PLAGIARISM_OUTPUT_PLAGIARISM_JSON = os.path.join(PLAGIARISM_FOLDER, 'plagiarism')
+    PLAGIARISM_OUTPUT_JSON_GRAPH_BY_ARTICLES = os.path.join(PLAGIARISM_FOLDER, 'plagiarism_graph_by_articles')
+    PLAGIARISM_OUTPUT_JSON_GRAPH_BY_WORDS = os.path.join(PLAGIARISM_FOLDER, 'plagiarism_graph_by_words')
+
+    HYPERLINKS_FOLDER = 'data/analysis/hyperlinks/'
+    HYPERLINKS_OUTPUT_JSON_GRAPH = os.path.join(HYPERLINKS_FOLDER, 'graph_all_time.json')
+    HYPERLINKS_OUTPUT_JSON_DATA = os.path.join(HYPERLINKS_FOLDER, 'data_all_time.json')
+    HYPERLINKS_GRAPH_LINK_THRESHOLD = 5
+
     WORK_TYPES = [
-        'plagiates'
+        'plagiates',
+        'hyperlinks',
     ]
 
     def __init__(self):
         self.args = self.parse_commandline()
+        self.db_con = connector.get_db_connection()
 
     def parse_commandline(self):
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -39,6 +50,10 @@ class DoAnalysis:
     def run(self):
         if self.args.work_type == 'plagiates':
             self.find_plagiates()
+        elif self.args.work_type == 'hyperlinks':
+            self.analyze_hyperlinks()
+
+        self._close_db_connection()
 
     def find_plagiates(self):
         if not os.path.isdir(self.NGRAM_FILES_FOLDER):
@@ -48,8 +63,8 @@ class DoAnalysis:
             print('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER, file=sys.stderr)
             return
 
-        if not os.path.isdir(self.ANALYSIS_PLAGIARISM_FOLDER):
-            os.makedirs(self.ANALYSIS_PLAGIARISM_FOLDER)
+        if not os.path.isdir(self.PLAGIARISM_FOLDER):
+            os.makedirs(self.PLAGIARISM_FOLDER)
 
         input_ngrams_files = []
         input_vertical_files = []
@@ -86,8 +101,8 @@ class DoAnalysis:
             two_weeks_vertical_files
         ]
         for i in range(2):
-            output_file_path_duplicate_position_all_time = '%s%s' % (self.OUTPUT_FILE_PATH_DUPLICATE_POSITIONS, suffixes[i])
-            output_file_path_plagiates_all_time = '%s%s' % (self.OUTPUT_FILE_PATH_PLAGIATES, suffixes[i])
+            output_file_path_duplicate_position_all_time = '%s%s' % (self.PLAGIARISM_OUTPUT_DUPLICATE_POSITIONS, suffixes[i])
+            output_file_path_plagiates_all_time = '%s%s' % (self.PLAGIARISM_OUTPUT_PLAGIATES, suffixes[i])
 
             print('Running plagiarism detector on %s.' % suffixes[i], file=sys.stderr)
             plagiarism_detector = PlagiarismDetector(
@@ -101,18 +116,120 @@ class DoAnalysis:
                 output_file_path_duplicate_position_all_time,
                 output_file_path_plagiates_all_time,
                 input_verticals[i],
-                '%s%s.html' % (self.OUTPUT_FILE_PATH_PLAGIARISM_HTML, suffixes[i]),
-                '%s%s.json' % (self.OUTPUT_FILE_PATH_PLAGIARISM_JSON, suffixes[i]),
-                '%s%s.json' % (self.OUTPUT_FILE_PATH_JSON_GRAPH_BY_ARTICLES, suffixes[i]),
-                '%s%s.json' % (self.OUTPUT_FILE_PATH_JSON_GRAPH_BY_WORDS, suffixes[i]),
+                '%s%s.html' % (self.PLAGIARISM_OUTPUT_PLAGIARISM_HTML, suffixes[i]),
+                '%s%s.json' % (self.PLAGIARISM_OUTPUT_PLAGIARISM_JSON, suffixes[i]),
+                '%s%s.json' % (self.PLAGIARISM_OUTPUT_JSON_GRAPH_BY_ARTICLES, suffixes[i]),
+                '%s%s.json' % (self.PLAGIARISM_OUTPUT_JSON_GRAPH_BY_WORDS, suffixes[i]),
                 'doc', 'dbid', 's',
                 use_threshold=(i == 0)
             )
             plagiarism_output_processor.run()
 
+    def analyze_hyperlinks(self):
+        if not os.path.isdir(self.HYPERLINKS_FOLDER):
+            os.makedirs(self.HYPERLINKS_FOLDER)
 
+        cur = self.db_con.cursor()
 
+        print('Retrieving all processed articles.', file=sys.stderr)
+        cur.execute('SELECT a.id, a.url, d.filename FROM article_processed_data d '
+                    'JOIN article_metadata a ON a.id = d.article_metadata_id')
+        rows = cur.fetchall()
+        print('Finished retrieving all processed articles.', file=sys.stderr)
 
+        print('Loading hyperlinks from processed JSON files.', file=sys.stderr)
+
+        # id_by_url: (netloc, path) : (article_id, article_url)
+        id_by_url = dict()
+        # hyperlinks_by_id: (article_id, article_url) : [hyperlinks]
+        hyperlinks_in_files = dict()
+
+        for index, (article_id, article_url, article_filename) in enumerate(rows):
+            if os.path.exists(article_filename):
+                with open(article_filename, 'r') as json_file:
+                    data = json.load(json_file)
+
+                    if 'hyperlinks' in data:
+                        hyperlinks_in_files[(article_id, article_url)] = data['hyperlinks']
+                    else:
+                        hyperlinks_in_files[(article_id, article_url)] = []
+
+                    parsed_url = urlparse(article_url)
+                    id_by_url[(parsed_url.netloc, parsed_url.path)] = (article_id, article_url)
+
+            if index % int(len(rows)/10) == 0 and math.ceil(index/len(rows) * 100.0) != 100:
+                print('%.0f%%' % math.ceil(index/len(rows) * 100.0), end='....', file=sys.stderr)
+                sys.stderr.flush()
+        print('\nFinished loading hyperlinks from processed JSON files.', file=sys.stderr)
+
+        print('Analyzing hyperlinks...', file=sys.stderr)
+        # raw_data: source_url: [reference_urls]
+        raw_data = dict()
+        links = dict()
+        for index, ((article_id, article_url), hyperlinks) in enumerate(hyperlinks_in_files.items()):
+            for hyperlink in hyperlinks:
+                parsed_url = urlparse(hyperlink)
+                key = (parsed_url.netloc, parsed_url.path)
+
+                if key in id_by_url:
+                    source_netloc = urlparse(article_url).netloc
+                    target_article_url = id_by_url[key][1]
+                    target_netloc = urlparse(target_article_url).netloc
+                    if source_netloc != target_netloc:
+                        link_key = (source_netloc, target_netloc)
+                        if link_key in links:
+                            links[link_key] += 1
+                        else:
+                            links[link_key] = 1
+
+                        if article_url not in raw_data:
+                            raw_data[article_url] = [target_article_url]
+                        else:
+                            raw_data[article_url].append(target_article_url)
+
+            if index % int(len(hyperlinks_in_files)/10) == 0 and math.ceil(index/len(hyperlinks_in_files) * 100.0) != 100:
+                print('%.0f%%' % math.ceil(index/len(hyperlinks_in_files) * 100.0), end='....', file=sys.stderr)
+                sys.stderr.flush()
+        print('\nFinished analyzing hyperlinks.', file=sys.stderr)
+
+        with open(self.HYPERLINKS_OUTPUT_JSON_DATA, 'w') as output_file:
+            output_file.write(json.dumps(raw_data, indent=4, ensure_ascii=False))
+
+        graph_json_data = {
+            'nodes': [],
+            'links': []
+        }
+        domains = set()
+        for (source, target), count in links.items():
+            if count >= self.HYPERLINKS_GRAPH_LINK_THRESHOLD:
+                domains.add(source)
+                domains.add(target)
+                graph_json_data['links'].append({
+                    'value': count,
+                    'source': source,
+                    'target': target
+                })
+
+        colors = PlagiarismOutputProcessor.get_spaced_colors(len(domains))
+        graph_json_data['nodes'] = [{
+                'domain': x,
+                'name': x,
+                'id': x,
+                'color': '#%02x%02x%02x' % colors[index]
+            }
+            for (index, x) in enumerate(domains)]
+
+        graph_json_data['links'].sort(key=lambda val: (val['source'], -val['value']))
+
+        with open(self.HYPERLINKS_OUTPUT_JSON_GRAPH, 'w') as output_file:
+            output_file.write(json.dumps(graph_json_data, indent=4, ensure_ascii=False))
+
+        if cur:
+            cur.close()
+
+    def _close_db_connection(self):
+        if self.db_con:
+            self.db_con.close()
 
 
 if __name__ == '__main__':
