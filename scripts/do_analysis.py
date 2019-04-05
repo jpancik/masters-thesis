@@ -30,9 +30,13 @@ class DoAnalysis:
     HYPERLINKS_OUTPUT_JSON_DATA = os.path.join(HYPERLINKS_FOLDER, 'data_all_time.json')
     HYPERLINKS_GRAPH_LINK_THRESHOLD = 5
 
+    KEYWORDS_OUTPUT_JSON_DATA = 'data/analysis/keywords.json'
+    TERMS_OUTPUT_JSON_DATA = 'data/analysis/terms.json'
+
     WORK_TYPES = [
         'plagiates',
         'hyperlinks',
+        'keywords+terms'
     ]
 
     def __init__(self):
@@ -52,6 +56,8 @@ class DoAnalysis:
             self.find_plagiates()
         elif self.args.work_type == 'hyperlinks':
             self.analyze_hyperlinks()
+        elif self.args.work_type == 'keywords+terms':
+            self.analyze_keywords_and_terms()
 
         self._close_db_connection()
 
@@ -226,6 +232,18 @@ class DoAnalysis:
 
         if cur:
             cur.close()
+
+    def analyze_keywords_and_terms(self):
+        # Read API key from file.
+        # Do request: https://ske.fi.muni.cz/bonito/run.cgi/extract_keywords?corpname=dezinfo&ref_corpname=preloaded%2Fczes2&simple_n=1&max_terms=100&alnum=0&onealpha=1&minfreq=1&format=json&attr=lemma
+        with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file,\
+             open('files/tmp_keywords_response.json', 'r') as tmp_response:
+            keywords_file.write(tmp_response.read())
+
+        # Do request: https://ske.fi.muni.cz/bonito/run.cgi/extract_terms?corpname=dezinfo&ref_corpname=preloaded%2Fcztenten12_8_sample&simple_n=1&max_terms=100&max_keywords=100&alnum=0&onealpha=1&minfreq=1&format=json&attr=lemma
+        with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file,\
+             open('files/tmp_terms_response.json', 'r') as tmp_response:
+            terms_file.write(tmp_response.read())
 
     def _close_db_connection(self):
         if self.db_con:

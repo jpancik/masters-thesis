@@ -176,7 +176,7 @@ class ProcessArticles:
                         json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
                         file_path = self._store_processed_article(article_id, domain_type, json_data)
                         processed_articles.append((article_id, file_path))
-                        print('(%s/%s) Stored response in %s.' % (index, total_count, file_path), file=sys.stderr)
+                        print('(%s/%s) Stored result in %s.' % (index, total_count, file_path), file=sys.stderr)
 
                     processed_articles_count += 1
                     processed_articles_last_id = max(processed_articles_last_id, article_id)

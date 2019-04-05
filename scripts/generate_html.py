@@ -14,6 +14,7 @@ class GenerateHtml:
     ANALYSIS_PLAGIARISM_BY_ARTICLES_PAGE_FILENAME_TWO_WEEKS = 'plagiarism_by_articles_two_weeks.html'
     ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_TWO_WEEKS = 'plagiarism_by_words_two_weeks.html'
     ANALYSIS_HYPERLINKS_ALL_TIME = 'hyperlinks_all_time.html'
+    ANALYSIS_KEYWORDS_TERMS = 'keywords_terms.html'
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -37,6 +38,7 @@ class GenerateHtml:
         self._prepare_crawler_status_page()
         self._prepare_analysis_plagiarism_page()
         self._prepare_analysis_hyperlinks_page()
+        self._prepare_analysis_keywords_terms()
 
     def _prepare_index_page(self):
         html_file_path = os.path.join(self.args.output, self.INDEX_PAGE_FILENAME)
@@ -153,6 +155,24 @@ class GenerateHtml:
                     % ('data_all_time.json')
             }, active_tab='dropdown'))
 
+
+    def _prepare_analysis_keywords_terms(self):
+        keywords_terms_html_file_path = os.path.join(self.args.output, self.ANALYSIS_KEYWORDS_TERMS)
+
+        shutil.copy2('data/analysis/keywords.json', os.path.join(self.args.output, 'keywords.json'))
+        shutil.copy2('data/analysis/terms.json', os.path.join(self.args.output, 'terms.json'))
+
+        with open(keywords_terms_html_file_path, 'w') as html_file,\
+                open('data/analysis/keywords.json', 'r') as keywords_json,\
+                open('data/analysis/terms.json', 'r') as terms_json:
+            html_file.write(self._load_template('files/html_templates/keywords_terms.html', {
+                'keywords_json': keywords_json.read(),
+                'terms_json': terms_json.read(),
+                'type_selector':
+                    '<a href="%s">keywords JSON</a> | '
+                    '<a href="%s">terms JSON</a>'
+                    % ('keywords.json', 'terms.json')
+            }, active_tab='dropdown'))
 
     @staticmethod
     def _load_template(filename, args_dict, active_tab=None):
