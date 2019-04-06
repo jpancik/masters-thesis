@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
 from lib.crawler_db import connector
+from lib.keywords_analyzer.keywords_extractor import KeywordsPerDomainExtractor
 from lib.plagiarism_detector.plagiarism_detector import PlagiarismDetector
 from lib.plagiarism_detector.plagiarism_output_processor import PlagiarismOutputProcessor
 from scripts.create_corpus import CreateCorpus
@@ -36,7 +37,8 @@ class DoAnalysis:
     WORK_TYPES = [
         'plagiates',
         'hyperlinks',
-        'keywords+terms'
+        'keywords+terms',
+        'keywords_per_domain'
     ]
 
     def __init__(self):
@@ -47,17 +49,19 @@ class DoAnalysis:
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--dry-run', action='store_true', default=False,
                             help='Don\'t store output and print it to stdout.')
-        parser.add_argument('--work-type', type=str, choices=self.WORK_TYPES, required=True,
+        parser.add_argument('--type', type=str, choices=self.WORK_TYPES, required=True,
                             help='Type of scrape work to perform')
         return parser.parse_args()
 
     def run(self):
-        if self.args.work_type == 'plagiates':
+        if self.args.type == 'plagiates':
             self.find_plagiates()
-        elif self.args.work_type == 'hyperlinks':
+        elif self.args.type == 'hyperlinks':
             self.analyze_hyperlinks()
-        elif self.args.work_type == 'keywords+terms':
+        elif self.args.type == 'keywords+terms':
             self.analyze_keywords_and_terms()
+        elif self.args.type == 'keywords_per_domain':
+            self.analyze_keywords_per_domain()
 
         self._close_db_connection()
 
@@ -244,6 +248,26 @@ class DoAnalysis:
         with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file,\
              open('files/tmp_terms_response.json', 'r') as tmp_response:
             terms_file.write(tmp_response.read())
+
+    def analyze_keywords_per_domain(self):
+        if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
+            print('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER, file=sys.stderr)
+            return
+
+        input_vertical_files = []
+        for file_name in os.listdir(self.VERTICAL_FILES_FOLDER):
+            vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name)
+
+            if os.path.isfile(vertical_file_path) and vertical_file_path.endswith('.vert'):
+                print('Found vertical file %s.' % (vertical_file_path), file=sys.stderr)
+                input_vertical_files.append(vertical_file_path)
+
+        keywords_extractor = KeywordsPerDomainExtractor(
+            input_vertical_files,
+            'data/analysis/keywords_per_domain.json'
+        )
+        keywords_extractor.run()
+
 
     def _close_db_connection(self):
         if self.db_con:
