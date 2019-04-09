@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 class KeywordsPerDomainExtractor:
     KEYWORDS_COUNT_THRESHOLD = 5
     KEYWORDS_LENGTH_THRESHOLD = 3
+    PREFIX_BLACKLIST = ['twitter', 'facebook']
 
     def __init__(self, input_vertical_files,
                  output_file_keywords=None):
@@ -70,6 +71,12 @@ class KeywordsPerDomainExtractor:
                 if count < self.KEYWORDS_COUNT_THRESHOLD or len(word) <= self.KEYWORDS_LENGTH_THRESHOLD:
                     to_remove.append(word)
                     removed_words += count
+                else:
+                    for blacklisted_prefix in self.PREFIX_BLACKLIST:
+                        if word.lower().startswith(blacklisted_prefix):
+                            to_remove.append(word)
+                            removed_words += count
+                            break
 
             for word_to_remove in to_remove:
                 del words_count[word_to_remove]

@@ -55,16 +55,16 @@
         tbody = document.querySelector("#statistics-tbody");
         statistics = graph.links;
 
-        statistics_html = '';
+        table_html = '';
         for(var i = 0; i < statistics.length; i++) {
             var item = statistics[i];
-            statistics_html += "<tr>"
+            table_html += "<tr>"
                 + "<td>" + item.source.domain + "</td>"
                 + "<td>" + item.target.domain + "</td>"
                 + "<td>" + item.value + "</td>"
                 + "</tr>";
         }
-        tbody.innerHTML = statistics_html;
+        tbody.innerHTML = table_html;
     };
     loadStatistics(graphJson);
 </script>

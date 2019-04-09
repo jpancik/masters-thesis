@@ -15,6 +15,7 @@ class GenerateHtml:
     ANALYSIS_PLAGIARISM_BY_WORDS_PAGE_FILENAME_TWO_WEEKS = 'plagiarism_by_words_two_weeks.html'
     ANALYSIS_HYPERLINKS_ALL_TIME = 'hyperlinks_all_time.html'
     ANALYSIS_KEYWORDS_TERMS = 'keywords_terms.html'
+    ANALYSIS_KEYWORDS_PER_DOMAIN = 'keywords_per_domain.html'
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -39,6 +40,7 @@ class GenerateHtml:
         self._prepare_analysis_plagiarism_page()
         self._prepare_analysis_hyperlinks_page()
         self._prepare_analysis_keywords_terms()
+        self._prepare_analysis_keywords_per_domain()
 
     def _prepare_index_page(self):
         html_file_path = os.path.join(self.args.output, self.INDEX_PAGE_FILENAME)
@@ -172,6 +174,19 @@ class GenerateHtml:
                     '<a href="%s">keywords JSON</a> | '
                     '<a href="%s">terms JSON</a>'
                     % ('keywords.json', 'terms.json')
+            }, active_tab='dropdown'))
+
+    def _prepare_analysis_keywords_per_domain(self):
+        keywords_per_domain_html_file_path = os.path.join(self.args.output, self.ANALYSIS_KEYWORDS_PER_DOMAIN)
+
+        shutil.copy2('data/analysis/keywords_per_domain.json', os.path.join(self.args.output, 'keywords_per_domain.json'))
+        shutil.copy2('files/html_templates/d3cloud.js', os.path.join(self.args.output, 'd3cloud.js'))
+
+        with open(keywords_per_domain_html_file_path, 'w') as html_file, \
+                open('data/analysis/keywords_per_domain.json', 'r') as keywords_json:
+            html_file.write(self._load_template('files/html_templates/keywords_per_domain.html', {
+                'keywords_json': keywords_json.read(),
+                'type_selector': '<a href="%s">keywords per domain JSON</a>' % ('keywords_per_domain.json')
             }, active_tab='dropdown'))
 
     @staticmethod

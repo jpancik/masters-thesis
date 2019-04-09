@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Dezinfo crawler</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="d3cloud.js"></script>
+</head>
+<body>
+{{header}}
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <p>{{type_selector}}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center" id="domain-select">
+        </div>
+    </div>
+    <div class="row">
+        <div id="graph" class="col-md-12">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Keywords</h3>
+            <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Keyword</th>
+                <th scope="col">How many times more this keyword appears</th>
+                <th scope="col">Count in dezinfo corpus</th>
+            </tr>
+            </thead>
+            <tbody id="keywords-tbody">
+            </tbody>
+            </table>
+        </div>
+    </div>
+</main><!-- /.container -->
+<script>
+    keywordsJson = {{keywords_json}};
+
+    // Fill selector.
+    select_div = document.querySelector("#domain-select");
+    select_html = '<span>Select website domain: </span> <select>';
+    for(var key in keywordsJson) {
+        option = '<option value="' + key + '">' + key + '</option>';
+        select_html += option;
+    }
+    select_html += '</select>';
+    select_div.innerHTML = select_html;
+
+    domain_select = document.querySelector("#domain-select select");
+    domain_select.onchange = function(e) {
+        domain = domain_select.value;
+        createCloud(domain);
+        loadStatistics(domain)
+    };
+
+    createCloud = function (domain) {
+        document.getElementById('graph').innerHTML = '';
+
+        keywords = keywordsJson[domain];
+
+        var width = document.getElementById('graph').clientWidth;
+        var height = width/2;
+        var margin = {top: 20, right: 20, bottom: 40, left: 20};
+
+        var categories = d3.keys(d3.nest().key(function (d) {
+            return d.keyword;
+        }).map(keywords));
+        var color = d3.scale.ordinal().range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"]);
+        var fontSize = d3.scale.pow().exponent(1.5)
+            .domain([keywords[keywords.length - 1].ratio, keywords[0].ratio]).range([20, 80]);
+
+        var layout = d3.layout.cloud()
+            .timeInterval(10)
+            .size([width, height])
+            .words(keywords)
+            .rotate(function (d) {
+                return 0;
+            })
+            .font('monospace')
+            .fontSize(function (d, i) {
+                return fontSize(d.ratio);
+            })
+            .text(function (d) {
+                return d.keyword;
+            })
+            .spiral("archimedean")
+            .on("end", draw)
+            .start();
+
+        var svg = d3.select('#graph').append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var wordcloud = svg.append("g")
+            .attr('class', 'wordcloud')
+            .attr("transform", "translate(" + (width - margin.left - margin.right) / 2 + "," + (height - margin.top - margin.bottom) / 2 + ")");
+
+        function draw(words) {
+            wordcloud.selectAll("text")
+                .data(keywords)
+                .enter().append("text")
+                .attr('class', 'word')
+                .style("font-size", function (d) {
+                    return d.size + "px";
+                })
+                .style("font-family", function (d) {
+                    return d.font;
+                })
+                .style("fill", function (d) {
+                    var paringObject = keywords.filter(function (obj) {
+                        return obj.keyword === d.text
+                    });
+                    return color(paringObject[0].keyword);
+                })
+                .attr("text-anchor", "middle")
+                .attr("transform", function (d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function (d) {
+                    return d.text;
+                });
+        }
+    };
+    createCloud('www.parlamentnilisty.cz');
+
+    loadStatistics = function (domain) {
+        tbody = document.querySelector("#keywords-tbody");
+
+        keywords = keywordsJson[domain];
+
+        table_html = '';
+        for(var i = 0; i < keywords.length; i++) {
+            var item = keywords[i];
+            table_html += "<tr>"
+                + "<td>" + item.keyword + "</td>"
+                + "<td>" + item.ratio + "</td>"
+                + "<td>" + item.count + "</td>"
+                + "</tr>";
+        }
+        tbody.innerHTML = table_html;
+    };
+    loadStatistics('www.parlamentnilisty.cz');
+
+</script>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
