@@ -57,6 +57,8 @@
 <script>
     keywordsJson = {{keywords_json}};
     loadKeywords = function(data) {
+        blacklist = ['Ã', 'twitter', 'Å', 'facebook', 'youtub', '_'];
+
         tbody = document.querySelector("#keywords-tbody");
         keywords = data.keywords;
 
@@ -64,7 +66,19 @@
         for(var i = 0; i < keywords.length; i++) {
             var item = keywords[i];
 
+            do_continue = false;
             if (item.item.length <= 3) {
+                continue;
+            }
+
+            for (index in blacklist) {
+                console.log(blacklist[index].toLowerCase() + ' ' + item.item.toLowerCase());
+                if (item.item.toLowerCase().includes(blacklist[index].toLowerCase())) {
+                    do_continue = true;
+                    break;
+                }
+            }
+            if (do_continue) {
                 continue;
             }
 

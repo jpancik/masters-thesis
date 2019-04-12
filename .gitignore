@@ -5,3 +5,4 @@ venv/
 data/
 .DS_Store
 files/db_password
+files/ske_api_key

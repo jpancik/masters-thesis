@@ -4,8 +4,12 @@ import math
 import os
 import sys
 import ntpath
+import traceback
+import urllib
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
+
+import requests
 
 from lib.crawler_db import connector
 from lib.keywords_analyzer.keywords_extractor import KeywordsPerDomainExtractor
@@ -35,6 +39,7 @@ class DoAnalysis:
     TERMS_OUTPUT_JSON_DATA = 'data/analysis/terms.json'
 
     WORK_TYPES = [
+        'all',
         'plagiates',
         'hyperlinks',
         'keywords+terms',
@@ -54,13 +59,15 @@ class DoAnalysis:
         return parser.parse_args()
 
     def run(self):
-        if self.args.type == 'plagiates':
+        do_all = self.args.type == 'all'
+
+        if self.args.type == 'plagiates' or do_all:
             self.find_plagiates()
-        elif self.args.type == 'hyperlinks':
+        if self.args.type == 'hyperlinks' or do_all:
             self.analyze_hyperlinks()
-        elif self.args.type == 'keywords+terms':
+        if self.args.type == 'keywords+terms' or do_all:
             self.analyze_keywords_and_terms()
-        elif self.args.type == 'keywords_per_domain':
+        if self.args.type == 'keywords_per_domain' or do_all:
             self.analyze_keywords_per_domain()
 
         self._close_db_connection()
@@ -238,16 +245,51 @@ class DoAnalysis:
             cur.close()
 
     def analyze_keywords_and_terms(self):
-        # Read API key from file.
-        # Do request: https://ske.fi.muni.cz/bonito/run.cgi/extract_keywords?corpname=dezinfo&ref_corpname=preloaded%2Fczes2&simple_n=1&max_terms=100&alnum=0&onealpha=1&minfreq=1&format=json&attr=lemma
-        with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file,\
-             open('files/tmp_keywords_response.json', 'r') as tmp_response:
-            keywords_file.write(tmp_response.read())
+        with open('files/ske_api_key', 'r') as api_key_file:
+            content = api_key_file.read()
+            username, api_key = content.split(' ')
 
-        # Do request: https://ske.fi.muni.cz/bonito/run.cgi/extract_terms?corpname=dezinfo&ref_corpname=preloaded%2Fcztenten12_8_sample&simple_n=1&max_terms=100&max_keywords=100&alnum=0&onealpha=1&minfreq=1&format=json&attr=lemma
-        with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file,\
-             open('files/tmp_terms_response.json', 'r') as tmp_response:
-            terms_file.write(tmp_response.read())
+        params = {
+            'corpname': 'dezinfo',
+            'ref_corpname': 'preloaded/czes2',
+            'simple_n': '1',
+            'max_terms': '100',
+            'max_keywords': '250',
+            'alnum': '0',
+            'onealpha': '1',
+            'minfreq': '1',
+            'format': 'json',
+            'attr': 'lemma',
+            'username': username,
+            'api_key': api_key
+        }
+        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        keywords_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_keywords?'
+
+        try:
+            response = requests.get('%s%s' % (keywords_url_base, url_query), timeout=120)
+
+            with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file:
+                keywords_file.write(response.text)
+
+            print('Finished retrieving keywords through API.', file=sys.stderr)
+        except Exception as e:
+            traceback.print_exc()
+            print('Error getting keywords through API with message %s.' % e, file=sys.stderr)
+
+        terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
+        params['ref_corpname'] = 'preloaded/cztenten12_8_sample'
+        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        try:
+            response = requests.get('%s%s' % (terms_url_base, url_query), timeout=120)
+
+            with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file:
+                terms_file.write(response.text)
+
+            print('Finished retrieving terms through API.', file=sys.stderr)
+        except Exception as e:
+            traceback.print_exc()
+            print('Error getting terms through API with message %s.' % e, file=sys.stderr)
 
     def analyze_keywords_per_domain(self):
         if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
