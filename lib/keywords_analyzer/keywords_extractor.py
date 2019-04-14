@@ -18,7 +18,8 @@ class KeywordsPerDomainExtractor:
     def run(self):
         ref_freq_file_path = 'data/czes2_lemma_freq.tsv'
         if not os.path.exists(ref_freq_file_path):
-            print('Could not find file with reference lemma frequencies.', file=sys.stderr)
+            print('Could not find file %s with reference lemma frequencies.' % (ref_freq_file_path), file=sys.stderr)
+            return
 
         doc_url_re = re.compile(' %s="([^"]+)"' % 'url')
         doc_struct = 'doc'
