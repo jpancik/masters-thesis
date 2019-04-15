@@ -250,7 +250,7 @@ class DoAnalysis:
             username, api_key = content.split(' ')
 
         params = {
-            'corpname': 'dezinfo',
+            'corpname': 'preloaded/dezinfo',
             'ref_corpname': 'preloaded/czes2',
             'simple_n': '1',
             'max_terms': '100',
@@ -260,14 +260,15 @@ class DoAnalysis:
             'minfreq': '1',
             'format': 'json',
             'attr': 'lemma',
-            'username': username,
-            'api_key': api_key
         }
         url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        url_query += '&username=%s' % username
+        url_query += '&api_key=%s' % api_key
         keywords_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_keywords?'
 
         try:
-            response = requests.get('%s%s' % (keywords_url_base, url_query), timeout=120)
+            url = '%s%s' % (keywords_url_base, url_query)
+            response = requests.get(url, timeout=120)
 
             with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file:
                 keywords_file.write(response.text)
