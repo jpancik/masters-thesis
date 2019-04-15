@@ -10,7 +10,7 @@ from lib import util
 class KeywordsPerDomainExtractor:
     KEYWORDS_COUNT_THRESHOLD = 5
     KEYWORDS_LENGTH_THRESHOLD = 3
-    PREFIX_BLACKLIST = ['twitter', 'facebook']
+    PREFIX_BLACKLIST = ['twitter', 'facebook', 'loading']
 
     def __init__(self, input_vertical_files,
                  output_file_keywords=None):
