@@ -1,5 +1,7 @@
 import sys, re
 
+from lib import util
+
 
 class NgramsGenerator:
     def __init__(self, input_file, output_file, doc_struct, doc_id, sent_struct, ngram_length=7):
@@ -13,7 +15,7 @@ class NgramsGenerator:
 
     def generate(self):
         doc_counter = sent_counter = ngram_counter = 0
-        for doc in self.read_big_structures(self.input_file, self.doc_struct):
+        for doc in util.read_big_structures(self.input_file, self.doc_struct):
             doc_counter += 1
             doc_lines = doc.split('\n')
 
@@ -54,26 +56,6 @@ class NgramsGenerator:
             'Ngrams Generator: %d documents, %d sentences, %d %d-grams processed'
             % (doc_counter, sent_counter, ngram_counter, self.ngram_length),
             file=sys.stderr)
-
-    @staticmethod
-    def read_big_structures(fp, structure_tag, buffer_size=10000000):
-        structure_start_re = re.compile('^<%s[ >]' % structure_tag, re.M)
-        buffer_ = ''
-        while True:
-            new_data = fp.read(buffer_size)
-            if not new_data:
-                break
-            buffer_ += new_data
-            starting_positions = [m.start() for m in structure_start_re.finditer(buffer_)]
-            if not starting_positions:
-                continue
-            for i in range(len(starting_positions) - 1):
-                start = starting_positions[i]
-                end = starting_positions[i + 1]
-                yield buffer_[start:end]
-            buffer_ = buffer_[starting_positions[-1]:]
-        if buffer_ != '':
-            yield buffer_
 
     def get_sentence_shingles(self, sent_tokens):
         shingle_hashes = []

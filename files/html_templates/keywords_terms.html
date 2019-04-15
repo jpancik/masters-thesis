@@ -72,7 +72,6 @@
             }
 
             for (index in blacklist) {
-                console.log(blacklist[index].toLowerCase() + ' ' + item.item.toLowerCase());
                 if (item.item.toLowerCase().includes(blacklist[index].toLowerCase())) {
                     do_continue = true;
                     break;

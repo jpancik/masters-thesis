@@ -4,6 +4,8 @@ import re
 import sys
 from urllib.parse import urlparse
 
+from lib import util
+
 
 class KeywordsPerDomainExtractor:
     KEYWORDS_COUNT_THRESHOLD = 5
@@ -31,7 +33,7 @@ class KeywordsPerDomainExtractor:
         for vertical_file_path in self.input_vertical_files:
             print('Loading vertical file %s.' % vertical_file_path, file=sys.stderr)
             with open(vertical_file_path, 'r') as vertical_file:
-                for raw_doc in self.read_big_structures(vertical_file, doc_struct):
+                for raw_doc in util.read_big_structures(vertical_file, doc_struct):
                     doc_header, doc_body = raw_doc.split('\n', 1)
                     doc_url = doc_url_re.search(doc_header).group(1)
                     doc_netloc = urlparse(doc_url).netloc
@@ -125,24 +127,3 @@ class KeywordsPerDomainExtractor:
 
         with open(self.output_file_keywords, 'w') as output_file:
             output_file.write(json.dumps(output, indent=4))
-
-    @staticmethod
-    def read_big_structures(fp, structure_tag, buffer_size=10000000):
-        structure_start_re = re.compile('^<%s[ >]' % structure_tag, re.M)
-        buffer_ = ''
-        while True:
-            new_data = fp.read(buffer_size)
-            if not new_data:
-                break
-            buffer_ += new_data
-            starting_positions = [m.start() for m in structure_start_re.finditer(buffer_)]
-            if not starting_positions:
-                continue
-            for i in range(len(starting_positions) - 1):
-                start = starting_positions[i]
-                end = starting_positions[i + 1]
-                yield buffer_[start:end]
-            buffer_ = buffer_[starting_positions[-1]:]
-        if buffer_ != '':
-            yield buffer_
-

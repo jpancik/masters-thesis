@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 import requests
 
+from lib import util
 from lib.crawler_db import connector
 from lib.keywords_analyzer.keywords_extractor import KeywordsPerDomainExtractor
 from lib.plagiarism_detector.plagiarism_detector import PlagiarismDetector
@@ -227,12 +228,12 @@ class DoAnalysis:
                     'target': target
                 })
 
-        colors = PlagiarismOutputProcessor.get_spaced_colors(len(domains))
+        colors = util.get_spaced_colors(len(domains))
         graph_json_data['nodes'] = [{
                 'domain': x,
                 'name': x,
                 'id': x,
-                'color': '#%02x%02x%02x' % colors[index]
+                'color': colors[index]
             }
             for (index, x) in enumerate(domains)]
 
@@ -283,6 +284,8 @@ class DoAnalysis:
         terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
         params['ref_corpname'] = 'preloaded/cztenten12_8_sample'
         url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        url_query += '&username=%s' % username
+        url_query += '&api_key=%s' % api_key
         try:
             response = requests.get('%s%s' % (terms_url_base, url_query), timeout=120)
 

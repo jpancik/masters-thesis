@@ -13,7 +13,7 @@ def get_db_connection():
             raise Exception('Create files/db_password that contains database password on first line without a new line.')
 
         with open('files/db_password', 'r') as db_password_file:
-            db_password = db_password_file.read()
+            db_password = db_password_file.read().strip()
 
         return psycopg2.connect("host=db.fi.muni.cz dbname=pgdb user=xpancik2 password=%s" % db_password)
     else:

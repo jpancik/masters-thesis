@@ -3,6 +3,8 @@ import sys, re
 from datetime import datetime
 from urllib.parse import urlparse
 
+from lib import util
+
 
 class PlagiarismOutputProcessor:
     GRAPH_LINK_BY_ARTICLES_THRESHOLD = 5
@@ -28,26 +30,6 @@ class PlagiarismOutputProcessor:
         self.output_json_file_path = output_json_file_path
         self.output_json_graph_by_articles_file_path = output_json_graph_by_articles_file_path
         self.output_json_graph_by_words_file_path = output_json_graph_by_words_file_path
-
-    @staticmethod
-    def read_big_structures(fp, structure_tag, buffer_size=10000000):
-        structure_start_re = re.compile('^<%s[ >]' % structure_tag, re.M)
-        buffer_ = ''
-        while True:
-            new_data = fp.read(buffer_size)
-            if not new_data:
-                break
-            buffer_ += new_data
-            starting_positions = [m.start() for m in structure_start_re.finditer(buffer_)]
-            if starting_positions == []:
-                continue
-            for i in range(len(starting_positions) - 1):
-                start = starting_positions[i]
-                end = starting_positions[i + 1]
-                yield buffer_[start:end]
-            buffer_ = buffer_[starting_positions[-1]:]
-        if buffer_ != '':
-            yield buffer_
 
     def run(self):
         doc_id_re = re.compile(' %s="([^"]+)"' % self.doc_id)
@@ -114,7 +96,7 @@ class PlagiarismOutputProcessor:
         doc_counter, doc_sentences, doc_attrs = 0, {}, {}
         for vertical_file_path in self.input_vertical_files:
             with open(vertical_file_path, 'r') as vertical_file:
-                for raw_doc in self.read_big_structures(vertical_file, self.doc_struct):
+                for raw_doc in util.read_big_structures(vertical_file, self.doc_struct):
                     # Simulate "cut -f 1" here:
                     doc_lines = raw_doc.split('\n')
                     cut_result = []
@@ -499,13 +481,13 @@ class PlagiarismOutputProcessor:
             'statistics': plagiates_statistics,
         }
 
-        colors = self.get_spaced_colors(len(domains))
+        colors = util.get_spaced_colors(len(domains))
         for index, domain in enumerate(domains):
             json_data['nodes'].append({
                 'domain': domain,
                 'name': domain,
                 'id': domain,
-                'color': '#%02x%02x%02x' % colors[index]
+                'color': colors[index]
             })
 
         for (source_domain, plagiate_domain), count in links_by_article.items():
@@ -530,12 +512,3 @@ class PlagiarismOutputProcessor:
 
         with open(self.output_json_graph_by_words_file_path, 'w') as json_file:
             json_file.write(json.dumps(json_data, indent=4))
-
-    # Source: https://www.quora.com/How-do-I-generate-n-visually-distinct-RGB-colours-in-Python
-    @staticmethod
-    def get_spaced_colors(n):
-        max_value = 255**3
-        interval = int(max_value / n)
-        colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
-
-        return [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
