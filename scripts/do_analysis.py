@@ -248,6 +248,8 @@ class DoAnalysis:
         with open('files/ske_api_key', 'r') as api_key_file:
             content = api_key_file.read()
             username, api_key = content.split(' ')
+            username = username.strip()
+            api_key = api_key.strip()
 
         params = {
             'corpname': 'preloaded/dezinfo',
