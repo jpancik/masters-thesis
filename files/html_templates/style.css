@@ -23,3 +23,12 @@ svg {
     stroke: #000;
     stroke-width: 1px;
 }
+
+.trend-box-outer {
+    padding: 10px;
+}
+
+.trend-box-inner {
+    border: solid #007bff 1px;
+    border-radius: 10px;
+}

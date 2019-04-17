@@ -38,13 +38,15 @@ class DoAnalysis:
 
     KEYWORDS_OUTPUT_JSON_DATA = 'data/analysis/keywords.json'
     TERMS_OUTPUT_JSON_DATA = 'data/analysis/terms.json'
+    TRENDS_OUTPUT_JSON_DATA = 'data/analysis/trends.json'
 
     WORK_TYPES = [
         'all',
         'plagiates',
         'hyperlinks',
         'keywords+terms',
-        'keywords_per_domain'
+        'keywords_per_domain',
+        'trends'
     ]
 
     def __init__(self):
@@ -67,9 +69,11 @@ class DoAnalysis:
         if self.args.type == 'hyperlinks' or do_all:
             self.analyze_hyperlinks()
         if self.args.type == 'keywords+terms' or do_all:
-            self.analyze_keywords_and_terms()
+            self.keywords_and_terms()
         if self.args.type == 'keywords_per_domain' or do_all:
-            self.analyze_keywords_per_domain()
+            self.keywords_per_domain()
+        if self.args.type == 'trends' or do_all:
+            self.trends()
 
         self._close_db_connection()
 
@@ -245,12 +249,8 @@ class DoAnalysis:
         if cur:
             cur.close()
 
-    def analyze_keywords_and_terms(self):
-        with open('files/ske_api_key', 'r') as api_key_file:
-            content = api_key_file.read()
-            username, api_key = content.split(' ')
-            username = username.strip()
-            api_key = api_key.strip()
+    def keywords_and_terms(self):
+        username, api_key = self._read_api_key()
 
         params = {
             'corpname': 'preloaded/dezinfo',
@@ -297,7 +297,7 @@ class DoAnalysis:
             traceback.print_exc()
             print('Error getting terms through API with message %s.' % e, file=sys.stderr)
 
-    def analyze_keywords_per_domain(self):
+    def keywords_per_domain(self):
         if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
             print('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER, file=sys.stderr)
             return
@@ -316,6 +316,47 @@ class DoAnalysis:
         )
         keywords_extractor.run()
 
+    def trends(self):
+        username, api_key = self._read_api_key()
+
+        params = {
+            'corpname': 'preloaded/dezinfo',
+            'reload': '',
+            'structattr': 'doc.yearmonth',
+            'trends_attr': 'lemma',
+            'trends_method': 'mkts_all',
+            'trends_maxp': '0.1',
+            'trends_sort_by': 't',
+            'trends_minfreq': '2',
+            'trends_re': '',
+            'filter_nonwords': '0',
+            'filter_capitalized': '0',
+            'format': 'json'
+        }
+        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        url_query += '&username=%s' % username
+        url_query += '&api_key=%s' % api_key
+        trends_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/trends?'
+
+        try:
+            print('%s%s' % (trends_url_base, url_query))
+            url = '%s%s' % (trends_url_base, url_query)
+            response = requests.get(url, timeout=120)
+
+            with open(self.TRENDS_OUTPUT_JSON_DATA, 'w') as trends_file:
+                trends_file.write(response.text)
+
+            print('Finished retrieving trends through API.', file=sys.stderr)
+        except Exception as e:
+            traceback.print_exc()
+            print('Error getting trends through API with message %s.' % e, file=sys.stderr)
+
+    @staticmethod
+    def _read_api_key():
+        with open('files/ske_api_key', 'r') as api_key_file:
+            content = api_key_file.read()
+            username, api_key = content.split(' ')
+        return username.strip(), api_key.strip()
 
     def _close_db_connection(self):
         if self.db_con:

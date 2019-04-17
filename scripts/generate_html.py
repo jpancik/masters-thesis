@@ -16,6 +16,7 @@ class GenerateHtml:
     ANALYSIS_HYPERLINKS_ALL_TIME = 'hyperlinks_all_time.html'
     ANALYSIS_KEYWORDS_TERMS = 'keywords_terms.html'
     ANALYSIS_KEYWORDS_PER_DOMAIN = 'keywords_per_domain.html'
+    ANALYSIS_TRENDS = 'trends.html'
 
     def __init__(self):
         self.args = self.parse_commandline()
@@ -41,6 +42,7 @@ class GenerateHtml:
         self._prepare_analysis_hyperlinks_page()
         self._prepare_analysis_keywords_terms()
         self._prepare_analysis_keywords_per_domain()
+        self._prepare_analysis_trends()
 
     def _prepare_index_page(self):
         html_file_path = os.path.join(self.args.output, self.INDEX_PAGE_FILENAME)
@@ -187,6 +189,18 @@ class GenerateHtml:
             html_file.write(self._load_template('files/html_templates/keywords_per_domain.html', {
                 'keywords_json': keywords_json.read(),
                 'type_selector': '<a href="%s">keywords per domain JSON</a>' % ('keywords_per_domain.json')
+            }, active_tab='dropdown'))
+
+    def _prepare_analysis_trends(self):
+        trends_html_file_path = os.path.join(self.args.output, self.ANALYSIS_TRENDS)
+
+        shutil.copy2('data/analysis/trends.json', os.path.join(self.args.output, 'trends.json'))
+
+        with open(trends_html_file_path, 'w') as html_file, \
+                open('data/analysis/trends.json', 'r') as trends_json:
+            html_file.write(self._load_template('files/html_templates/trends.html', {
+                'trends_json': trends_json.read(),
+                'type_selector': '<a href="%s">trends JSON</a>' % 'trends.json'
             }, active_tab='dropdown'))
 
     @staticmethod

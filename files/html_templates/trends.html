@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Dezinfo crawler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+{{header}}
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <p>{{type_selector}}</p>
+            <br/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <p id="pages">Page: <a href="#">1   </a><a href="#">2   </a><a href="#">3   </a></p>
+            <br/>
+        </div>
+    </div>
+    <div id="trends-boxes">
+        <div class="row">
+            <div class="col-md-4 text-center trend-box-outer">
+                <div class="trend-box-inner">
+                    <svg style="width: 100%; height: 100px">
+
+                    </svg>
+                    <h5>Keyword</h5>
+                    <div class="row">
+                        <div class="col-sm-4"><span>trend</span></div>
+                        <div class="col-sm-4"><span>p-value</span></div>
+                        <div class="col-sm-4"><span>frequency</span></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4"><p>val 1</p></div>
+                        <div class="col-sm-4"><p>val 2</p></div>
+                        <div class="col-sm-4"><p>val 3</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <br/>
+    <br/>
+</main><!-- /.container -->
+<script>
+    trendsJson = {{trends_json}};
+
+    const pageSize = 100;
+
+    getGraphSvh = function(graph) {
+        let rawPoints = graph.split(':');
+        rawPoints = rawPoints.map(x => parseInt(x));
+
+        const range = Math.max( ...rawPoints );
+
+        height = 80;
+        pointsY = [];
+        for (let i = 0; i < rawPoints.length; i++) {
+            const ratio = rawPoints[i]/range;
+            const point = ratio * height;
+            pointsY.push(point);
+        }
+
+        const pointWidthStep = 230 / (pointsY.length - 1);
+        let pathFilledString = "M0," + height;
+        let pathStrokeString = "M0," + (height - pointsY[0] - 1);
+        for (let i = 0; i < pointsY.length; i++) {
+            const posX = (i * pointWidthStep);
+            const posY = (height - pointsY[i] - 2);
+
+            pathFilledString += " L" + posX + "," + posY;
+
+            if (i > 0) {
+                pathStrokeString += " L" + posX + "," + posY;
+            }
+        }
+        pathFilledString += ' L' + ((pointsY.length - 1) * pointWidthStep) + ',' + height;
+
+        return "<svg style='width: 100%; height: 100px;' viewBox='0 0 250 100' preserveAspectRatio='none'>" +
+                    "<g transform='translate(10,10)'>" +
+                        "<path d='" + pathFilledString + "' style='fill: #87bbff; stroke: none;'></path>" +
+                        "<path d='" + pathStrokeString + "' style='fill: none; stroke: #0084ff;'></path>" +
+                    "</g>" +
+               "</svg>";
+    };
+
+    getTrendHtml = function(id, keyword, trend, pvalue, frequency, graphSvg) {
+        return "<div class='col-md-3 text-center trend-box-outer'>" +
+                   "<div class='trend-box-inner'>" +
+                       graphSvg +
+                       "<h5>" + keyword + "</h5>" +
+                       "<div class='row'>" +
+                           "<div class='col-sm-6'><span>trend</span></div>" +
+                           "<div class='col-sm-6'><span>frequency</span></div>" +
+                       "</div>" +
+                       "<div class='row'>" +
+                           "<div class='col-sm-6'><p>" + trend.toFixed(2) + "</p></div>" +
+                           "<div class='col-sm-6'><p>" + frequency.toFixed(2) + "</p></div>" +
+                       "</div>" +
+                   "</div>" +
+               "</div>";
+    };
+
+    renderPages = function(page) {
+        pages = document.querySelector("#pages");
+
+        pages.innerHTML = "Page: ";
+        const pagesCount = Math.ceil(trendsJson.result.length / pageSize);
+
+        for (let i = 0; i < pagesCount; i++) {
+            if (i === page) {
+                pages.innerHTML += "<span>" + (i + 1) + "     </span>";
+            } else {
+                pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ");'>" + (i + 1) + "     </a>";
+            }
+        }
+    };
+
+    renderTrends = function(page) {
+        trendsBoxes = document.querySelector("#trends-boxes");
+
+        trendsBoxes.innerHTML = "";
+
+        newHtml = "";
+
+        rowHtml = "<div class='row'>";
+        rowFilled = 0;
+
+        keywords = trendsJson.result;
+        for (let i = page * pageSize; i < keywords.length && i < (page + 1) * pageSize; i++) {
+            const item = keywords[i];
+            const id = item[0];
+            const keyword = item[1];
+            const trend = item[2];
+            const pvalue = item[3];
+            const frequency = item[4];
+
+            if (rowFilled >= 4) {
+                rowHtml += "</div>";
+                newHtml += rowHtml;
+                rowHtml = "<div class='row'>";
+                rowFilled = 0;
+            }
+            rowHtml += getTrendHtml(id, keyword, trend, pvalue, frequency, getGraphSvh(trendsJson.samples[id]));
+            rowFilled += 1;
+        }
+
+        if(rowFilled > 0) {
+            rowHtml += "</div>";
+            newHtml += rowHtml;
+        }
+
+        trendsBoxes.innerHTML = newHtml;
+        renderPages(page);
+    };
+    renderTrends(0);
+</script>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
