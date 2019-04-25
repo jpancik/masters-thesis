@@ -13,14 +13,15 @@ class KeywordsPerDomainExtractor:
     PREFIX_BLACKLIST = ['twitter', 'facebook', 'loading']
 
     def __init__(self, input_vertical_files,
+                 ref_freq_file_path='data/czes2_lemma_freq.tsv',
                  output_file_keywords=None):
         self.input_vertical_files = input_vertical_files
+        self.ref_freq_file_path = ref_freq_file_path
         self.output_file_keywords = output_file_keywords
 
     def run(self):
-        ref_freq_file_path = 'data/czes2_lemma_freq.tsv'
-        if not os.path.exists(ref_freq_file_path):
-            print('Could not find file %s with reference lemma frequencies.' % (ref_freq_file_path), file=sys.stderr)
+        if not os.path.exists(self.ref_freq_file_path):
+            print('Could not find file %s with reference lemma frequencies.' % (self.ref_freq_file_path), file=sys.stderr)
             return
 
         doc_url_re = re.compile(' %s="([^"]+)"' % 'url')
@@ -85,11 +86,11 @@ class KeywordsPerDomainExtractor:
                 del words_count[word_to_remove]
             words_count_per_domain[website_domain] -= removed_words
 
-        print('Loading reference frequencies from %s.' % ref_freq_file_path, file=sys.stderr)
+        print('Loading reference frequencies from %s.' % self.ref_freq_file_path, file=sys.stderr)
         # (word, count)
         reference_words_count = dict()
         refernece_words_total_count = 0
-        with open(ref_freq_file_path, 'r') as ref_freq_file:
+        with open(self.ref_freq_file_path, 'r') as ref_freq_file:
             for line in ref_freq_file:
                 id, word, count = line.split('\t')
                 reference_words_count[word] = int(count)

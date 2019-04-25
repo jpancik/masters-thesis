@@ -6,6 +6,8 @@ from concurrent.futures import TimeoutError
 
 from pebble import ProcessPool
 
+from lib import webtrack_logger
+from lib.webtrack_logger import log
 from lib.articles_url_gatherer_domain_types.json_domain_type import JsonDomainType
 from lib.articles_url_retrievers.regex_parser import RegexParser
 from lib.articles_url_retrievers.rss_parser import RssParser
@@ -15,6 +17,7 @@ from lib.crawler_db import connector
 class GatherArticlesMetadata:
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
         self.domain_types = self._init_domain_types(self.args.config)
 
         self.db_con = connector.get_db_connection()
@@ -39,7 +42,7 @@ class GatherArticlesMetadata:
             allowed_domains = []
             for line in sys.stdin:
                 allowed_domains.append(line[:-1])
-            print('Gathering article metadata for domains %s.' % allowed_domains, file=sys.stderr)
+            log.info('Gathering article metadata for domains %s.' % allowed_domains, file=sys.stderr)
 
         domain_types_to_process = []
         for domain_type in self.domain_types:
@@ -66,18 +69,18 @@ class GatherArticlesMetadata:
                     else:
                         uploaded_count = self._upload_articles(domain_type, articles_metadata)
 
-                    print('%s: Number of articles uploaded/retrieved: %s/%s.'
-                          % (domain_type.get_name(), uploaded_count, len(articles_metadata)), file=sys.stderr)
+                    log.info('%s: Number of articles uploaded/retrieved: %s/%s.'
+                          % (domain_type.get_name(), uploaded_count, len(articles_metadata)))
                 except StopIteration:
                     break
                 except TimeoutError as error:
-                    print('Function took longer than 180 seconds.', file=sys.stderr)
+                    log.error('Function took longer than 180 seconds.')
 
         self._close_db_connection()
 
     @staticmethod
     def _gather_articles_metadata(domain_type):
-        print('Gathering for: %s' % domain_type.get_name(), file=sys.stderr)
+        log.info('Gathering for: %s' % domain_type.get_name())
 
         if domain_type.has_rss():
             articles_metadata = RssParser.get_article_metadata(domain_type)

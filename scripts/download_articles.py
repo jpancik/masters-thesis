@@ -8,7 +8,9 @@ from datetime import datetime
 import requests
 from pebble import ProcessPool
 
+from lib import webtrack_logger
 from lib.crawler_db import connector
+from lib.webtrack_logger import log
 from scripts.gather_articles_metadata import GatherArticlesMetadata
 
 
@@ -17,6 +19,7 @@ class DownloadArticles:
 
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
         self.db_con = connector.get_db_connection()
 
     @staticmethod
@@ -39,7 +42,7 @@ class DownloadArticles:
             input = []
             for line in sys.stdin:
                 if line.startswith('OUTPUT:'):
-                    print('Downloading article: %s.' % line[:-1], file=sys.stderr)
+                    log.info('Downloading article: %s.' % line[:-1])
                     input.append(line)
 
             result = csv.reader(input)
@@ -109,11 +112,11 @@ class DownloadArticles:
                             'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
                             (id, file_path))
                         self.db_con.commit()
-                        print('(%s/%s) Stored response in %s.' % (index, total_count, file_path), file=sys.stderr)
+                        log.info('(%s/%s) Stored response in %s.' % (index, total_count, file_path))
                 except StopIteration:
                     break
                 except TimeoutError as error:
-                    print('Function took longer than 180 seconds.', file=sys.stderr)
+                    log.info('Function took longer than 180 seconds.')
 
         if cur:
             cur.close()
@@ -133,13 +136,11 @@ class DownloadArticles:
                     response.encoding = domain_type.get_encoding()
                     break
 
-            print('(%s/%s) Finished downloading: %s.' % (index, total_count, url), file=sys.stderr)
+            log.info('(%s/%s) Finished downloading: %s.' % (index, total_count, url))
             return index, total_count, file_path, article_metadata, response
         except Exception as e:
             traceback.print_exc()
-            print(
-                '(%s/%s) Error downloading: %s with message %s.' % (index, total_count, url, e),
-                file=sys.stderr)
+            log.info('(%s/%s) Error downloading: %s with message %s.' % (index, total_count, url, e))
             return None, None, None, None, None
 
     @staticmethod

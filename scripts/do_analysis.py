@@ -339,7 +339,6 @@ class DoAnalysis:
         trends_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/trends?'
 
         try:
-            print('%s%s' % (trends_url_base, url_query))
             url = '%s%s' % (trends_url_base, url_query)
             response = requests.get(url, timeout=120)
 
