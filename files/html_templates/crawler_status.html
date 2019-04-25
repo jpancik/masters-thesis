@@ -32,7 +32,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h5>Articles count gathered by day:</h5>
+            <h5>Articles count gathered in last 10 days:</h5>
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -49,10 +49,39 @@
     <div class="row">
         <div class="col-md-12">
             <br />
+            <h5>Corpus info:</h5>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Compiled at</th>
+                    <th scope="col">Documents</th>
+                    <th scope="col">Sentences</th>
+                    <th scope="col">Tokens</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{corpus_info_compiled_at}}</td>
+                        <td>{{corpus_info_documents}}</td>
+                        <td>{{corpus_info_sentences}}</td>
+                        <td>{{corpus_info_tokens}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
             <br />
             <h2>Watchdog possible errors</h2>
             <div class="">
                 <h5>No articles found for these website domains</h5>
+                <p>
+                    To fix this (if the website is not just down for a bit), look at the configuration file
+                    in <b>files/website_article_urls_descriptions.json</b> and fix the RSS/regex parser config.
+                    If the domain is permanently down, just remove it from the configuration file. Read README.md for further info.
+                </p>
             </div>
         </div>
     </div>
@@ -75,6 +104,14 @@
             <br />
             <div class="">
                 <h5>Problems with processing articles</h5>
+                <p>
+                    To fix these problems, look at the configuration file
+                    in <b>files/website_article_format_descriptions.json</b> and fix the CSS path or completely remove
+                    the group, if it's no longer present in the articles.
+                    If the domain is permanently down, just remove it from the configuration file.
+                    Occasionally these problems are standard, since articles don't contain a certain information all the
+                    time. Read README.md for further info.
+                </p>
             </div>
         </div>
     </div>

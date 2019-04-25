@@ -21,6 +21,8 @@ from scripts.create_preverticals import CreatePreverticals
 
 
 class DoAnalysis:
+    CORPUS_INFO_OUTPUT_JSON_DATA = 'data/corpus_info.json'
+
     VERTICAL_FILES_FOLDER = CreatePreverticals.VERTICAL_FILES_FOLDER
     NGRAM_FILES_FOLDER = CreateCorpus.NGRAM_FILES_FOLDER
     PLAGIARISM_FOLDER = 'data/analysis/plagiarism/'
@@ -42,6 +44,7 @@ class DoAnalysis:
 
     WORK_TYPES = [
         'all',
+        'corpus_info',
         'plagiates',
         'hyperlinks',
         'keywords+terms',
@@ -64,6 +67,8 @@ class DoAnalysis:
     def run(self):
         do_all = self.args.type == 'all'
 
+        if self.args.type == 'corpus_info' or do_all:
+            self.get_corpus_info()
         if self.args.type == 'plagiates' or do_all:
             self.find_plagiates()
         if self.args.type == 'hyperlinks' or do_all:
@@ -76,6 +81,30 @@ class DoAnalysis:
             self.trends()
 
         self._close_db_connection()
+
+    def get_corpus_info(self):
+        username, api_key = self._read_api_key()
+
+        params = {
+            'corpname': 'preloaded/dezinfo',
+            'format': 'json'
+        }
+        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        url_query += '&username=%s' % username
+        url_query += '&api_key=%s' % api_key
+        corpus_info_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/corp_info?'
+
+        try:
+            url = '%s%s' % (corpus_info_url_base, url_query)
+            response = requests.get(url, timeout=120)
+
+            with open(self.CORPUS_INFO_OUTPUT_JSON_DATA, 'w') as corpus_info_file:
+                corpus_info_file.write(response.text)
+
+            print('Finished retrieving corpus info through API.', file=sys.stderr)
+        except Exception as e:
+            traceback.print_exc()
+            print('Error getting corpus info through API with message %s.' % e, file=sys.stderr)
 
     def find_plagiates(self):
         if not os.path.isdir(self.NGRAM_FILES_FOLDER):
@@ -262,7 +291,7 @@ class DoAnalysis:
             'onealpha': '1',
             'minfreq': '1',
             'format': 'json',
-            'attr': 'lemma',
+            'attr': 'word',
         }
         url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
         url_query += '&username=%s' % username
@@ -312,7 +341,8 @@ class DoAnalysis:
 
         keywords_extractor = KeywordsPerDomainExtractor(
             input_vertical_files,
-            'data/analysis/keywords_per_domain.json'
+            ref_freq_file_path='data/czes2_word_freq.tsv',
+            output_file_keywords='data/analysis/keywords_per_domain.json'
         )
         keywords_extractor.run()
 
@@ -323,7 +353,7 @@ class DoAnalysis:
             'corpname': 'preloaded/dezinfo',
             'reload': '',
             'structattr': 'doc.yearmonth',
-            'trends_attr': 'lemma',
+            'trends_attr': 'word',
             'trends_method': 'mkts_all',
             'trends_maxp': '0.1',
             'trends_sort_by': 't',

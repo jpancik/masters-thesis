@@ -57,7 +57,7 @@
 <script>
     keywordsJson = {{keywords_json}};
     loadKeywords = function(data) {
-        blacklist = ['Ã', 'twitter', 'Å', 'facebook', 'youtub', '_'];
+        blacklist = ['Ã', 'twitter', 'Å', 'facebook', 'youtub', '_', 'loading'];
 
         tbody = document.querySelector("#keywords-tbody");
         keywords = data.keywords;
@@ -82,8 +82,8 @@
             }
 
             keywords_html += "<tr>"
-                + "<td>" + item.item + "</td>"
-                + "<td>" + item.score + "</td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link.replace('czes2', 'dezinfo') + "'>" + item.item + "</a></td>"
+                + "<td>" + parseFloat(item.score).toFixed(2) + "</td>"
                 + "<td>" + item.frq1 + "</td>"
                 + "<td>" + item.frq2 + "</td>"
                 + "</tr>";
@@ -101,8 +101,8 @@
         for(var i = 0; i < terms.length; i++) {
             var item = terms[i];
             terms_html += "<tr>"
-                + "<td>" + item.item + "</td>"
-                + "<td>" + item.score + "</td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link + "'>" + item.item + "</a></td>"
+                + "<td>" + parseFloat(item.score).toFixed(2) + "</td>"
                 + "<td>" + item.frq1 + "</td>"
                 + "<td>" + item.frq2 + "</td>"
                 + "</tr>";

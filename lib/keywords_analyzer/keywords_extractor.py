@@ -13,15 +13,15 @@ class KeywordsPerDomainExtractor:
     PREFIX_BLACKLIST = ['twitter', 'facebook', 'loading']
 
     def __init__(self, input_vertical_files,
-                 ref_freq_file_path='data/czes2_lemma_freq.tsv',
-                 output_file_keywords=None):
+                 ref_freq_file_path,
+                 output_file_keywords):
         self.input_vertical_files = input_vertical_files
         self.ref_freq_file_path = ref_freq_file_path
         self.output_file_keywords = output_file_keywords
 
     def run(self):
         if not os.path.exists(self.ref_freq_file_path):
-            print('Could not find file %s with reference lemma frequencies.' % (self.ref_freq_file_path), file=sys.stderr)
+            print('Could not find file %s with reference frequencies.' % (self.ref_freq_file_path), file=sys.stderr)
             return
 
         doc_url_re = re.compile(' %s="([^"]+)"' % 'url')
@@ -39,11 +39,11 @@ class KeywordsPerDomainExtractor:
                     doc_url = doc_url_re.search(doc_header).group(1)
                     doc_netloc = urlparse(doc_url).netloc
 
-                    # Simulate "cut -f 2" here, we want lemmas.
+                    # Simulate "cut -f 1" here, we want words. "splitted = line.split('\t', 2)" would take lemmas.
                     doc_lines = doc_body.split('\n')
                     cut_result = []
                     for line in doc_lines:
-                        splitted = line.split('\t', 2)
+                        splitted = line.split('\t', 1)
                         cut_result.append(splitted[len(splitted) - 2])
                     doc_lines = cut_result
                     # Continue.

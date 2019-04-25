@@ -1,4 +1,5 @@
 import argparse
+import json
 from datetime import datetime
 import os
 import re
@@ -36,13 +37,15 @@ class GenerateHtml:
         shutil.copy2('files/html_templates/style.css', os.path.join(self.args.output, 'style.css'))
         shutil.copy2('files/html_templates/directed_graph.js', os.path.join(self.args.output, 'directed_graph.js'))
 
-        self._prepare_index_page()
         self._prepare_crawler_status_page()
         self._prepare_analysis_plagiarism_page()
         self._prepare_analysis_hyperlinks_page()
         self._prepare_analysis_keywords_terms()
         self._prepare_analysis_keywords_per_domain()
         self._prepare_analysis_trends()
+
+        # Create index page as last, if any of the previous fail, we shouldn't update date generated.
+        self._prepare_index_page()
 
     def _prepare_index_page(self):
         html_file_path = os.path.join(self.args.output, self.INDEX_PAGE_FILENAME)
@@ -57,9 +60,16 @@ class GenerateHtml:
 
         shutil.copy2('files/html_templates/crawler_status.js', os.path.join(self.args.output, 'crawler_status.js'))
 
+        with open('data/corpus_info.json', 'r') as corpus_info_file:
+            corpus_info = json.load(corpus_info_file)
+
         with open(html_file_path, 'w') as html_file, open('data/watchdog_output.json', 'r') as watchdog_json:
             html_file.write(self._load_template('files/html_templates/crawler_status.html', {
-                'watchdog_json': watchdog_json.read()
+                'watchdog_json': watchdog_json.read(),
+                'corpus_info_compiled_at': corpus_info['compiled'],
+                'corpus_info_documents': '{:,}'.format(int(corpus_info['sizes']['doccount'])),
+                'corpus_info_sentences': '{:,}'.format(int(corpus_info['sizes']['sentcount'])),
+                'corpus_info_tokens': '{:,}'.format(int(corpus_info['sizes']['tokencount'])),
             }, active_tab='status'))
 
     def _prepare_analysis_plagiarism_page(self):
