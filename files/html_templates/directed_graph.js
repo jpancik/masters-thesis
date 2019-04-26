@@ -103,8 +103,6 @@ loadGraph = function(graph) {
         .text(function(d) {
             return d.name;
         })
-        .style("stroke", "black")
-        .style("stroke-width", 0.5)
         .style("fill", function(d) {
             return d.color;
         });

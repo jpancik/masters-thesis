@@ -114,15 +114,6 @@ STRUCTURE doc {
     ATTRIBUTE url {
         TYPE "UNIQUE"
     }
-    ATTRIBUTE t3ld {
-        LABEL "Third level domain"
-        DYNAMIC url2domain
-        DYNLIB   internal
-        ARG1     "3"
-        FUNTYPE  i
-        FROMATTR url
-        TYPE     freq
-    }
     ATTRIBUTE t2ld {
         LABEL "Second level domain"
         DYNAMIC url2domain

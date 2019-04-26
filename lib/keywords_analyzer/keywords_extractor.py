@@ -32,7 +32,7 @@ class KeywordsPerDomainExtractor:
         # (netloc, count)
         words_count_per_domain = dict()
         for vertical_file_path in self.input_vertical_files:
-            print('Loading vertical file %s.' % vertical_file_path, file=sys.stderr)
+            #print('Loading vertical file %s.' % vertical_file_path, file=sys.stderr)
             with open(vertical_file_path, 'r') as vertical_file:
                 for raw_doc in util.read_big_structures(vertical_file, doc_struct):
                     doc_header, doc_body = raw_doc.split('\n', 1)
@@ -64,7 +64,7 @@ class KeywordsPerDomainExtractor:
                             words_count_per_domain[doc_netloc] += 1
                         else:
                             words_count_per_domain[doc_netloc] = 1
-            print('Loaded vertical file.', file=sys.stderr)
+            print('Loaded vertical file %s.' % vertical_file_path, file=sys.stderr)
 
         # Remove words that appear too infrequently.
         for website_domain, words_count in words_per_domain.items():
@@ -102,7 +102,6 @@ class KeywordsPerDomainExtractor:
         for website_domain, words_count in words_per_domain.items():
             for word, count in words_count.items():
                 if word not in reference_words_count:
-                    # print('%s not found' % word)
                     continue
 
                 ratio_dezinfo = count/words_count_per_domain[website_domain]
@@ -111,7 +110,7 @@ class KeywordsPerDomainExtractor:
                     if website_domain not in word_ratio_per_website_domain:
                         word_ratio_per_website_domain[website_domain] = []
 
-                    word_ratio_per_website_domain[website_domain].append((word, (ratio_dezinfo/ratio_reference), count))
+                    word_ratio_per_website_domain[website_domain].append((word, (ratio_dezinfo/ratio_reference), count, reference_words_count[word], count))
 
         # (website_domain, [(keyword, ratio, count)]
         output = dict()
@@ -119,12 +118,16 @@ class KeywordsPerDomainExtractor:
             ratios_list.sort(key=lambda x: -x[1])
 
             output[website_domain] = []
-            for (keyword, ratio, count) in ratios_list[0:100]:
+            for (keyword, ratio, frequency_dezinfo, frequency_reference, count) in ratios_list[0:100]:
                 output[website_domain].append({
                     'keyword': keyword,
                     'ratio': ratio,
+                    'freq1': frequency_dezinfo,
+                    'freq2': frequency_reference,
                     'count': count
                 })
 
         with open(self.output_file_keywords, 'w') as output_file:
             output_file.write(json.dumps(output, indent=4))
+
+        print('Finished looking for keywords per domain.')

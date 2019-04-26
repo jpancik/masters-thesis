@@ -6,6 +6,12 @@ createChart = function(data) {
     var height = width / 2;
     var margin = 10;
 
+    var totalCount = 0;
+    for (var websiteDomain in data) {
+        totalCount += data[websiteDomain];
+    }
+    var minCount = totalCount/50;
+
     // The radius of the pieplot is half the width or half the height (smallest one). I substract a bit of margin.
     var radius = Math.min(width, height) / 2 - margin;
 
@@ -59,7 +65,6 @@ createChart = function(data) {
         .style("stroke-width", "1px")
         .style("opacity", 0.7)
         .on("mouseover", function (d, i) {
-            console.log(d);
             svg.append("text")
                 .attr("dy", "-0.5em")
                 .style("text-anchor", "middle")
@@ -83,8 +88,6 @@ createChart = function(data) {
             svg.select(".label1").remove();
             svg.select(".label2").remove();
         });
-
-    var minCount = 10;
 
     // Add the polylines between chart and labels:
     svg

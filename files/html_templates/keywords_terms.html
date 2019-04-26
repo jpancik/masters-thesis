@@ -82,10 +82,10 @@
             }
 
             keywords_html += "<tr>"
-                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link.replace('czes2', 'dezinfo') + "'>" + item.item + "</a></td>"
+                + "<td>" + item.item + "</td>"
                 + "<td>" + parseFloat(item.score).toFixed(2) + "</td>"
-                + "<td>" + item.frq1 + "</td>"
-                + "<td>" + item.frq2 + "</td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.link + "'>" + item.frq1 + "</a></td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link + "'>" + item.frq2 + "</a></td>"
                 + "</tr>";
         }
         tbody.innerHTML = keywords_html;
@@ -101,10 +101,10 @@
         for(var i = 0; i < terms.length; i++) {
             var item = terms[i];
             terms_html += "<tr>"
-                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link + "'>" + item.item + "</a></td>"
+                + "<td>" + item.item + "</td>"
                 + "<td>" + parseFloat(item.score).toFixed(2) + "</td>"
-                + "<td>" + item.frq1 + "</td>"
-                + "<td>" + item.frq2 + "</td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.link + "'>" + item.frq1 + "</a></td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link + "'>" + item.frq2 + "</a></td>"
                 + "</tr>";
         }
         tbody.innerHTML = terms_html;

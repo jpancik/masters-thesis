@@ -105,11 +105,13 @@ class Watchdog:
             })
 
         cur.execute('SELECT a.website_domain, COUNT(*) FROM article_metadata a '
-                    'WHERE a.created_at >= (NOW() - INTERVAL \'24 HOUR\') '
                     'GROUP BY a.website_domain;')
-        website_domains_last_24_hours = dict()
+        website_domains_article_counts = dict()
         for website_domain, count in cur.fetchall():
-            website_domains_last_24_hours[website_domain] = count
+            website_domains_article_counts[website_domain] = count
+
+        cur.execute('SELECT MIN(a.created_at) FROM article_metadata_gathering_summary a;')
+        gathering_started_at = cur.fetchone()
 
         cur.close()
         self._close_db_connection()
@@ -121,7 +123,8 @@ class Watchdog:
                 'no_articles_found': no_articles_found,
                 'processing_problems': processing_problems,
                 'articles_count_per_day': articles_count_per_day,
-                'website_domain_last_24_hours': website_domains_last_24_hours
+                'website_domains_article_counts': website_domains_article_counts,
+                'gathering_started_at': str(gathering_started_at[0].strftime('%B %-d, %Y'))
             }, indent=4, ensure_ascii=False))
 
     def _close_db_connection(self):

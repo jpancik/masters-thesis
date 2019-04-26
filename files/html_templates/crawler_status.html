@@ -22,7 +22,13 @@
 <main role="main" class="container">
     <div class="row">
         <div class="col-md-12">
-            <h5>Distribution of articles by their website domains over last 24 hours:</h5>
+            <h5 id="gathering-started-at"></h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h5>Distribution of articles by their website domains:</h5>
         </div>
     </div>
     <div class="row">
@@ -134,11 +140,15 @@
     <script>
         watchdogJson = {{watchdog_json}};
 
-        (function() {
-            tbody = document.querySelector("#gathering-tbody");
-            no_articles_found = watchdogJson.no_articles_found;
+        let gatheringStartedAtElement = document.querySelector("#gathering-started-at");
+        gatheringStartedAtElement.innerHTML = "Gathering of articles started on: " + watchdogJson.gathering_started_at;
 
-            no_articles_found_html = '';
+
+        (function() {
+            const tbody = document.querySelector("#gathering-tbody");
+            const no_articles_found = watchdogJson.no_articles_found;
+
+            let no_articles_found_html = '';
             for (var i = 0; i < no_articles_found.length; i++) {
                 var item = no_articles_found[i];
                 no_articles_found_html += "<tr>"
@@ -150,10 +160,10 @@
         })();
 
         (function() {
-            tbody = document.querySelector("#processing-tbody");
-            processing_problems = watchdogJson.processing_problems;
+            const tbody = document.querySelector("#processing-tbody");
+            const processing_problems = watchdogJson.processing_problems;
 
-            processing_problems_html = '';
+            let processing_problems_html = '';
             for(var i = 0; i < processing_problems.length; i++) {
                 var item = processing_problems[i];
                 processing_problems_html += "<tr>"
@@ -166,10 +176,10 @@
         })();
 
         (function() {
-            tbody = document.querySelector("#articles-count-tbody");
-            articles_count_per_day = watchdogJson.articles_count_per_day;
+            const tbody = document.querySelector("#articles-count-tbody");
+            const articles_count_per_day = watchdogJson.articles_count_per_day;
 
-            articles_count_per_day_html = '';
+            let articles_count_per_day_html = '';
             for(var i = 0; i < articles_count_per_day.length; i++) {
                 var item = articles_count_per_day[i];
                 articles_count_per_day_html += "<tr>"
@@ -180,7 +190,7 @@
             tbody.innerHTML = articles_count_per_day_html;
         })();
 
-        createChart(watchdogJson.website_domain_last_24_hours);
+        createChart(watchdogJson.website_domains_article_counts);
     </script>
 
 </main><!-- /.container -->

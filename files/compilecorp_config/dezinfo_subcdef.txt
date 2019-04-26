@@ -38,7 +38,7 @@
 
 =www.protiproud.cz
 	doc
-    urldomain="protiproud.cz"
+    urldomain="protiproud.parlamentnilisty.cz"
 
 =www.nejvic-info.cz
 	doc
@@ -174,7 +174,7 @@
 
 =instory.cz
 	doc
-    urldomain="instory.cz"
+    t2ld="instory.cz"
 
 =farmazdravi.cz
 	doc
