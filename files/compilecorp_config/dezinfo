@@ -11,6 +11,8 @@ LANGUAGE "Czech"
 INFOHREF "https://github.com/jpancik/masters-thesis/blob/master/files/compilecorp_config/dezinfo_doc.md"
 TAGSETDOC "https://www.sketchengine.eu/tagset-reference-for-czech/"
 
+SUBCDEF "/home/xpancik2/masters-thesis/files/compilecorp_config/dezinfo_subcdef.txt"
+
 WSATTR lemma
 WSDEF "/corpora/wsdef/czech-ajka-6.1.wsdef.txt"
 TERMDEF "/corpora/wsdef/czech-majka-terms-1.0.wsdef.m4"
@@ -111,6 +113,15 @@ STRUCTURE doc {
     ATTRIBUTE yearmonth
     ATTRIBUTE url {
         TYPE "UNIQUE"
+    }
+    ATTRIBUTE t3ld {
+        LABEL "Third level domain"
+        DYNAMIC url2domain
+        DYNLIB   internal
+        ARG1     "3"
+        FUNTYPE  i
+        FROMATTR url
+        TYPE     freq
     }
     ATTRIBUTE t2ld {
         LABEL "Second level domain"

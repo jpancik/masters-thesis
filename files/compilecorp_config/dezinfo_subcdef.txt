@@ -1,0 +1,245 @@
+*FREQLISTATTRS word tag lemma lempos
+
+=parlamentnilisty.cz
+	doc
+    urldomain="parlamentnilisty.cz"
+
+=nwoo.org
+	doc
+    urldomain="nwoo.org"
+
+=www.zvedavec.org
+	doc
+    urldomain="zvedavec.org"
+
+=www.vlasteneckenoviny.cz
+	doc
+    urldomain="vlasteneckenoviny.cz"
+
+=www.svetkolemnas.info
+	doc
+    urldomain="svetkolemnas.info"
+
+=www.skrytapravda.cz
+	doc
+    urldomain="skrytapravda.cz"
+
+=www.securitymagazin.cz
+	doc
+    urldomain="securitymagazin.cz"
+
+=www.rukojmi.cz
+	doc
+    urldomain="rukojmi.cz"
+
+=www.prvnizpravy.cz
+	doc
+    urldomain="prvnizpravy.cz"
+
+=www.protiproud.cz
+	doc
+    urldomain="protiproud.cz"
+
+=www.nejvic-info.cz
+	doc
+    urldomain="nejvic-info.cz"
+
+=www.mikan.cz
+	doc
+    urldomain="mikan.cz"
+
+=www.lajkit.cz
+	doc
+    urldomain="lajkit.cz"
+
+=www.krajskelisty.cz
+	doc
+    urldomain="krajskelisty.cz"
+
+=www.isstras.eu/cs
+	doc
+    urldomain="isstras.eu"
+
+=www.halonoviny.cz
+	doc
+    urldomain="halonoviny.cz"
+
+=www.freepub.cz
+	doc
+    urldomain="freepub.cz"
+
+=www.freeglobe.cz
+	doc
+    urldomain="freeglobe.cz"
+
+=www.euserver.cz
+	doc
+    urldomain="euserver.cz"
+
+=www.euportal.cz
+	doc
+    urldomain="euportal.cz"
+
+=www.eportal.cz
+	doc
+    urldomain="eportal.cz"
+
+=www.czechfreepress.cz
+	doc
+    urldomain="czechfreepress.cz"
+
+=www.ctusi.info
+	doc
+    urldomain="ctusi.info"
+
+=www.casopis-sifra.cz
+	doc
+    urldomain="casopis-sifra.cz"
+
+=www.bezpolitickekorektnosti.cz
+	doc
+    urldomain="bezpolitickekorektnosti.cz"
+
+=www.alternativnimagazin.cz
+	doc
+    urldomain="alternativnimagazin.cz"
+
+=wertyzreport.cz
+	doc
+    urldomain="wertyzreport.cz"
+
+=veksvetla.cz
+	doc
+    urldomain="veksvetla.cz"
+
+=tadesco.cz
+	doc
+    urldomain="tadesco.cz"
+
+=svobodnenoviny.eu
+	doc
+    urldomain="svobodnenoviny.eu"
+
+=stredoevropan.cz
+	doc
+    urldomain="stredoevropan.cz"
+
+=stalo-se.cz
+	doc
+    urldomain="stalo-se.cz"
+
+=proevropu.com
+	doc
+    urldomain="proevropu.com"
+
+=procproto.cz
+	doc
+    urldomain="procproto.cz"
+
+=pravyprostor.cz
+	doc
+    urldomain="pravyprostor.cz"
+
+=pravdive.eu
+	doc
+    urldomain="pravdive.eu"
+
+=outsidermedia.cz
+	doc
+    urldomain="outsidermedia.cz"
+
+=orgo-net.blogspot.com
+	doc
+    urldomain="orgo-net.blogspot.com"
+
+=news.e-republika.cz
+	doc
+    urldomain="news.e-republika.cz"
+
+=morezprav.cz
+	doc
+    urldomain="morezprav.cz"
+
+=megazine.cz
+	doc
+    urldomain="megazine.cz"
+
+=jackings.net
+	doc
+    urldomain="jackings.net"
+
+=ipribeh.cz
+	doc
+    urldomain="ipribeh.cz"
+
+=instory.cz
+	doc
+    urldomain="instory.cz"
+
+=farmazdravi.cz
+	doc
+    urldomain="farmazdravi.cz"
+
+=www.eurasia24.cz
+	doc
+    urldomain="eurasia24.cz"
+
+=cz.sputniknews.com
+	doc
+    urldomain="cz.sputniknews.com"
+
+=ceskozdrave.cz
+	doc
+    urldomain="ceskozdrave.cz"
+
+=ceskoaktualne.cz
+	doc
+    urldomain="ceskoaktualne.cz"
+
+=aeronet.cz
+	doc
+    urldomain="aeronet.cz"
+
+=ac24.cz
+	doc
+    urldomain="ac24.cz"
+
+=www.duchdoby.cz
+	doc
+    urldomain="duchdoby.cz"
+
+=zpravy.dt24.cz
+	doc
+    urldomain="zpravy.dt24.cz"
+
+=e-republika.cz
+	doc
+    urldomain="e-republika.cz"
+
+=www.eurabia.cz
+	doc
+    urldomain="eurabia.cz"
+
+=eurodenik.cz
+	doc
+    urldomain="eurodenik.cz"
+
+=eurozpravy.cz
+	doc
+    urldomain="eurozpravy.cz"
+
+=leva-net.webnode.cz
+	doc
+    urldomain="leva-net.webnode.cz"
+
+=www.necenzurujeme.cz
+	doc
+    urldomain="necenzurujeme.cz"
+
+=www.novaburzoazie.com
+	doc
+    urldomain="novaburzoazie.com"
+
+=vasevec.parlamentnilisty.cz
+	doc
+    urldomain="vasevec.parlamentnilisty.cz"

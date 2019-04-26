@@ -283,7 +283,7 @@ class DoAnalysis:
 
         params = {
             'corpname': 'preloaded/dezinfo',
-            'ref_corpname': 'preloaded/czes2',
+            'ref_corpname': 'preloaded/cztenten15_0',
             'simple_n': '1',
             'max_terms': '100',
             'max_keywords': '250',
@@ -311,7 +311,7 @@ class DoAnalysis:
             print('Error getting keywords through API with message %s.' % e, file=sys.stderr)
 
         terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
-        params['ref_corpname'] = 'preloaded/cztenten12_8_sample'
+        params['ref_corpname'] = 'preloaded/cztenten15_0_sample'
         url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
         url_query += '&username=%s' % username
         url_query += '&api_key=%s' % api_key
