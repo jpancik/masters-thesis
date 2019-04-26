@@ -365,5 +365,15 @@
   },
   "vasevec.parlamentnilisty.cz": {
     "rss_url": "http://vasevec.parlamentnilisty.cz/rss.xml"
+  },
+  "idnes.cz": {
+    "rss_url": "https://servis.idnes.cz/rss.aspx",
+    "encoding": "windows-1250"
+  },
+  "novinky.cz": {
+    "rss_url": "https://www.novinky.cz/rss2/"
+  },
+  "irozhlas.cz": {
+    "rss_url": "https://www.irozhlas.cz/rss/irozhlas"
   }
 }

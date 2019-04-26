@@ -20,6 +20,7 @@ class HtmlExtractor:
     @staticmethod
     def _extract_text_from_html(html_content, split_paragraphs=False):
         content = html_content
+        content = re.sub(r'<!--((?!-->).|\n)*-->', '', content)
         if split_paragraphs:
             content = re.sub(r'<p[^>]*>', '\n', content)
         return re.sub(r'<[^>]*>', ' ', content)
@@ -85,10 +86,13 @@ class HtmlExtractor:
             if not url:
                 continue
 
-            if not url.startswith('http://') and not url.startswith('https://'):
-                url = 'http://%s' % url
+            if url.startswith('../'):
+                continue
 
-            out.add(urljoin(domain, url))
+            if url.startswith('http://') or url.startswith('https://'):
+                out.add(url)
+            else:
+                out.add(urljoin(domain, url))
 
         return [i for i in out]
 
@@ -112,11 +116,21 @@ class HtmlExtractor:
                 for selector_to_remove in remove_selectors:
                     removed = [x.extract() for x in a.select(selector_to_remove)]
                     self._log_debug('Selector to remove %s removed: "%s".' % (selector_to_remove, removed))
-        self._log_debug(article)
+        self._log_debug('Cleaned article HTML:')
+        for index, a in enumerate(article):
+            self._log_debug('Article block %s:' % index)
+            self._log_debug(a)
 
         raw_texts = []
         for a in article:
             html_content = str(a).replace('\n', ' ')
+
+            remove_regexes = self.domain_type.get_article_remove_regexes()
+            if remove_regexes:
+                for regex in remove_regexes:
+                    self._log_debug('Removing with regex: %s' % regex)
+                    html_content = re.sub(regex, '', html_content)
+
             raw_texts.append(self._extract_text_from_html(html_content, split_paragraphs=True))
 
         text = ' '.join(raw_texts)

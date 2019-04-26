@@ -7,10 +7,6 @@
       "selector": "#main article section section.section-inarticle",
       "regex_raw_html": "autor: <strong>([^<]*)</strong>"
     },
-    "date": {
-      "selector": "#main div div div article section div div div.time",
-      "date_format": "%d. %m. %Y %H:%M"
-    },
     "perex": {
       "selector": "#main div div div article section p strong"
     },
@@ -22,6 +18,9 @@
         "div.well",
         "h2",
         "div.poll-percent"
+      ],
+      "remove_regexes": [
+        "<p>Jste politik\\? Zveřejněte((?!</p>).)*</p>"
       ]
     }
   },
@@ -1170,6 +1169,7 @@
         ".b-article__refs-credits",
         ".b-article__refs",
         ".b-counters",
+        ".social-likes-pane__etc-popup",
         "section.comments"
       ]
     }
@@ -1510,6 +1510,67 @@
         ".footer-nav",
         ".footer-nav-right",
         ".block"
+      ]
+    }
+  },
+
+  "idnes.cz": {
+    "title": {
+      "selector": ".art-full h1"
+    },
+    "author": {
+      "selector": ".authors span"
+    },
+    "perex": {
+      "selector": ".opener"
+    },
+    "keywords": {
+      "selector": ".art-tags",
+      "regex_text": "Témata:((?:[\n ]*(.*)[\n ]*)*)"
+    },
+    "article": {
+      "selector": "#art-text"
+    }
+  },
+
+  "novinky.cz": {
+    "title": {
+      "selector": "#articleHeaderBig"
+    },
+    "author": {
+      "selector": ".articleAuthors"
+    },
+    "perex": {
+      "selector": ".perex"
+    },
+    "article": {
+      "selector": "#articleBody",
+      "remove_selectors": [
+        "table",
+        "blockquote",
+        ".acmDescription",
+        ".acmAuthor"
+      ]
+    }
+  },
+
+  "irozhlas.cz": {
+    "title": {
+      "selector": "article h1"
+    },
+    "author": {
+      "selector": ".meta strong"
+    },
+    "perex": {
+      "selector": "header.b-detail__head p"
+    },
+    "article": {
+      "selector": "article div.row--article div.b-detail",
+      "remove_selectors": [
+        "header",
+        ".meta",
+        ".b-inline",
+        ".b-tweet"
       ]
     }
   }

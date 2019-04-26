@@ -6,6 +6,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from lib import webtrack_logger
 from lib.articles_url_gatherer_domain_types.articles_url_gatherer_domain_type import DomainType
 
 
@@ -44,7 +45,7 @@ class RegexParser:
                     for link in soup.find_all('a'):
                         possible_articles.add(link.get('href'))
             except Exception as e:
-                print(e, file=sys.stderr)
+                webtrack_logger.log.error(e)
 
         article_regex = re.compile(regex_parser_args.regex)
 

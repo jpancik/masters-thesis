@@ -28,6 +28,7 @@ class DownloadArticles:
         parser.add_argument('--dry-run', action='store_true', default=False,
                             help='Don\'t store output and print it to stdout.')
         parser.add_argument('--id', type=int, default=None, help='Specify id of article to download.')
+        parser.add_argument('--domain', type=str, default=None, help='Specify domain of articles to download.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
         parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
         parser.add_argument('--config', type=str, default='files/website_article_urls_descriptions.json', help='Specify path to the articles urls JSON configuration file.')
@@ -70,6 +71,9 @@ class DownloadArticles:
             if self.args.id:
                 cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date FROM article_metadata a '
                             'WHERE a.id = %s', (self.args.id, ))
+            elif self.args.domain:
+                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date FROM article_metadata a '
+                            'WHERE a.website_domain = %s', (self.args.domain,))
             else:
                 cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date FROM article_metadata a '
                             'LEFT OUTER JOIN article_raw_html r ON r.article_metadata_id = a.id '

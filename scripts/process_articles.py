@@ -9,10 +9,12 @@ from datetime import datetime
 from langid import langid
 from pebble import ProcessPool
 
+from lib import webtrack_logger
 from lib.article_data_extractors.html_extractor import HtmlExtractor
 from lib.articles_processor_domain_type.articles_processor_domain_type import DomainType
 from lib.articles_processor_domain_type.json_domain_type import JsonDomainType
 from lib.crawler_db import connector
+from lib.webtrack_logger import log
 from scripts.download_articles import DownloadArticles
 
 
@@ -22,6 +24,7 @@ class ProcessArticles:
 
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
         self.domain_types = self._init_domain_types(self.args.config)
         self.db_con = connector.get_db_connection()
 
@@ -39,7 +42,7 @@ class ProcessArticles:
         parser.add_argument('--skip-hyperlinks', action='store_true', default=False, help='Don\'t gather all hyperlinks from article.')
         parser.add_argument('-p', '--pipeline', action='store_true', default=False, help='Run script in pipeline mode.')
         parser.add_argument('--config', type=str, default='files/website_article_format_descriptions.json', help='Specify path to the articles format JSON configuration file.')
-        parser.add_argument('--processes', type=int, default=16, help='Specify number of processes for the pool.')
+        parser.add_argument('--processes', type=int, default=32, help='Specify number of processes for the pool.')
         return parser.parse_args()
 
     def run(self):
@@ -55,8 +58,8 @@ class ProcessArticles:
                 if capturing_article:
                     current_article_html.append(line)
                     if line.endswith('</html>\n'):
-                        print('Captured article: %s with %s lines'
-                              % (current_article_metadata, len(current_article_html)), file=sys.stderr)
+                        log.info('Captured article: %s with %s lines'
+                              % (current_article_metadata, len(current_article_html)))
                         input_articles_data.append((current_article_metadata, ''.join(current_article_html)))
 
                         capturing_article = False
@@ -67,77 +70,80 @@ class ProcessArticles:
                         capturing_article = True
                         current_article_metadata = list(csv.reader([line]))[0]
 
-            for ((_, website_domain_name, url, title, publication_date), article_raw_html) in input_articles_data:
-                to_process = [
-                    ((-1, url, title, publication_date, datetime.now()), article_raw_html)
-                ]
+            with ProcessPool(max_workers=self.args.processes) as pool:
+                for ((_, website_domain_name, url, title, publication_date), article_raw_html) in input_articles_data:
+                    to_process = [
+                        ((-1, url, title, publication_date, datetime.now()), article_raw_html)
+                    ]
 
-                domain_type = self.domain_types[website_domain_name]
-                if not domain_type:
-                    continue
+                    domain_type = self.domain_types[website_domain_name]
+                    if not domain_type:
+                        continue
 
-                (processed_articles,
-                 processed_articles_count,
-                 processed_articles_last_id,
-                 empty_title_count,
-                 empty_author_count,
-                 empty_publication_date_count,
-                 empty_perex_count,
-                 empty_keywords_count,
-                 empty_article_content_count) = self._process_articles(domain_type, to_process)
+                    (processed_articles,
+                     processed_articles_count,
+                     processed_articles_last_id,
+                     empty_title_count,
+                     empty_author_count,
+                     empty_publication_date_count,
+                     empty_perex_count,
+                     empty_keywords_count,
+                     empty_article_content_count) = self._process_articles(pool, domain_type, to_process)
 
-                json_data = processed_articles[0]
-                json_data['url'] = url
-                print(json.dumps(json_data, ensure_ascii=False))
+                    json_data = processed_articles[0]
+                    json_data['url'] = url
+                    print(json.dumps(json_data, ensure_ascii=False))
         else:
-            for website_domain_name, domain_type in self.domain_types.items():
-                if self.args.domain is not None and self.args.domain != website_domain_name:
-                    continue
+            with ProcessPool(max_workers=self.args.processes) as pool:
+                for website_domain_name, domain_type in self.domain_types.items():
+                    if self.args.domain is not None and self.args.domain != website_domain_name:
+                        continue
 
-                sql_query, article_begin_id = self._construct_query(cur, website_domain_name)
-                print('Executing query "%s".' % sql_query, file=sys.stderr)
+                    sql_query, article_begin_id = self._construct_query(cur, website_domain_name)
+                    log.info('Executing query "%s".' % sql_query)
 
-                cur.execute(sql_query)
-                article_rows = cur.fetchall()
+                    cur.execute(sql_query)
+                    article_rows = cur.fetchall()
 
-                to_process = []
-                for id, url, title, publication_date, filename, created_at in article_rows:
-                    with open(filename, 'r') as file:
-                        to_process.append(((id, url, title, publication_date, created_at), file.read()))
+                    to_process = []
+                    for id, url, title, publication_date, filename, created_at in article_rows:
+                        with open(filename, 'r') as file:
+                            to_process.append(((id, url, title, publication_date, created_at), file.read()))
 
-                (processed_articles,
-                 processed_articles_count,
-                 processed_articles_last_id,
-                 empty_title_count,
-                 empty_author_count,
-                 empty_publication_date_count,
-                 empty_perex_count,
-                 empty_keywords_count,
-                 empty_article_content_count) = self._process_articles(domain_type, to_process)
+                    (processed_articles,
+                     processed_articles_count,
+                     processed_articles_last_id,
+                     empty_title_count,
+                     empty_author_count,
+                     empty_publication_date_count,
+                     empty_perex_count,
+                     empty_keywords_count,
+                     empty_article_content_count) = self._process_articles(pool, domain_type, to_process)
 
-                if not self.args.manual and not self.args.dry_run and processed_articles_count > 0:
-                    cur.execute('INSERT INTO article_processing_summary'
-                                '(website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
-                                'empty_perex_count, empty_keywords_count, empty_article_content_count, '
-                                'total_articles_processed_count, start_article_id, end_article_id) '
-                                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
-                                (website_domain_name, empty_title_count, empty_author_count, empty_publication_date_count,
-                                 empty_perex_count, empty_keywords_count, empty_article_content_count,
-                                 processed_articles_count, article_begin_id, processed_articles_last_id))
-                    processing_summary_id = cur.fetchone()[0]
+                    if not self.args.manual and not self.args.dry_run and not self.args.debug \
+                            and not self.args.limit and processed_articles_count > 0:
+                        cur.execute('INSERT INTO article_processing_summary'
+                                    '(website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
+                                    'empty_perex_count, empty_keywords_count, empty_article_content_count, '
+                                    'total_articles_processed_count, start_article_id, end_article_id) '
+                                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id',
+                                    (website_domain_name, empty_title_count, empty_author_count, empty_publication_date_count,
+                                     empty_perex_count, empty_keywords_count, empty_article_content_count,
+                                     processed_articles_count, article_begin_id, processed_articles_last_id))
+                        processing_summary_id = cur.fetchone()[0]
 
-                    for article_metadata_id, file_path in processed_articles:
-                        cur.execute('INSERT INTO article_processed_data'
-                                    '(website_domain, article_metadata_id, article_processing_summary_id, filename) '
-                                    'VALUES (%s, %s, %s, %s)',
-                                    (website_domain_name, article_metadata_id, processing_summary_id, file_path))
+                        for article_metadata_id, file_path in processed_articles:
+                            cur.execute('INSERT INTO article_processed_data'
+                                        '(website_domain, article_metadata_id, article_processing_summary_id, filename) '
+                                        'VALUES (%s, %s, %s, %s)',
+                                        (website_domain_name, article_metadata_id, processing_summary_id, file_path))
 
-                    self.db_con.commit()
+                        self.db_con.commit()
 
         cur.close()
         self._close_db_connection()
 
-    def _process_articles(self, domain_type, articles_raw_data):
+    def _process_articles(self, pool, domain_type, articles_raw_data):
         input_data = []
         for index, ((article_id, url, title, publication_date, created_at), article_html) in enumerate(articles_raw_data):
             input_data.append((
@@ -156,41 +162,41 @@ class ProcessArticles:
         empty_article_content_count = 0
         processed_articles = []
 
-        with ProcessPool(max_workers=self.args.processes) as pool:
-            future = pool.map(self._process_article, input_data, timeout=180)
 
-            iterator = future.result()
-            while True:
-                try:
-                    (index, total_count, article_id, article_out,
-                     article_empty_title_count, article_empty_author_count, article_empty_publication_date_count,
-                     article_empty_perex_count, article_empty_keywords_count, article_empty_article_content_count) = next(iterator)
-                    if article_out is None:
-                        continue
+        future = pool.map(self._process_article, input_data, timeout=180)
 
-                    if self.args.dry_run:
-                        json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
-                        print(json_data)
-                    elif self.args.pipeline:
-                        processed_articles.append(article_out)
-                    else:
-                        json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
-                        file_path = self._store_processed_article(article_id, domain_type, json_data)
-                        processed_articles.append((article_id, file_path))
-                        print('(%s/%s) Stored result in %s.' % (index, total_count, file_path), file=sys.stderr)
+        iterator = future.result()
+        while True:
+            try:
+                (index, total_count, article_id, article_out,
+                 article_empty_title_count, article_empty_author_count, article_empty_publication_date_count,
+                 article_empty_perex_count, article_empty_keywords_count, article_empty_article_content_count) = next(iterator)
+                if article_out is None:
+                    continue
 
-                    processed_articles_count += 1
-                    processed_articles_last_id = max(processed_articles_last_id, article_id)
-                    empty_title_count += article_empty_title_count
-                    empty_author_count += article_empty_author_count
-                    empty_publication_date_count += article_empty_publication_date_count
-                    empty_perex_count += article_empty_perex_count
-                    empty_keywords_count += article_empty_keywords_count
-                    empty_article_content_count += article_empty_article_content_count
-                except StopIteration:
-                    break
-                except TimeoutError as error:
-                    print('Function took longer than 180 seconds.', file=sys.stderr)
+                if self.args.dry_run:
+                    json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
+                    print(json_data)
+                elif self.args.pipeline:
+                    processed_articles.append(article_out)
+                else:
+                    json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
+                    file_path = self._store_processed_article(article_id, domain_type, json_data)
+                    processed_articles.append((article_id, file_path))
+                    log.info('(%s/%s) Stored result in %s.' % (index, total_count, file_path))
+
+                processed_articles_count += 1
+                processed_articles_last_id = max(processed_articles_last_id, article_id)
+                empty_title_count += article_empty_title_count
+                empty_author_count += article_empty_author_count
+                empty_publication_date_count += article_empty_publication_date_count
+                empty_perex_count += article_empty_perex_count
+                empty_keywords_count += article_empty_keywords_count
+                empty_article_content_count += article_empty_article_content_count
+            except StopIteration:
+                break
+            except TimeoutError as error:
+                log.warning('Function took longer than 180 seconds.')
 
         return (processed_articles, processed_articles_count, processed_articles_last_id, empty_title_count,
                 empty_author_count, empty_publication_date_count, empty_perex_count, empty_keywords_count,
@@ -200,7 +206,7 @@ class ProcessArticles:
     def _process_article(input_data):
         index, total_count, id, url, title, publication_date, created_at, domain_type, article_html, debug, skip_hyperlinks = input_data
 
-        print('(%s/%s) Started processing article from %s.' % (index, total_count, url), file=sys.stderr)
+        log.info('(%s/%s) Started processing article from %s.' % (index, total_count, url))
 
         out = None
         empty_title_count = 0
@@ -254,12 +260,9 @@ class ProcessArticles:
             if not article_content:
                 empty_article_content_count += 1
 
-            print('(%s/%s) Finished processing article from %s.' % (index, total_count, url), file=sys.stderr)
+            log.info('(%s/%s) Finished processing article from %s.' % (index, total_count, url))
         except Exception as e:
-            print(
-                '(%s/%s) Error processing article from %s with message: %s.' % (index, total_count, url, e),
-                file=sys.stderr)
-            traceback.print_exc()
+            log.error('(%s/%s) Error processing article from %s with message: %s.' % (index, total_count, url, e))
 
         return (
             index, total_count, id, out,

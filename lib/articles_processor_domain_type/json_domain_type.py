@@ -41,6 +41,10 @@ class JsonDomainType(DomainType):
         dict = self.data_dict.get('article')
         return dict.get('remove_selectors') if dict else None
 
+    def get_article_remove_regexes(self):
+        dict = self.data_dict.get('article')
+        return dict.get('remove_regexes') if dict else None
+
     @classmethod
     def get_json_domain_types(cls, loaded_json):
         out = {}
