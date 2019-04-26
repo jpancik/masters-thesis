@@ -6,6 +6,7 @@ import sys
 import traceback
 from datetime import datetime
 
+from langid import langid
 from pebble import ProcessPool
 
 from lib.article_data_extractors.html_extractor import HtmlExtractor
@@ -234,6 +235,9 @@ class ProcessArticles:
                 out['keywords'] = article_keywords
             if article_content:
                 out['article_content'] = article_content
+                language_id = langid.classify(article_content)
+                out['language'] = language_id[0]
+
             if article_hyperlinks and not skip_hyperlinks:
                 out['hyperlinks'] = article_hyperlinks
 

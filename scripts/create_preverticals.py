@@ -96,6 +96,7 @@ class CreatePreverticals:
                     data['author'] if 'author' in data else None,
                     data['publication_date'] if 'publication_date' in data else None,
                     data['perex'] if 'perex' in data else None,
+                    data['language'] if 'language' in data else None,
                     data['article_content'] if 'article_content' in data else None)
 
             if index != 0 and index % ((int(total_count / 100.0)) * 10) == 0:
@@ -107,7 +108,7 @@ class CreatePreverticals:
     @staticmethod
     def print_to_vertical(
             output_file, article_metadata_id, article_url,
-            title, author, publication_date, perex, article_content):
+            title, author, publication_date, perex, language, article_content):
 
         output_file.write('<doc')
         output_file.write(' dbid=%s' % quoteattr(str(article_metadata_id)))
@@ -119,6 +120,8 @@ class CreatePreverticals:
         if publication_date:
             output_file.write(' date=%s' % quoteattr(publication_date))
             output_file.write(' yearmonth=%s' % quoteattr(publication_date[0:7].replace('-', '')))
+        if language:
+            output_file.write(' language=%s' % quoteattr(language))
         output_file.write('>\n')
 
         if perex:
