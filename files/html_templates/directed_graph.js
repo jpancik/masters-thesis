@@ -1,6 +1,15 @@
 // Source from: https://bl.ocks.org/martinjc/e4c013dab1fabb2e02e2ee3bc6e1b49d
 // Released under the The MIT License.
 
+window.showHoverInfo = true;
+
+function offset(el) {
+    var rect = el.getBoundingClientRect(),
+    scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+    scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+}
+
 // load the graph
 loadGraph = function(graph) {
     // dimensions
@@ -103,6 +112,7 @@ loadGraph = function(graph) {
         .text(function(d) {
             return d.name;
         })
+        .style("font-size", "1em")
         .style("fill", function(d) {
             return d.color;
         });
@@ -195,6 +205,39 @@ loadGraph = function(graph) {
             link.style("stroke", function(o) {
                 return o.source === d || o.target === d ? o.source.color : "#ddd";
             });
+
+
+            let hoverInfoElement = document.querySelector("#hoverinfo");
+            if (hoverInfoElement && window.showHoverInfo) {
+                let graph = document.querySelector('#graph');
+                let offsetGraph = offset(graph);
+
+                const x = offsetGraph.left + d.x + 75;
+                const y = offsetGraph.top + d.y + 75;
+                hoverInfoElement.style.top = y + "px";
+                hoverInfoElement.style.left = x + "px";
+                hoverInfoElement.style.display = "block";
+
+                let table = document.querySelector("#hoverinfo tbody");
+                table.innerHTML = '';
+
+                var tableLinks = [];
+                link.filter(function (o) {
+                    return o.target === d;
+                }).each(function (o) {
+                    tableLinks.push([o.source.domain, o.value]);
+                });
+
+                tableLinks.sort(function (a, b) {
+                    return b[1] - a[1];
+                });
+                for (let i = 0; i < tableLinks.length; i++) {
+                    table.innerHTML += "<tr>" +
+                        "<td>" + tableLinks[i][0] + "</td>" +
+                        "<td class='text-center'>" + tableLinks[i][1] + "</td>" +
+                        "</tr>";
+                }
+            }
         };
     }
 
@@ -203,5 +246,10 @@ loadGraph = function(graph) {
         node.style("fill-opacity", 1);
         link.style("stroke-opacity", 1);
         link.style("stroke", "#ddd");
+
+        const hoverInfoElement = document.querySelector('#hoverinfo');
+        if (hoverInfoElement) {
+            hoverInfoElement.style.display = "none";
+        }
     }
 };

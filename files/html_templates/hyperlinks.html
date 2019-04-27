@@ -33,6 +33,11 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-12 text-center">
+            <p id="hoverinfo-toggle"><a href="#" onclick="toggleHoverInfo(); return false;">Disable hover info</a></p>
+        </div>
+    </div>
+    <div class="row">
         <p>
             This is a bidirectional graph showing how are web domains hyperlinking from within articles to other
             articles on different web domains.
@@ -44,7 +49,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-striped">
+            <table class="table table-striped" id="hyperlinks-table">
                 <thead>
                 <tr>
                     <th scope="col">Domain</th>
@@ -58,6 +63,20 @@
             <br />
             <br />
         </div>
+    </div>
+
+    <div style="position: absolute; background-color: #ffffff;
+                top: 0px; left: 0px; border: black 1px solid; border-radius: 5px; display: none;" id="hoverinfo">
+        <table class="table table-borderless">
+            <thead>
+            <tr>
+                <th scope="col">Website domain</th>
+                <th scope="col"># of hyperlinks</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
 </main><!-- /.container -->
 <script src="directed_graph.js"></script>
@@ -81,6 +100,17 @@
         tbody.innerHTML = table_html;
     };
     loadStatistics(graphJson);
+
+    toggleHoverInfo = function() {
+        window.showHoverInfo = !window.showHoverInfo;
+
+        const element = document.querySelector("#hoverinfo-toggle");
+        if (window.showHoverInfo) {
+            element.innerHTML = "<a href='#' onclick='toggleHoverInfo(); return false;'>Disable hover info</a>";
+        } else {
+            element.innerHTML = "<a href='#' onclick='toggleHoverInfo(); return false;'>Enable hover info</a>";
+        }
+    }
 </script>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -97,7 +127,7 @@
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('.table').DataTable();
+        $('#hyperlinks-table').DataTable();
     });
 </script>
 </body>

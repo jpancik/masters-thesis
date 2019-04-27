@@ -31,6 +31,11 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-12 text-center">
+            <p id="hoverinfo-toggle"><a href="#" onclick="toggleHoverInfo(); return false;">Disable hover info</a></p>
+        </div>
+    </div>
+    <div class="row">
         <p>
             This is a bidirectional graph showing how are web domains taking parts of articles from articles on
             other web domains. We consider an article to be a plagiate, if 25% of it is taken from another article.
@@ -59,6 +64,20 @@
             </table>
         </div>
     </div>
+
+    <div style="position: absolute; background-color: #ffffff;
+                top: 0px; left: 0px; border: black 1px solid; border-radius: 5px; display: none;" id="hoverinfo">
+        <table class="table table-borderless">
+            <thead>
+            <tr>
+                <th scope="col">Website domain</th>
+                <th scope="col"># of art. taken</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 </main><!-- /.container -->
 <script src="directed_graph.js"></script>
 <script>
@@ -83,6 +102,17 @@
         tbody.innerHTML = table_html;
     };
     loadStatistics(graphJson);
+
+    toggleHoverInfo = function() {
+        window.showHoverInfo = !window.showHoverInfo;
+
+        const element = document.querySelector("#hoverinfo-toggle");
+        if (window.showHoverInfo) {
+            element.innerHTML = "<a href='#' onclick='toggleHoverInfo(); return false;'>Disable hover info</a>";
+        } else {
+            element.innerHTML = "<a href='#' onclick='toggleHoverInfo(); return false;'>Enable hover info</a>";
+        }
+    }
 </script>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
