@@ -401,7 +401,7 @@ class PlagiarismOutputProcessor:
             plagiates))
 
         with open(self.output_json_file_path, 'w') as json_file:
-            json_file.write(json.dumps(plagiates, indent=4, ensure_ascii=False))
+            json_file.write(json.dumps(plagiates, ensure_ascii=False))
 
         return plagiates
 
@@ -498,7 +498,7 @@ class PlagiarismOutputProcessor:
                 })
 
         with open(self.output_json_graph_by_articles_file_path, 'w') as json_file:
-            json_file.write(json.dumps(json_data, indent=4))
+            json_file.write(json.dumps(json_data))
 
         json_data['links'] = []
         for (source_domain, plagiate_domain), count in links_by_words.items():
@@ -510,4 +510,4 @@ class PlagiarismOutputProcessor:
                 })
 
         with open(self.output_json_graph_by_words_file_path, 'w') as json_file:
-            json_file.write(json.dumps(json_data, indent=4))
+            json_file.write(json.dumps(json_data))

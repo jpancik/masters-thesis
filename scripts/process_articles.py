@@ -174,12 +174,12 @@ class ProcessArticles:
                     continue
 
                 if self.args.dry_run:
-                    json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
+                    json_data = json.dumps(article_out, ensure_ascii=False)
                     print(json_data)
                 elif self.args.pipeline:
                     processed_articles.append(article_out)
                 else:
-                    json_data = json.dumps(article_out, indent=4, ensure_ascii=False)
+                    json_data = json.dumps(article_out, ensure_ascii=False)
                     file_path = self._store_processed_article(article_id, domain_type, json_data)
                     processed_articles.append((article_id, file_path))
                     log.info('(%s/%s) Stored result in %s.' % (index, total_count, file_path))

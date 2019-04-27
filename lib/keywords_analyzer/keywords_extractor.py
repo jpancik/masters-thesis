@@ -127,6 +127,6 @@ class KeywordsPerDomainExtractor:
                 })
 
         with open(self.output_file_keywords, 'w') as output_file:
-            output_file.write(json.dumps(output, indent=4))
+            output_file.write(json.dumps(output))
 
         log.info('Finished looking for keywords per domain.')

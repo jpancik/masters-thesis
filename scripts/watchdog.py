@@ -124,7 +124,7 @@ class Watchdog:
                 'articles_count_per_day': articles_count_per_day,
                 'website_domains_article_counts': website_domains_article_counts,
                 'gathering_started_at': str(gathering_started_at[0].strftime('%B %-d, %Y'))
-            }, indent=4, ensure_ascii=False))
+            }, ensure_ascii=False))
 
     def _close_db_connection(self):
         if self.db_con:

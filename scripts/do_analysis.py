@@ -244,7 +244,7 @@ class DoAnalysis:
         log.info('\nFinished analyzing hyperlinks.')
 
         with open(self.HYPERLINKS_OUTPUT_JSON_DATA, 'w') as output_file:
-            output_file.write(json.dumps(raw_data, indent=4, ensure_ascii=False))
+            output_file.write(json.dumps(raw_data, ensure_ascii=False))
 
         graph_json_data = {
             'nodes': [],
@@ -273,7 +273,7 @@ class DoAnalysis:
         graph_json_data['links'].sort(key=lambda val: (val['source'], -val['value']))
 
         with open(self.HYPERLINKS_OUTPUT_JSON_GRAPH, 'w') as output_file:
-            output_file.write(json.dumps(graph_json_data, indent=4, ensure_ascii=False))
+            output_file.write(json.dumps(graph_json_data, ensure_ascii=False))
 
         if cur:
             cur.close()
