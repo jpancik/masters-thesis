@@ -19,6 +19,13 @@
     <div class="row">
         <div class="col-md-12 text-center">
             <p>{{type_selector}}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <span>Search for word:</span>
+            <input type="text" id="search" oninput="inputChanged(this); return false;"/>
+            <br/>
             <br/>
         </div>
     </div>
@@ -59,7 +66,7 @@
 
     const pageSize = 100;
 
-    getGraphSvh = function(graph) {
+    getGraphSvg = function(graph) {
         let rawPoints = graph.split(':');
         rawPoints = rawPoints.map(x => parseInt(x));
 
@@ -113,22 +120,22 @@
                "</div>";
     };
 
-    renderPages = function(page) {
+    renderPages = function(page, filter, keywordsLength) {
         pages = document.querySelector("#pages");
 
         pages.innerHTML = "Page: ";
-        const pagesCount = Math.ceil(trendsJson.result.length / pageSize);
+        const pagesCount = Math.ceil(keywordsLength / pageSize);
 
         for (let i = 0; i < pagesCount; i++) {
             if (i === page) {
                 pages.innerHTML += "<span>" + (i + 1) + "     </span>";
             } else {
-                pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ");'>" + (i + 1) + "     </a>";
+                pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ",'" + filter + "');'>" + (i + 1) + "     </a>";
             }
         }
     };
 
-    renderTrends = function(page) {
+    renderTrends = function(page, filter) {
         trendsBoxes = document.querySelector("#trends-boxes");
 
         trendsBoxes.innerHTML = "";
@@ -138,7 +145,10 @@
         rowHtml = "<div class='row'>";
         rowFilled = 0;
 
-        keywords = trendsJson.result;
+        unfiltered = trendsJson.result;
+        keywords = unfiltered.filter(function (keyword) {
+            return keyword[1].toLowerCase().startsWith(filter.toLowerCase());
+        });
         for (let i = page * pageSize; i < keywords.length && i < (page + 1) * pageSize; i++) {
             const item = keywords[i];
             const id = item[0];
@@ -153,7 +163,7 @@
                 rowHtml = "<div class='row'>";
                 rowFilled = 0;
             }
-            rowHtml += getTrendHtml(id, keyword, trend, pvalue, frequency, getGraphSvh(trendsJson.samples[id]));
+            rowHtml += getTrendHtml(id, keyword, trend, pvalue, frequency, getGraphSvg(trendsJson.samples[id]));
             rowFilled += 1;
         }
 
@@ -163,9 +173,13 @@
         }
 
         trendsBoxes.innerHTML = newHtml;
-        renderPages(page);
+        renderPages(page, filter, keywords.length);
     };
-    renderTrends(0);
+    renderTrends(0, '');
+
+    inputChanged = function(input) {
+        renderTrends(0, input.value);
+    }
 </script>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -340,7 +340,7 @@ class DoAnalysis:
 
         keywords_extractor = KeywordsPerDomainExtractor(
             input_vertical_files,
-            ref_freq_file_path='data/czes2_word_freq.tsv',
+            ref_freq_file_path='data/word_freq.tsv',
             output_file_keywords='data/analysis/keywords_per_domain.json'
         )
         keywords_extractor.run()
