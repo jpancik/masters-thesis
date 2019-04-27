@@ -2,7 +2,9 @@ import argparse
 import json
 import sys
 
+from lib import webtrack_logger
 from lib.crawler_db import connector
+from lib.webtrack_logger import log
 from scripts.process_articles import ProcessArticles
 
 
@@ -11,6 +13,7 @@ class Watchdog:
 
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
         self.db_con = connector.get_db_connection()
 
     @staticmethod
@@ -26,7 +29,7 @@ class Watchdog:
 
         cur = self.db_con.cursor()
 
-        print('Checking article gathering summaries for possible errors.', file=sys.stderr)
+        log.info('Checking article gathering summaries for possible errors.')
         cur.execute(
             'SELECT s.website_domain, s.total_articles_count, s.created_at FROM article_metadata_gathering_summary s '
             'WHERE DATE(s.created_at) = (SELECT MAX(DATE(s.created_at)) FROM article_metadata_gathering_summary s);')
@@ -37,16 +40,15 @@ class Watchdog:
         for website_domain, total_articles_count, created_at in article_metadata_gathering_summaries:
             if total_articles_count == 0:
                 faulty += 1
-                print('Error: No articles found for domain %s.' % website_domain, file=sys.stderr)
+                log.warning('No articles found for domain %s.' % website_domain)
                 no_articles_found.append({
                     'created_at': str(created_at),
                     'website_domain': website_domain
                 })
-        print('Checked %s domains and found %s possible errors.' % (len(article_metadata_gathering_summaries), faulty),
-              file=sys.stderr)
+        log.info(
+            'Checked %s domains and found %s possible errors.' % (len(article_metadata_gathering_summaries), faulty))
 
-        print('Checking article processing summaries for possible errors.',
-              file=sys.stderr)
+        log.info('Checking article processing summaries for possible errors.')
         cur.execute(
             'SELECT website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
             'empty_perex_count, empty_keywords_count, empty_article_content_count, total_articles_processed_count, created_at '
@@ -59,8 +61,7 @@ class Watchdog:
              empty_keywords_count, empty_article_content_count,
              total_articles_processed_count, created_at) in article_processing_summaries:
             if website_domain not in domain_types:
-                print('Warning: Unknown website_domain %s.' % website_domain,
-                      file=sys.stderr)
+                log.warning('Unknown website_domain %s.' % website_domain)
                 continue
 
             domain = domain_types[website_domain]
@@ -76,8 +77,7 @@ class Watchdog:
                 if domain.get_attribute_selector_info(name):
                     percentage = float(empty_count) / float(total_articles_processed_count)
                     if percentage > self.args.threshold:
-                        print('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, message_text),
-                              file=sys.stderr)
+                        log.warning('%s has %.0f%% of %s empty.' % (website_domain, percentage * 100, message_text))
                         processing_problems.append({
                             'created_at': str(created_at),
                             'website_domain': website_domain,
@@ -86,8 +86,7 @@ class Watchdog:
 
             percentage = float(empty_article_content_count) / float(total_articles_processed_count)
             if percentage > self.args.threshold_articles:
-                print('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, 'articles'),
-                      file=sys.stderr)
+                log.warning('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, 'articles'))
                 processing_problems.append({
                     'created_at': str(created_at),
                     'website_domain': website_domain,

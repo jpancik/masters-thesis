@@ -1,5 +1,7 @@
 import sys
 
+from lib.webtrack_logger import log
+
 
 class PlagiarismDetector:
     def __init__(self, input_ngram_files,
@@ -25,7 +27,7 @@ class PlagiarismDetector:
                             shingle_index[token_shingle_hash] = (doc_id, doc_sent_id, token_offset)
                         ngram_counter += 1
 
-        print('%d n-grams (%d unique) read' % (ngram_counter, len(shingle_index)), file=sys.stderr)
+        log.info('%d n-grams (%d unique) read' % (ngram_counter, len(shingle_index)))
 
         result_dup_doc_ids, result_dup_shingle_positions, result_dup_info = [], [], []
 
@@ -79,7 +81,7 @@ class PlagiarismDetector:
         with open(self.output_file_plagiates, 'w') as fp:
             for dup_info in result_dup_info:
                 fp.write('%s\n' % '\t'.join(dup_info))
-        print('%d/%d candidate documents found' % (dup_doc_count, doc_count), file=sys.stderr)
+        log.info('%d/%d candidate documents found' % (dup_doc_count, doc_count))
 
     @staticmethod
     def get_sentence_shingles(sent_line):

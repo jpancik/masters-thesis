@@ -1,10 +1,10 @@
 import json
 import os
 import re
-import sys
 from urllib.parse import urlparse
 
 from lib import util
+from lib.webtrack_logger import log
 
 
 class KeywordsPerDomainExtractor:
@@ -21,7 +21,7 @@ class KeywordsPerDomainExtractor:
 
     def run(self):
         if not os.path.exists(self.ref_freq_file_path):
-            print('Could not find file %s with reference frequencies.' % (self.ref_freq_file_path), file=sys.stderr)
+            log.error('Could not find file %s with reference frequencies.' % (self.ref_freq_file_path))
             return
 
         doc_url_re = re.compile(' %s="([^"]+)"' % 'url')
@@ -32,7 +32,6 @@ class KeywordsPerDomainExtractor:
         # (netloc, count)
         words_count_per_domain = dict()
         for vertical_file_path in self.input_vertical_files:
-            #print('Loading vertical file %s.' % vertical_file_path, file=sys.stderr)
             with open(vertical_file_path, 'r') as vertical_file:
                 for raw_doc in util.read_big_structures(vertical_file, doc_struct):
                     doc_header, doc_body = raw_doc.split('\n', 1)
@@ -64,7 +63,7 @@ class KeywordsPerDomainExtractor:
                             words_count_per_domain[doc_netloc] += 1
                         else:
                             words_count_per_domain[doc_netloc] = 1
-            print('Loaded vertical file %s.' % vertical_file_path, file=sys.stderr)
+            log.info('Loaded vertical file %s.' % vertical_file_path)
 
         # Remove words that appear too infrequently.
         for website_domain, words_count in words_per_domain.items():
@@ -86,7 +85,7 @@ class KeywordsPerDomainExtractor:
                 del words_count[word_to_remove]
             words_count_per_domain[website_domain] -= removed_words
 
-        print('Loading reference frequencies from %s.' % self.ref_freq_file_path, file=sys.stderr)
+        log.info('Loading reference frequencies from %s.' % self.ref_freq_file_path)
         # (word, count)
         reference_words_count = dict()
         refernece_words_total_count = 0
@@ -95,7 +94,7 @@ class KeywordsPerDomainExtractor:
                 id, word, count = line.split('\t')
                 reference_words_count[word] = int(count)
                 refernece_words_total_count += int(count)
-        print('Loaded reference frequencies.', file=sys.stderr)
+        log.info('Loaded reference frequencies.')
 
         # (netloc, [(word, ratio])
         word_ratio_per_website_domain = dict()
@@ -130,4 +129,4 @@ class KeywordsPerDomainExtractor:
         with open(self.output_file_keywords, 'w') as output_file:
             output_file.write(json.dumps(output, indent=4))
 
-        print('Finished looking for keywords per domain.')
+        log.info('Finished looking for keywords per domain.')

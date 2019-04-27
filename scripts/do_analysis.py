@@ -11,11 +11,12 @@ from urllib.parse import urlparse
 
 import requests
 
-from lib import util
+from lib import util, webtrack_logger
 from lib.crawler_db import connector
 from lib.keywords_analyzer.keywords_extractor import KeywordsPerDomainExtractor
 from lib.plagiarism_detector.plagiarism_detector import PlagiarismDetector
 from lib.plagiarism_detector.plagiarism_output_processor import PlagiarismOutputProcessor
+from lib.webtrack_logger import log
 from scripts.create_corpus import CreateCorpus
 from scripts.create_preverticals import CreatePreverticals
 
@@ -54,6 +55,7 @@ class DoAnalysis:
 
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
         self.db_con = connector.get_db_connection()
 
     def parse_commandline(self):
@@ -101,17 +103,16 @@ class DoAnalysis:
             with open(self.CORPUS_INFO_OUTPUT_JSON_DATA, 'w') as corpus_info_file:
                 corpus_info_file.write(response.text)
 
-            print('Finished retrieving corpus info through API.', file=sys.stderr)
+            log.info('Finished retrieving corpus info through API.')
         except Exception as e:
-            traceback.print_exc()
-            print('Error getting corpus info through API with message %s.' % e, file=sys.stderr)
+            log.error('Error getting corpus info through API with message %s.' % e)
 
     def find_plagiates(self):
         if not os.path.isdir(self.NGRAM_FILES_FOLDER):
-            print('Folder %s with n-grams not found.' % self.NGRAM_FILES_FOLDER, file=sys.stderr)
+            log.error('Folder %s with n-grams not found.' % self.NGRAM_FILES_FOLDER)
             return
         if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
-            print('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER, file=sys.stderr)
+            log.error('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER)
             return
 
         if not os.path.isdir(self.PLAGIARISM_FOLDER):
@@ -126,9 +127,8 @@ class DoAnalysis:
             if (os.path.isfile(vertical_file_path)
                     and vertical_file_path.endswith('.vert')
                     and os.path.exists(ngrams_file_path)):
-                print(
-                    'Found vertical file %s and matching n-grams file %s.' % (vertical_file_path, ngrams_file_path),
-                    file=sys.stderr)
+                log.info(
+                    'Found vertical file %s and matching n-grams file %s.' % (vertical_file_path, ngrams_file_path))
                 input_ngrams_files.append(ngrams_file_path)
                 input_vertical_files.append(vertical_file_path)
 
@@ -155,14 +155,14 @@ class DoAnalysis:
             output_file_path_duplicate_position_all_time = '%s%s' % (self.PLAGIARISM_OUTPUT_DUPLICATE_POSITIONS, suffixes[i])
             output_file_path_plagiates_all_time = '%s%s' % (self.PLAGIARISM_OUTPUT_PLAGIATES, suffixes[i])
 
-            print('Running plagiarism detector on %s.' % suffixes[i], file=sys.stderr)
+            log.info('Running plagiarism detector on %s.' % suffixes[i])
             plagiarism_detector = PlagiarismDetector(
                 input_ngrams[i],
                 output_file_duplicate_positions=output_file_path_duplicate_position_all_time,
                 output_file_plagiates=output_file_path_plagiates_all_time)
             plagiarism_detector.run()
 
-            print('Processing plagiarism detector output on %s.' % suffixes[i], file=sys.stderr)
+            log.info('Processing plagiarism detector output on %s.' % suffixes[i])
             plagiarism_output_processor = PlagiarismOutputProcessor(
                 output_file_path_duplicate_position_all_time,
                 output_file_path_plagiates_all_time,
@@ -182,13 +182,13 @@ class DoAnalysis:
 
         cur = self.db_con.cursor()
 
-        print('Retrieving all processed articles.', file=sys.stderr)
+        log.info('Retrieving all processed articles.')
         cur.execute('SELECT a.id, a.url, d.filename FROM article_processed_data d '
                     'JOIN article_metadata a ON a.id = d.article_metadata_id')
         rows = cur.fetchall()
-        print('Finished retrieving all processed articles.', file=sys.stderr)
+        log.info('Finished retrieving all processed articles.')
 
-        print('Loading hyperlinks from processed JSON files.', file=sys.stderr)
+        log.info('Loading hyperlinks from processed JSON files.')
 
         # id_by_url: (netloc, path) : (article_id, article_url)
         id_by_url = dict()
@@ -211,9 +211,9 @@ class DoAnalysis:
             if index % int(len(rows)/10) == 0 and math.ceil(index/len(rows) * 100.0) != 100:
                 print('%.0f%%' % math.ceil(index/len(rows) * 100.0), end='....', file=sys.stderr)
                 sys.stderr.flush()
-        print('\nFinished loading hyperlinks from processed JSON files.', file=sys.stderr)
+        log.info('\nFinished loading hyperlinks from processed JSON files.')
 
-        print('Analyzing hyperlinks...', file=sys.stderr)
+        log.info('Analyzing hyperlinks...')
         # raw_data: source_url: [reference_urls]
         raw_data = dict()
         links = dict()
@@ -241,7 +241,7 @@ class DoAnalysis:
             if index % int(len(hyperlinks_in_files)/10) == 0 and math.ceil(index/len(hyperlinks_in_files) * 100.0) != 100:
                 print('%.0f%%' % math.ceil(index/len(hyperlinks_in_files) * 100.0), end='....', file=sys.stderr)
                 sys.stderr.flush()
-        print('\nFinished analyzing hyperlinks.', file=sys.stderr)
+        log.info('\nFinished analyzing hyperlinks.')
 
         with open(self.HYPERLINKS_OUTPUT_JSON_DATA, 'w') as output_file:
             output_file.write(json.dumps(raw_data, indent=4, ensure_ascii=False))
@@ -305,10 +305,9 @@ class DoAnalysis:
             with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file:
                 keywords_file.write(response.text)
 
-            print('Finished retrieving keywords through API.', file=sys.stderr)
+            log.info('Finished retrieving keywords through API.')
         except Exception as e:
-            traceback.print_exc()
-            print('Error getting keywords through API with message %s.' % e, file=sys.stderr)
+            log.error('Error getting keywords through API with message %s.' % e)
 
         terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
         params['ref_corpname'] = 'preloaded/cztenten15_0_sample'
@@ -321,14 +320,14 @@ class DoAnalysis:
             with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file:
                 terms_file.write(response.text)
 
-            print('Finished retrieving terms through API.', file=sys.stderr)
+            log.info('Finished retrieving terms through API.')
         except Exception as e:
             traceback.print_exc()
-            print('Error getting terms through API with message %s.' % e, file=sys.stderr)
+            log.error('Error getting terms through API with message %s.' % e)
 
     def keywords_per_domain(self):
         if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
-            print('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER, file=sys.stderr)
+            log.error('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER)
             return
 
         input_vertical_files = []
@@ -336,7 +335,7 @@ class DoAnalysis:
             vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name)
 
             if os.path.isfile(vertical_file_path) and vertical_file_path.endswith('.vert'):
-                print('Found vertical file %s.' % (vertical_file_path), file=sys.stderr)
+                log.info('Found vertical file %s.' % (vertical_file_path))
                 input_vertical_files.append(vertical_file_path)
 
         keywords_extractor = KeywordsPerDomainExtractor(
@@ -375,10 +374,9 @@ class DoAnalysis:
             with open(self.TRENDS_OUTPUT_JSON_DATA, 'w') as trends_file:
                 trends_file.write(response.text)
 
-            print('Finished retrieving trends through API.', file=sys.stderr)
+            log.info('Finished retrieving trends through API.')
         except Exception as e:
-            traceback.print_exc()
-            print('Error getting trends through API with message %s.' % e, file=sys.stderr)
+            log.error('Error getting trends through API with message %s.' % e)
 
     @staticmethod
     def _read_api_key():

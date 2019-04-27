@@ -4,6 +4,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from lib import util
+from lib.webtrack_logger import log
 
 
 class PlagiarismOutputProcessor:
@@ -86,9 +87,7 @@ class PlagiarismOutputProcessor:
                     doc_ids_required.add(src_doc_id)
         doc_ids_required.update(dup_doc_ids)
 
-        print(
-            '%d duplicate positions read, %d major sources determined' % (dup_pos_counter, len(source_ranges)),
-            file=sys.stderr)
+        log.info('%d duplicate positions read, %d major sources determined' % (dup_pos_counter, len(source_ranges)))
 
         id_to_doc_attrs_map = dict()
 
@@ -120,7 +119,7 @@ class PlagiarismOutputProcessor:
                             'date': doc_date
                         }
                     except AttributeError:
-                        print('%s' % doc_header, file=sys.stderr)
+                        log.error('%s' % doc_header)
                         raise
                     if not doc_id in doc_ids_required:
                         continue
@@ -140,7 +139,7 @@ class PlagiarismOutputProcessor:
                                 this_doc_sentences.append(sent_words)
                             sent_words, in_sent = [], True
 
-        print('%d source documents read' % doc_counter, file=sys.stderr)
+        log.info('%d source documents read' % doc_counter)
 
         self._write_html_output(
             dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
@@ -283,7 +282,7 @@ class PlagiarismOutputProcessor:
                 html_file.write('<div class="panel">\n%s\n</div>\n' % '\n'.join(marked_doc_content))
                 html_file.write('<div class="clear"></div>\n')
             html_file.write('</body>\n</html>\n')
-            print('%d candidate documents visualised' % dup_doc_len, file=sys.stderr)
+            log.info('%d candidate documents visualised' % dup_doc_len)
 
     def _write_json_output(self, dup_doc_ids, src_doc_ids_of_dup_docs, id_to_doc_attrs_map,
             doc_sentences, duplicate_ranges, doc_attrs, dup_doc_info, source_ranges):

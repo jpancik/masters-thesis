@@ -5,6 +5,7 @@ import sys
 from xml.sax.saxutils import quoteattr
 
 from lib.crawler_db import connector
+from lib.webtrack_logger import log
 
 
 class CreatePreverticals:
@@ -13,6 +14,7 @@ class CreatePreverticals:
 
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
         self.db_con = connector.get_db_connection()
 
     @staticmethod
@@ -55,7 +57,7 @@ class CreatePreverticals:
             for date in dates:
                 file_name = '%s-%s-%s.pvert' % (date[0].year, date[0].month, date[0].day)
                 if os.path.exists('%s/%s' % (self.PRE_VERTICAL_FILES_FOLDER, file_name)) and not self.args.dont_skip:
-                    print('Skipping "%s" because it already exists.' % file_name, file=sys.stderr)
+                    log.info('Skipping "%s" because it already exists.' % file_name)
                     continue
 
                 cur.execute('SELECT m.id, m.url, d.filename FROM article_processed_data d '
@@ -79,12 +81,11 @@ class CreatePreverticals:
             output_file = open(output_filename, 'w')
 
         total_count = len(article_processed_data_rows)
-        print('Started processing %s articles into vertical file "%s".' % (total_count, output_filename),
-              file=sys.stderr)
+        log.info('Started processing %s articles into vertical file "%s".' % (total_count, output_filename))
 
         for index, (article_metadata_id, article_url, filename) in enumerate(article_processed_data_rows):
             if not os.path.exists(filename):
-                print('Filename %s does not exist.' % filename, file=sys.stderr)
+                log.info('Filename %s does not exist.' % filename)
 
             with open(filename, 'r') as file:
                 data = json.load(file)
@@ -100,7 +101,7 @@ class CreatePreverticals:
                     data['article_content'] if 'article_content' in data else None)
 
             if index != 0 and index % ((int(total_count / 100.0)) * 10) == 0:
-                print('Finished processing %.0f%% articles.' % (index / float(total_count) * 100.0), file=sys.stderr)
+                log.info('Finished processing %.0f%% articles.' % (index / float(total_count) * 100.0))
 
         if output_file:
             output_file.close()

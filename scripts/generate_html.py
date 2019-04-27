@@ -25,8 +25,6 @@ class GenerateHtml:
     @staticmethod
     def parse_commandline():
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        parser.add_argument('--dry-run', action='store_true', default=False,
-                            help='Don\'t store output and print it to stdout.')
         parser.add_argument('--output', type=str, default='data/html/', help='Specify path where to put HTML files.')
         return parser.parse_args()
 

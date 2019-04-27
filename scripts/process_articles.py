@@ -3,7 +3,6 @@ import csv
 import json
 import os
 import sys
-import traceback
 from datetime import datetime
 
 from langid import langid

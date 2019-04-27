@@ -1,6 +1,7 @@
 import sys, re
 
 from lib import util
+from lib.webtrack_logger import log
 
 
 class NgramsGenerator:
@@ -29,7 +30,7 @@ class NgramsGenerator:
             try:
                 doc_id = self.doc_id_re.search(doc_lines[0]).group(1)
             except AttributeError:
-                print('%s\n' % doc[:100], file=sys.stderr)
+                log.info('%s\n' % doc[:100])
                 raise
             sent_tokens, in_sent, doc_sent_id = [], False, 0
             for line in doc_lines:
@@ -52,10 +53,9 @@ class NgramsGenerator:
                             (doc_id, doc_sent_id, '\t'.join(map(str, sent_token_shingles))))
                         ngram_counter += len(sent_token_shingles)
                     sent_tokens, in_sent = [], True
-        print(
+        log.info(
             'Ngrams Generator: %d documents, %d sentences, %d %d-grams processed'
-            % (doc_counter, sent_counter, ngram_counter, self.ngram_length),
-            file=sys.stderr)
+            % (doc_counter, sent_counter, ngram_counter, self.ngram_length))
 
     def get_sentence_shingles(self, sent_tokens):
         shingle_hashes = []

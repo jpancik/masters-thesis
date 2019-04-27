@@ -3,7 +3,9 @@ import os
 import subprocess
 import sys
 
+from lib import webtrack_logger
 from lib.plagiarism_detector.generate_ngrams import NgramsGenerator
+from lib.webtrack_logger import log
 from scripts.create_preverticals import CreatePreverticals
 
 
@@ -15,6 +17,7 @@ class CreateCorpus:
 
     def __init__(self):
         self.args = self.parse_commandline()
+        webtrack_logger.setup_logging()
 
     @staticmethod
     def parse_commandline():
@@ -27,7 +30,7 @@ class CreateCorpus:
 
     def run(self):
         if not os.path.isdir(self.PRE_VERTICAL_FILES_FOLDER):
-            print('Path for pre-verticals does not exist %s.' % self.PRE_VERTICAL_FILES_FOLDER, file=sys.stderr)
+            log.info('Path for pre-verticals does not exist %s.' % self.PRE_VERTICAL_FILES_FOLDER)
             return
 
         env_with_py2 = os.environ.copy()
@@ -40,9 +43,7 @@ class CreateCorpus:
                     and pre_vertical_file_path.endswith('.pvert')
                     and (not os.path.exists(vertical_file_path) or self.args.dont_skip)):
                 # Process .pvert file into .vert using "cat *.pvert | /opt/majka_pipe/majka-czech.sh > *.vert".
-                print(
-                    'Processing pre-vertical %s file into %s.' % (pre_vertical_file_path, vertical_file_path),
-                    file=sys.stderr)
+                log.info('Processing pre-vertical %s file into %s.' % (pre_vertical_file_path, vertical_file_path))
 
                 # This can be easily multihreaded via:
                 # https://stackoverflow.com/questions/15107714/wait-process-until-all-subprocess-finish
@@ -58,7 +59,7 @@ class CreateCorpus:
                             stdin=cat_process.stdout, stdout=vertical_file, env=env_with_py2)
                         majka_process.wait()
             else:
-                print('Skipping already existing pre-vertical file %s.' % (pre_vertical_file_path))
+                log.info('Skipping already existing pre-vertical file %s.' % (pre_vertical_file_path))
 
         # Generate n-grams for plagiates analysis.
         if not os.path.isdir(self.NGRAM_FILES_FOLDER):
@@ -70,9 +71,7 @@ class CreateCorpus:
             if (os.path.isfile(vertical_file_path)
                     and vertical_file_path.endswith('.vert')
                     and (not os.path.exists(ngrams_file_path) or self.args.dont_skip)):
-                print(
-                    'Creating ngrams %s from vertical file %s.' % (ngrams_file_path, vertical_file_path),
-                    file=sys.stderr)
+                log.info('Creating ngrams %s from vertical file %s.' % (ngrams_file_path, vertical_file_path))
 
                 with open(vertical_file_path, 'r') as vertical_file:
                     with open(ngrams_file_path, 'w') as ngrams_file:
@@ -80,11 +79,11 @@ class CreateCorpus:
                         ngrams_generator.generate()
             else:
                 if os.path.exists(ngrams_file_path) and vertical_file_path.endswith('.vert'):
-                    print('Skipping ngram generation because of existing n-grams file %s.' % (ngrams_file_path))
+                    log.info('Skipping ngram generation because of existing n-grams file %s.' % (ngrams_file_path))
 
 
         if not self.args.debug:
-            print('Running compilecorp')
+            log.info('Running compilecorp')
             compilecorp_process = subprocess.Popen(
                 ['compilecorp', '--recompile-corpus','/home/xpancik2/masters-thesis/files/compilecorp_config/dezinfo'],
                 env=env_with_py2)
