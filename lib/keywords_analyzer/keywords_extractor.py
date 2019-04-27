@@ -109,7 +109,7 @@ class KeywordsPerDomainExtractor:
                     if website_domain not in word_ratio_per_website_domain:
                         word_ratio_per_website_domain[website_domain] = []
 
-                    word_ratio_per_website_domain[website_domain].append((word, (ratio_dezinfo/ratio_reference), count, reference_words_count[word], count))
+                    word_ratio_per_website_domain[website_domain].append((word, (ratio_dezinfo/ratio_reference), count, reference_words_count[word]))
 
         # (website_domain, [(keyword, ratio, count)]
         output = dict()
@@ -117,13 +117,12 @@ class KeywordsPerDomainExtractor:
             ratios_list.sort(key=lambda x: -x[1])
 
             output[website_domain] = []
-            for (keyword, ratio, frequency_dezinfo, frequency_reference, count) in ratios_list[0:100]:
+            for (keyword, ratio, frequency_dezinfo, frequency_reference) in ratios_list[0:100]:
                 output[website_domain].append({
                     'keyword': keyword,
                     'ratio': ratio,
                     'freq1': frequency_dezinfo,
-                    'freq2': frequency_reference,
-                    'count': count
+                    'freq2': frequency_reference
                 })
 
         with open(self.output_file_keywords, 'w') as output_file:

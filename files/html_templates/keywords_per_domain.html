@@ -42,7 +42,6 @@
                 <th scope="col">How many times more this keyword appears</th>
                 <th scope="col">Freq. 1</th>
                 <th scope="col">Freq. 2</th>
-                <th scope="col">Count in dezinfo corpus</th>
             </tr>
             </thead>
             <tbody id="keywords-tbody">
@@ -156,7 +155,6 @@
                 + "<td>" + item.ratio.toFixed(2) + "</td>"
                 + "<td>" + item.freq1 + "</td>"
                 + "<td>" + item.freq2 + "</td>"
-                + "<td>" + item.count + "</td>"
                 + "</tr>";
         }
         tbody.innerHTML = table_html;
