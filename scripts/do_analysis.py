@@ -2,6 +2,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 import ntpath
 import traceback
@@ -41,6 +42,7 @@ class DoAnalysis:
 
     KEYWORDS_OUTPUT_JSON_DATA = 'data/analysis/keywords.json'
     TERMS_OUTPUT_JSON_DATA = 'data/analysis/terms.json'
+    KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA = 'data/analysis/keywords_per_domain.json'
     TRENDS_OUTPUT_JSON_DATA = 'data/analysis/trends.json'
 
     WORK_TYPES = [
@@ -326,28 +328,43 @@ class DoAnalysis:
             log.error('Error getting terms through API with message %s.' % e)
 
     def keywords_per_domain(self):
-        if not os.path.isdir(self.VERTICAL_FILES_FOLDER):
-            log.error('Folder %s with vertical files not found.' % self.VERTICAL_FILES_FOLDER)
-            return
+        subcorpuses_list = self._get_subcorpuses()
+        # TODO: add all once corpdef is updated.
+        subcorpuses_list.remove('all')
+        subcorpuses_list.remove('idnes.cz')
+        subcorpuses_list.remove('novinky.cz')
+        subcorpuses_list.remove('irozhlas.cz')
 
-        input_vertical_files = []
-        for file_name in os.listdir(self.VERTICAL_FILES_FOLDER):
-            vertical_file_path = os.path.join(self.VERTICAL_FILES_FOLDER, file_name)
+        keywords = {}
 
-            if os.path.isfile(vertical_file_path) and vertical_file_path.endswith('.vert'):
-                log.info('Found vertical file %s.' % (vertical_file_path))
-                input_vertical_files.append(vertical_file_path)
+        for subcorpus_name in subcorpuses_list:
+            params = {
+                'corpname': 'preloaded/dezinfo',
+                'ref_corpname': 'preloaded/cztenten15_0',
+                'usesubcorp': subcorpus_name,
+                'simple_n': '1',
+                'max_terms': '100',
+                'max_keywords': '125',
+                'alnum': '0',
+                'onealpha': '1',
+                'minfreq': '1',
+                'format': 'json',
+                'attr': 'word',
+            }
 
-        keywords_extractor = KeywordsPerDomainExtractor(
-            input_vertical_files,
-            ref_freq_file_path='data/word_freq.tsv',
-            output_file_keywords='data/analysis/keywords_per_domain.json'
-        )
-        keywords_extractor.run()
+            keywords_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_keywords?'
+            keywords_response = self._send_api_request(keywords_url_base, params)
+            keywords_json = json.loads(keywords_response.text)
+            if 'keywords' in keywords_json:
+                keywords[subcorpus_name] = keywords_json['keywords']
+            else:
+                log.warning('Key keywords is missing from retrieved JSON.')
+            log.info('Finished retrieving keywords through API for subcorpus %s.' % subcorpus_name)
+
+        with open(self.KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA, 'w') as keywords_file:
+            keywords_file.write(json.dumps(keywords))
 
     def trends(self):
-        username, api_key = self._read_api_key()
-
         params = {
             'corpname': 'preloaded/dezinfo',
             'reload': '',
@@ -362,21 +379,14 @@ class DoAnalysis:
             'filter_capitalized': '0',
             'format': 'json'
         }
-        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
-        url_query += '&username=%s' % username
-        url_query += '&api_key=%s' % api_key
         trends_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/trends?'
 
-        try:
-            url = '%s%s' % (trends_url_base, url_query)
-            response = requests.get(url, timeout=120)
+        response = self._send_api_request(trends_url_base, params)
 
-            with open(self.TRENDS_OUTPUT_JSON_DATA, 'w') as trends_file:
-                trends_file.write(response.text)
+        with open(self.TRENDS_OUTPUT_JSON_DATA, 'w') as trends_file:
+            trends_file.write(response.text)
 
-            log.info('Finished retrieving trends through API.')
-        except Exception as e:
-            log.error('Error getting trends through API with message %s.' % e)
+        log.info('Finished retrieving trends through API.')
 
     @staticmethod
     def _read_api_key():
@@ -384,6 +394,29 @@ class DoAnalysis:
             content = api_key_file.read()
             username, api_key = content.split(' ')
         return username.strip(), api_key.strip()
+
+    def _send_api_request(self, url_base, params):
+        username, api_key = self._read_api_key()
+
+        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+        url_query += '&username=%s' % username
+        url_query += '&api_key=%s' % api_key
+
+        try:
+            url = '%s%s' % (url_base, url_query)
+            log.info(url)
+            response = requests.get(url, timeout=120)
+            return response
+        except Exception as e:
+            log.error('Error getting %s through API with message %s.' % (url, e))
+
+    def _get_subcorpuses(self):
+        subcorpuses_list = []
+        with open('files/compilecorp_config/dezinfo_subcdef.txt', 'r') as subcorpora_definitions:
+            raw_file = subcorpora_definitions.read()
+            for match in re.finditer(r'^=(.*)$', raw_file, re.MULTILINE):
+                subcorpuses_list.append(match.group(1))
+        return subcorpuses_list
 
     def _close_db_connection(self):
         if self.db_con:
