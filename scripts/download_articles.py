@@ -69,23 +69,31 @@ class DownloadArticles:
                     os.makedirs(folder_name)
 
             if self.args.id:
-                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date FROM article_metadata a '
+                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
+                            'FROM article_metadata a '
+                            'LEFT JOIN article_raw_html r ON r.article_metadata_id = a.id '
                             'WHERE a.id = %s', (self.args.id, ))
             elif self.args.domain:
-                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date FROM article_metadata a '
+                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
+                            'FROM article_metadata a '
+                            'LEFT JOIN article_raw_html r ON r.article_metadata_id = a.id '
                             'WHERE a.website_domain = %s', (self.args.domain,))
             else:
-                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date FROM article_metadata a '
+                cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
+                            'FROM article_metadata a '
                             'LEFT OUTER JOIN article_raw_html r ON r.article_metadata_id = a.id '
                             'WHERE r.article_metadata_id IS NULL')
             articles_metadata = cur.fetchall()
 
         input_data = []
         for index, article_metadata in enumerate(articles_metadata):
-            id, website_domain_name, url, title, publication_date = article_metadata
+            id, website_domain_name, url, title, publication_date, stored_path = article_metadata
 
-            filename = '%s_%s.html' % (id, website_domain_name.replace('/', '-'))
-            full_path = os.path.join(folder_name, filename)
+            if not stored_path:
+                filename = '%s_%s.html' % (id, website_domain_name.replace('/', '-'))
+                full_path = os.path.join(folder_name, filename)
+            else:
+                full_path = stored_path
 
             input_data.append((index + 1, len(articles_metadata), full_path, domain_types, article_metadata))
 
@@ -99,7 +107,7 @@ class DownloadArticles:
                     if file_path is None or metadata is None or response is None:
                         continue
 
-                    id, website_domain_name, url, title, publication_date = metadata
+                    id, website_domain_name, url, title, publication_date, stored_path = metadata
 
                     if self.args.dry_run:
                         print(response.text)
@@ -112,10 +120,11 @@ class DownloadArticles:
                         with open(file_path, 'w') as file:
                             file.write(response.text)
 
-                        cur.execute(
-                            'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
-                            (id, file_path))
-                        self.db_con.commit()
+                        if not stored_path:
+                            cur.execute(
+                                'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
+                                (id, file_path))
+                            self.db_con.commit()
                         log.info('(%s/%s) Stored response in %s.' % (index, total_count, file_path))
                 except StopIteration:
                     break
@@ -129,14 +138,15 @@ class DownloadArticles:
     @staticmethod
     def _download_article(input_data):
         index, total_count, file_path, domain_types, article_metadata = input_data
-        id, website_domain_name, url, title, publication_date = article_metadata
+        id, website_domain_name, url, title, publication_date, stored_path = article_metadata
 
         try:
             response = requests.get(url, timeout=15, headers={
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
             })
+
             for domain_type in domain_types:
-                if domain_type.get_name() == website_domain_name:
+                if domain_type.get_name() == website_domain_name and domain_type.get_encoding():
                     response.encoding = domain_type.get_encoding()
                     break
 
