@@ -1,8 +1,23 @@
-// Source: https://www.d3-graph-gallery.com/graph/donut_label.html
+// Source: https://bl.ocks.org/laxmikanta415/dc33fe11344bf5568918ba690743e06f
+/*
+Copyright 2018 Laxmikanta Nayak
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 createChart = function(data) {
-    // set the dimensions and margins of the graph
-    var width = document.getElementById('my_dataviz').clientWidth;
+    var width = document.getElementById('pie-chart').clientWidth;
     var height = width / 2;
     var margin = 10;
 
@@ -12,11 +27,9 @@ createChart = function(data) {
     }
     var minCount = totalCount/50;
 
-    // The radius of the pieplot is half the width or half the height (smallest one). I substract a bit of margin.
-    var radius = Math.min(width, height) / 2 - margin;
+    var radius = height / 2 - margin;
 
-    // append the svg object to the div called 'my_dataviz'
-    var svg = d3.select("#my_dataviz")
+    var svg = d3.select("#pie-chart")
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -28,30 +41,20 @@ createChart = function(data) {
         keys.push(websiteDomain);
     }
 
-    // set the color scale
     var color = d3.scaleOrdinal()
         .domain(keys)
         .range(d3.schemeDark2);
 
-    // Compute the position of each group on the pie:
     var pie = d3.pie()
-        .sort(null) // Do not sort group by size
+        .sort(null)
         .value(function (d) {
             return d.value;
         });
     var data_ready = pie(d3.entries(data));
 
-    // The arc generator
-    var arc = d3.arc()
-        .innerRadius(radius * 0.5)         // This is the size of the donut hole
-        .outerRadius(radius * 0.8);
+    var arc = d3.arc().innerRadius(radius * 0.5).outerRadius(radius * 0.8);
+    var outerArc = d3.arc().innerRadius(radius * 0.9).outerRadius(radius * 0.9);
 
-    // Another arc that won't be drawn. Just for labels positionning
-    var outerArc = d3.arc()
-        .innerRadius(radius * 0.9)
-        .outerRadius(radius * 0.9);
-
-    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
     svg
         .selectAll('allSlices')
         .data(data_ready)
@@ -89,7 +92,6 @@ createChart = function(data) {
             svg.select(".label2").remove();
         });
 
-    // Add the polylines between chart and labels:
     svg
         .selectAll('allPolylines')
         .data(data_ready)
@@ -102,15 +104,14 @@ createChart = function(data) {
         .style("fill", "none")
         .attr("stroke-width", 1)
         .attr('points', function (d) {
-            var posA = arc.centroid(d); // line insertion in the slice
-            var posB = outerArc.centroid(d); // line break: we use the other arc generator that has been built only for that
-            var posC = outerArc.centroid(d); // Label position = almost the same as posB
-            var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2; // we need the angle to see if the X position will be at the extreme right or extreme left
-            posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+            var posA = arc.centroid(d);
+            var posB = outerArc.centroid(d);
+            var posC = outerArc.centroid(d);
+            var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+            posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1);
             return [posA, posB, posC]
         });
 
-    // Add the polylines between chart and labels:
     svg
         .selectAll('allLabels')
         .data(data_ready)

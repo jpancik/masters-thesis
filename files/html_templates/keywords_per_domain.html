@@ -78,11 +78,11 @@
         return unfilteredKeywords.filter(function(keyword) {
             const item = keyword.item;
 
-            for (index in blacklist) {
-                if (item.toLowerCase().includes(blacklist[index].toLowerCase())) {
-                    return false;
-                }
-            }
+            // for (index in blacklist) {
+            //     if (item.toLowerCase().includes(blacklist[index].toLowerCase())) {
+            //         return false;
+            //     }
+            // }
 
             return item.length > 2;
         });
