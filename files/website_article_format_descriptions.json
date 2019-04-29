@@ -1149,9 +1149,6 @@
     "title": {
       "selector": "html body h1"
     },
-    "author": {
-      "selector": "html body div.b-article__refs-date"
-    },
     "date": {
       "selector": ".b-article__refs-date",
       "date_format": "%H:%M %d.%m.%Y"
