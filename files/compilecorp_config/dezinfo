@@ -142,6 +142,7 @@ STRUCTURE doc {
         TYPE     freq
     }
     ATTRIBUTE wordcount
+    ATTRIBUTE language
 }
 STRUCTURE p {
     TYPE "map64"
