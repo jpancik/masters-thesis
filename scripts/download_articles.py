@@ -153,7 +153,6 @@ class DownloadArticles:
             log.info('(%s/%s) Finished downloading: %s.' % (index, total_count, url))
             return index, total_count, file_path, article_metadata, response
         except Exception as e:
-            traceback.print_exc()
             log.info('(%s/%s) Error downloading: %s with message %s.' % (index, total_count, url, e))
             return None, None, None, None, None
 

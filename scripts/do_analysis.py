@@ -281,8 +281,6 @@ class DoAnalysis:
             cur.close()
 
     def keywords_and_terms(self):
-        username, api_key = self._read_api_key()
-
         params = {
             'corpname': 'preloaded/dezinfo',
             'ref_corpname': 'preloaded/cztenten15_0',
@@ -295,37 +293,20 @@ class DoAnalysis:
             'format': 'json',
             'attr': 'word',
         }
-        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
-        url_query += '&username=%s' % username
-        url_query += '&api_key=%s' % api_key
         keywords_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_keywords?'
+        response = self._send_api_request(keywords_url_base, params)
 
-        try:
-            url = '%s%s' % (keywords_url_base, url_query)
-            response = requests.get(url, timeout=120)
-
-            with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file:
-                keywords_file.write(response.text)
-
-            log.info('Finished retrieving keywords through API.')
-        except Exception as e:
-            log.error('Error getting keywords through API with message %s.' % e)
+        with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file:
+            keywords_file.write(response.text)
+        log.info('Finished retrieving keywords through API.')
 
         terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
         params['ref_corpname'] = 'preloaded/cztenten15_0_sample'
-        url_query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
-        url_query += '&username=%s' % username
-        url_query += '&api_key=%s' % api_key
-        try:
-            response = requests.get('%s%s' % (terms_url_base, url_query), timeout=120)
+        response = self._send_api_request(terms_url_base, params)
+        with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file:
+            terms_file.write(response.text)
 
-            with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file:
-                terms_file.write(response.text)
-
-            log.info('Finished retrieving terms through API.')
-        except Exception as e:
-            traceback.print_exc()
-            log.error('Error getting terms through API with message %s.' % e)
+        log.info('Finished retrieving terms through API.')
 
     def keywords_per_domain(self):
         subcorpuses_list = self._get_subcorpuses()
