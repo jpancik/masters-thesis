@@ -1,245 +1,261 @@
 *FREQLISTATTRS word tag lemma lempos
 
+=all
+    doc
+    language="cs"
+
 =parlamentnilisty.cz
 	doc
-    urldomain="parlamentnilisty.cz"
+    urldomain="parlamentnilisty.cz" & language="cs"
 
 =nwoo.org
 	doc
-    urldomain="nwoo.org"
+    urldomain="nwoo.org" & language="cs"
 
 =www.zvedavec.org
 	doc
-    urldomain="zvedavec.org"
+    urldomain="zvedavec.org" & language="cs"
 
 =www.vlasteneckenoviny.cz
 	doc
-    urldomain="vlasteneckenoviny.cz"
+    urldomain="vlasteneckenoviny.cz" & language="cs"
 
 =www.svetkolemnas.info
 	doc
-    urldomain="svetkolemnas.info"
+    urldomain="svetkolemnas.info" & language="cs"
 
 =www.skrytapravda.cz
 	doc
-    urldomain="skrytapravda.cz"
+    urldomain="skrytapravda.cz" & language="cs"
 
 =www.securitymagazin.cz
 	doc
-    urldomain="securitymagazin.cz"
+    urldomain="securitymagazin.cz" & language="cs"
 
 =www.rukojmi.cz
 	doc
-    urldomain="rukojmi.cz"
+    urldomain="rukojmi.cz" & language="cs"
 
 =www.prvnizpravy.cz
 	doc
-    urldomain="prvnizpravy.cz"
+    urldomain="prvnizpravy.cz" & language="cs"
 
 =www.protiproud.cz
 	doc
-    urldomain="protiproud.parlamentnilisty.cz"
+    urldomain="protiproud.parlamentnilisty.cz" & language="cs"
 
 =www.nejvic-info.cz
 	doc
-    urldomain="nejvic-info.cz"
+    urldomain="nejvic-info.cz" & language="cs"
 
 =www.mikan.cz
 	doc
-    urldomain="mikan.cz"
+    urldomain="mikan.cz" & language="cs"
 
 =www.lajkit.cz
 	doc
-    urldomain="lajkit.cz"
+    urldomain="lajkit.cz" & language="cs"
 
 =www.krajskelisty.cz
 	doc
-    urldomain="krajskelisty.cz"
+    urldomain="krajskelisty.cz" & language="cs"
 
 =www.isstras.eu/cs
 	doc
-    urldomain="isstras.eu"
+    urldomain="isstras.eu" & language="cs"
 
 =www.halonoviny.cz
 	doc
-    urldomain="halonoviny.cz"
+    urldomain="halonoviny.cz" & language="cs"
 
 =www.freepub.cz
 	doc
-    urldomain="freepub.cz"
+    urldomain="freepub.cz" & language="cs"
 
 =www.freeglobe.cz
 	doc
-    urldomain="freeglobe.cz"
+    urldomain="freeglobe.cz" & language="cs"
 
 =www.euserver.cz
 	doc
-    urldomain="euserver.cz"
+    urldomain="euserver.cz" & language="cs"
 
 =www.euportal.cz
 	doc
-    urldomain="euportal.cz"
+    urldomain="euportal.cz" & language="cs"
 
 =www.eportal.cz
 	doc
-    urldomain="eportal.cz"
+    urldomain="eportal.cz" & language="cs"
 
 =www.czechfreepress.cz
 	doc
-    urldomain="czechfreepress.cz"
+    urldomain="czechfreepress.cz" & language="cs"
 
 =www.ctusi.info
 	doc
-    urldomain="ctusi.info"
+    urldomain="ctusi.info" & language="cs"
 
 =www.casopis-sifra.cz
 	doc
-    urldomain="casopis-sifra.cz"
+    urldomain="casopis-sifra.cz" & language="cs"
 
 =www.bezpolitickekorektnosti.cz
 	doc
-    urldomain="bezpolitickekorektnosti.cz"
+    urldomain="bezpolitickekorektnosti.cz" & language="cs"
 
 =www.alternativnimagazin.cz
 	doc
-    urldomain="alternativnimagazin.cz"
+    urldomain="alternativnimagazin.cz" & language="cs"
 
 =wertyzreport.cz
 	doc
-    urldomain="wertyzreport.cz"
+    urldomain="wertyzreport.cz" & language="cs"
 
 =veksvetla.cz
 	doc
-    urldomain="veksvetla.cz"
+    urldomain="veksvetla.cz" & language="cs"
 
 =tadesco.cz
 	doc
-    urldomain="tadesco.cz"
+    urldomain="tadesco.cz" & language="cs"
 
 =svobodnenoviny.eu
 	doc
-    urldomain="svobodnenoviny.eu"
+    urldomain="svobodnenoviny.eu" & language="cs"
 
 =stredoevropan.cz
 	doc
-    urldomain="stredoevropan.cz"
+    urldomain="stredoevropan.cz" & language="cs"
 
 =stalo-se.cz
 	doc
-    urldomain="stalo-se.cz"
+    urldomain="stalo-se.cz" & language="cs"
 
 =proevropu.com
 	doc
-    urldomain="proevropu.com"
+    urldomain="proevropu.com" & language="cs"
 
 =procproto.cz
 	doc
-    urldomain="procproto.cz"
+    urldomain="procproto.cz" & language="cs"
 
 =pravyprostor.cz
 	doc
-    urldomain="pravyprostor.cz"
+    urldomain="pravyprostor.cz" & language="cs"
 
 =pravdive.eu
 	doc
-    urldomain="pravdive.eu"
+    urldomain="pravdive.eu" & language="cs"
 
 =outsidermedia.cz
 	doc
-    urldomain="outsidermedia.cz"
+    urldomain="outsidermedia.cz" & language="cs"
 
 =orgo-net.blogspot.com
 	doc
-    urldomain="orgo-net.blogspot.com"
+    urldomain="orgo-net.blogspot.com" & language="cs"
 
 =news.e-republika.cz
 	doc
-    urldomain="news.e-republika.cz"
+    urldomain="news.e-republika.cz" & language="cs"
 
 =morezprav.cz
 	doc
-    urldomain="morezprav.cz"
+    urldomain="morezprav.cz" & language="cs"
 
 =megazine.cz
 	doc
-    urldomain="megazine.cz"
+    urldomain="megazine.cz" & language="cs"
 
 =jackings.net
 	doc
-    urldomain="jackings.net"
+    urldomain="jackings.net" & language="cs"
 
 =ipribeh.cz
 	doc
-    urldomain="ipribeh.cz"
+    urldomain="ipribeh.cz" & language="cs"
 
 =instory.cz
 	doc
-    t2ld="instory.cz"
+    t2ld="instory.cz" & language="cs"
 
 =farmazdravi.cz
 	doc
-    urldomain="farmazdravi.cz"
+    urldomain="farmazdravi.cz" & language="cs"
 
 =www.eurasia24.cz
 	doc
-    urldomain="eurasia24.cz"
+    urldomain="eurasia24.cz" & language="cs"
 
 =cz.sputniknews.com
 	doc
-    urldomain="cz.sputniknews.com"
+    urldomain="cz.sputniknews.com" & language="cs"
 
 =ceskozdrave.cz
 	doc
-    urldomain="ceskozdrave.cz"
+    urldomain="ceskozdrave.cz" & language="cs"
 
 =ceskoaktualne.cz
 	doc
-    urldomain="ceskoaktualne.cz"
+    urldomain="ceskoaktualne.cz" & language="cs"
 
 =aeronet.cz
 	doc
-    urldomain="aeronet.cz"
+    urldomain="aeronet.cz" & language="cs"
 
 =ac24.cz
 	doc
-    urldomain="ac24.cz"
+    urldomain="ac24.cz" & language="cs"
 
 =www.duchdoby.cz
 	doc
-    urldomain="duchdoby.cz"
+    urldomain="duchdoby.cz" & language="cs"
 
 =zpravy.dt24.cz
 	doc
-    urldomain="zpravy.dt24.cz"
+    urldomain="zpravy.dt24.cz" & language="cs"
 
 =e-republika.cz
 	doc
-    urldomain="e-republika.cz"
+    urldomain="e-republika.cz" & language="cs"
 
 =www.eurabia.cz
 	doc
-    urldomain="eurabia.cz"
+    urldomain="eurabia.cz" & language="cs"
 
 =eurodenik.cz
 	doc
-    urldomain="eurodenik.cz"
+    urldomain="eurodenik.cz" & language="cs"
 
 =eurozpravy.cz
 	doc
-    urldomain="eurozpravy.cz"
+    urldomain="eurozpravy.cz" & language="cs"
 
 =leva-net.webnode.cz
 	doc
-    urldomain="leva-net.webnode.cz"
+    urldomain="leva-net.webnode.cz" & language="cs"
 
 =www.necenzurujeme.cz
 	doc
-    urldomain="necenzurujeme.cz"
+    urldomain="necenzurujeme.cz" & language="cs"
 
 =www.novaburzoazie.com
 	doc
-    urldomain="novaburzoazie.com"
+    urldomain="novaburzoazie.com" & language="cs"
 
 =vasevec.parlamentnilisty.cz
 	doc
-    urldomain="vasevec.parlamentnilisty.cz"
+    urldomain="vasevec.parlamentnilisty.cz" & language="cs"
+
+=idnes.cz
+    doc
+    urldomain="idnes.cz" & language="cs"
+
+=novinky.cz
+    doc
+    urldomain="novinky.cz" & language="cs"
+
+=irozhlas.cz
+    doc
+    urldomain="irozhlas.cz" & language="cs"
