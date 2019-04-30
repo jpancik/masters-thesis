@@ -249,13 +249,13 @@
     urldomain="vasevec.parlamentnilisty.cz" & language="cs"
 
 =idnes.cz
-    doc
+	doc
     urldomain="idnes.cz" & language="cs"
 
 =novinky.cz
-    doc
+	doc
     urldomain="novinky.cz" & language="cs"
 
 =irozhlas.cz
-    doc
+	doc
     urldomain="irozhlas.cz" & language="cs"
