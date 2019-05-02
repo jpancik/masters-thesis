@@ -8,8 +8,8 @@ from lib.webtrack_logger import log
 
 
 class PlagiarismOutputProcessor:
-    GRAPH_LINK_BY_ARTICLES_THRESHOLD = 5
-    GRAPH_LINK_BY_WORDS_THRESHOLD = 500
+    GRAPH_LINK_BY_ARTICLES_THRESHOLD = 1
+    GRAPH_LINK_BY_WORDS_THRESHOLD = 1
 
     def __init__(self, dup_pos_file, plag_id_file, input_vertical_files,
                  output_html_file_path, output_json_file_path,
@@ -408,16 +408,17 @@ class PlagiarismOutputProcessor:
     def _write_graph_jsons(self, plagiates, id_to_doc_attrs_map):
         # Graph with number of articles taken from other domain.
         domains = set()
+        for doc_id, doc in id_to_doc_attrs_map.items():
+            domains.add(doc['domain'])
+
         links_by_article = dict()
         links_by_words = dict()
 
         for plagiate in plagiates:
             plagiate_domain = urlparse(plagiate['url']).netloc
-            domains.add(plagiate_domain)
 
             for source in plagiate['source_articles']:
                 source_domain = urlparse(source['url']).netloc
-                domains.add(source_domain)
 
                 key = (source_domain, plagiate_domain)
                 if key in links_by_article:

@@ -175,7 +175,7 @@ class GenerateHtml:
                 open('data/analysis/keywords_terms_per_domain.json', 'r') as keywords_json:
             html_file.write(self._load_template('files/html_templates/keywords_terms_per_domain.html', {
                 'keywords_terms_json': keywords_json.read(),
-                'type_selector': '<a href="%s">keywords per domain JSON</a>' % ('keywords_terms_per_domain.json')
+                'type_selector': '<a href="%s">keywords and trends per domain JSON</a>' % ('keywords_terms_per_domain.json')
             }, active_tab='dropdown'))
 
     def _prepare_analysis_trends(self):

@@ -38,7 +38,7 @@ class DoAnalysis:
     HYPERLINKS_FOLDER = 'data/analysis/hyperlinks/'
     HYPERLINKS_OUTPUT_JSON_GRAPH = os.path.join(HYPERLINKS_FOLDER, 'graph_all_time.json')
     HYPERLINKS_OUTPUT_JSON_DATA = os.path.join(HYPERLINKS_FOLDER, 'data_all_time.json')
-    HYPERLINKS_GRAPH_LINK_THRESHOLD = 5
+    HYPERLINKS_GRAPH_LINK_THRESHOLD = 1
 
     KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA = 'data/analysis/keywords_terms_per_domain.json'
     TRENDS_OUTPUT_JSON_DATA = 'data/analysis/trends.json'
@@ -208,13 +208,17 @@ class DoAnalysis:
             if index % int(len(rows)/10) == 0 and math.ceil(index/len(rows) * 100.0) != 100:
                 print('%.0f%%' % math.ceil(index/len(rows) * 100.0), end='....', file=sys.stderr)
                 sys.stderr.flush()
-        log.info('\nFinished loading hyperlinks from processed JSON files.')
+        print('', file=sys.stderr)
+        log.info('Finished loading hyperlinks from processed JSON files.')
 
         log.info('Analyzing hyperlinks...')
         # raw_data: source_url: [reference_urls]
         raw_data = dict()
         links = dict()
+        domains = set()
         for index, ((article_id, article_url), hyperlinks) in enumerate(hyperlinks_in_files.items()):
+            domains.add(urlparse(article_url).netloc)
+
             for hyperlink in hyperlinks:
                 parsed_url = urlparse(hyperlink)
                 key = (parsed_url.netloc, parsed_url.path)
@@ -238,7 +242,8 @@ class DoAnalysis:
             if index % int(len(hyperlinks_in_files)/10) == 0 and math.ceil(index/len(hyperlinks_in_files) * 100.0) != 100:
                 print('%.0f%%' % math.ceil(index/len(hyperlinks_in_files) * 100.0), end='....', file=sys.stderr)
                 sys.stderr.flush()
-        log.info('\nFinished analyzing hyperlinks.')
+        print('', file=sys.stderr)
+        log.info('Finished analyzing hyperlinks.')
 
         with open(self.HYPERLINKS_OUTPUT_JSON_DATA, 'w') as output_file:
             output_file.write(json.dumps(raw_data, ensure_ascii=False))
@@ -247,11 +252,8 @@ class DoAnalysis:
             'nodes': [],
             'links': []
         }
-        domains = set()
         for (source, target), count in links.items():
             if count >= self.HYPERLINKS_GRAPH_LINK_THRESHOLD:
-                domains.add(source)
-                domains.add(target)
                 graph_json_data['links'].append({
                     'value': count,
                     'source': source,
