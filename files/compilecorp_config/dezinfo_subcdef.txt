@@ -60,7 +60,7 @@
 	doc
     urldomain="krajskelisty.cz" & language="cs"
 
-=www.isstras.eu/cs
+=www.isstras.eu
 	doc
     urldomain="isstras.eu" & language="cs"
 
