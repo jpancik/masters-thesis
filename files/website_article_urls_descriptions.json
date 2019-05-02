@@ -371,9 +371,11 @@
     "encoding": "windows-1250"
   },
   "novinky.cz": {
-    "rss_url": "https://www.novinky.cz/rss2/"
+    "rss_url": "https://www.novinky.cz/rss2/",
+    "encoding": "utf-8"
   },
   "irozhlas.cz": {
-    "rss_url": "https://www.irozhlas.cz/rss/irozhlas"
+    "rss_url": "https://www.irozhlas.cz/rss/irozhlas",
+    "encoding": "utf-8"
   }
 }

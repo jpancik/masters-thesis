@@ -14,7 +14,6 @@ import requests
 
 from lib import util, webtrack_logger
 from lib.crawler_db import connector
-from lib.keywords_analyzer.keywords_extractor import KeywordsPerDomainExtractor
 from lib.plagiarism_detector.plagiarism_detector import PlagiarismDetector
 from lib.plagiarism_detector.plagiarism_output_processor import PlagiarismOutputProcessor
 from lib.webtrack_logger import log
