@@ -40,9 +40,7 @@ class DoAnalysis:
     HYPERLINKS_OUTPUT_JSON_DATA = os.path.join(HYPERLINKS_FOLDER, 'data_all_time.json')
     HYPERLINKS_GRAPH_LINK_THRESHOLD = 5
 
-    KEYWORDS_OUTPUT_JSON_DATA = 'data/analysis/keywords.json'
-    TERMS_OUTPUT_JSON_DATA = 'data/analysis/terms.json'
-    KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA = 'data/analysis/keywords_per_domain.json'
+    KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA = 'data/analysis/keywords_terms_per_domain.json'
     TRENDS_OUTPUT_JSON_DATA = 'data/analysis/trends.json'
 
     WORK_TYPES = [
@@ -50,8 +48,7 @@ class DoAnalysis:
         'corpus_info',
         'plagiates',
         'hyperlinks',
-        'keywords+terms',
-        'keywords_per_domain',
+        'keywords_terms',
         'trends'
     ]
 
@@ -77,10 +74,8 @@ class DoAnalysis:
             self.find_plagiates()
         if self.args.type == 'hyperlinks' or do_all:
             self.analyze_hyperlinks()
-        if self.args.type == 'keywords+terms' or do_all:
-            self.keywords_and_terms()
-        if self.args.type == 'keywords_per_domain' or do_all:
-            self.keywords_per_domain()
+        if self.args.type == 'keywords_terms' or do_all:
+            self.keywords_terms_per_domain()
         if self.args.type == 'trends' or do_all:
             self.trends()
 
@@ -280,43 +275,9 @@ class DoAnalysis:
         if cur:
             cur.close()
 
-    def keywords_and_terms(self):
-        params = {
-            'corpname': 'preloaded/dezinfo',
-            'ref_corpname': 'preloaded/cztenten15_0',
-            'simple_n': '1',
-            'max_terms': '100',
-            'max_keywords': '250',
-            'alnum': '0',
-            'onealpha': '1',
-            'minfreq': '1',
-            'format': 'json',
-            'attr': 'word',
-        }
-        keywords_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_keywords?'
-        response = self._send_api_request(keywords_url_base, params)
-
-        with open(self.KEYWORDS_OUTPUT_JSON_DATA, 'w') as keywords_file:
-            keywords_file.write(response.text)
-        log.info('Finished retrieving keywords through API.')
-
-        terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
-        params['ref_corpname'] = 'preloaded/cztenten15_0_sample'
-        response = self._send_api_request(terms_url_base, params)
-        with open(self.TERMS_OUTPUT_JSON_DATA, 'w') as terms_file:
-            terms_file.write(response.text)
-
-        log.info('Finished retrieving terms through API.')
-
-    def keywords_per_domain(self):
+    def keywords_terms_per_domain(self):
         subcorpuses_list = self._get_subcorpuses()
-        # TODO: add all once corpdef is updated.
-        subcorpuses_list.remove('all')
-        subcorpuses_list.remove('idnes.cz')
-        subcorpuses_list.remove('novinky.cz')
-        subcorpuses_list.remove('irozhlas.cz')
-
-        keywords = {}
+        keywords_terms_data = {}
 
         for subcorpus_name in subcorpuses_list:
             params = {
@@ -324,8 +285,7 @@ class DoAnalysis:
                 'ref_corpname': 'preloaded/cztenten15_0',
                 'usesubcorp': subcorpus_name,
                 'simple_n': '1',
-                'max_terms': '100',
-                'max_keywords': '125',
+                'max_keywords': '100',
                 'alnum': '0',
                 'onealpha': '1',
                 'minfreq': '1',
@@ -337,13 +297,37 @@ class DoAnalysis:
             keywords_response = self._send_api_request(keywords_url_base, params)
             keywords_json = json.loads(keywords_response.text)
             if 'keywords' in keywords_json:
-                keywords[subcorpus_name] = keywords_json['keywords']
+                keywords_terms_data[subcorpus_name] = {
+                    'keywords': keywords_json['keywords']
+                }
             else:
                 log.warning('Key keywords is missing from retrieved JSON.')
             log.info('Finished retrieving keywords through API for subcorpus %s.' % subcorpus_name)
 
-        with open(self.KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA, 'w') as keywords_file:
-            keywords_file.write(json.dumps(keywords))
+        for subcorpus_name in subcorpuses_list:
+            params = {
+                'corpname': 'preloaded/dezinfo',
+                'ref_corpname': 'preloaded/cztenten15_0_sample',
+                'usesubcorp': subcorpus_name,
+                'simple_n': '1',
+                'max_terms': '100',
+                'alnum': '0',
+                'onealpha': '1',
+                'minfreq': '1',
+                'format': 'json',
+                'attr': 'word',
+            }
+            terms_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/extract_terms?'
+            terms_response = self._send_api_request(terms_url_base, params)
+            terms_json = json.loads(terms_response.text)
+            if 'terms' in terms_json:
+                keywords_terms_data[subcorpus_name]['terms'] = terms_json['terms']
+            else:
+                log.warning('Key terms is missing from retrieved JSON.')
+            log.info('Finished retrieving terms through API for subcorpus %s.' % subcorpus_name)
+
+        with open(self.KEYWORDS_PER_DOMAIN_OUTPUT_JSON_DATA, 'w') as keywords_terms_file:
+            keywords_terms_file.write(json.dumps(keywords_terms_data))
 
     def trends(self):
         params = {

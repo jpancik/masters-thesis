@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-5">
             <h3>Keywords</h3>
             <table class="table table-striped">
             <thead>
@@ -48,15 +48,30 @@
             </tbody>
             </table>
         </div>
+        <div class="col-md-7">
+            <h3>Terms</h3>
+            <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Term</th>
+                <th scope="col">Score</th>
+                <th scope="col">Freq. 1</th>
+                <th scope="col">Freq. 2</th>
+            </tr>
+            </thead>
+            <tbody id="terms-tbody">
+            </tbody>
+            </table>
+        </div>
     </div>
 </main><!-- /.container -->
 <script>
-    keywordsJson = {{keywords_json}};
+    keywordsTermsJson = {{keywords_terms_json}};
 
     // Fill selector.
     select_div = document.querySelector("#domain-select");
     select_html = '<span>Select website domain: </span> <select>';
-    for(var key in keywordsJson) {
+    for(var key in keywordsTermsJson) {
         option = '<option value="' + key + '">' + key + '</option>';
         select_html += option;
     }
@@ -73,10 +88,26 @@
     getFilteredKeywords = function (domain) {
         const blacklist = ['Ã', 'twitter', 'Å', 'facebook', 'youtub', '_', 'loading'];
 
-        const unfilteredKeywords = keywordsJson[domain];
+        const unfilteredKeywords = keywordsTermsJson[domain].keywords;
 
         return unfilteredKeywords.filter(function(keyword) {
             const item = keyword.item;
+
+            // for (index in blacklist) {
+            //     if (item.toLowerCase().includes(blacklist[index].toLowerCase())) {
+            //         return false;
+            //     }
+            // }
+
+            return item.length > 2;
+        });
+    };
+
+    getFilteredTerms = function (domain) {
+        const unfilteredTerms = keywordsTermsJson[domain].terms;
+
+        return unfilteredTerms.filter(function(term) {
+            const item = term.item;
 
             // for (index in blacklist) {
             //     if (item.toLowerCase().includes(blacklist[index].toLowerCase())) {
@@ -147,10 +178,10 @@
                     var paringObject = keywords.filter(function (obj) {
                         return obj.item === d.text
                     });
-                    if (paringObject.length < 1) {
-                        console.log(d);
-                        return "#000000";
-                    }
+                    // if (paringObject.length < 1) {
+                    //     console.log(d);
+                    //     return "#000000";
+                    // }
                     return color(paringObject[0].item);
                 })
                 .attr("text-anchor", "middle")
@@ -163,26 +194,40 @@
                 });
         }
     };
-    createCloud('parlamentnilisty.cz');
+    createCloud('all');
 
     loadStatistics = function (domain) {
-        tbody = document.querySelector("#keywords-tbody");
-
         const keywords = getFilteredKeywords(domain);
 
-        table_html = '';
-        for(var i = 0; i < keywords.length; i++) {
-            var item = keywords[i];
-            table_html += "<tr>"
+        const keywordsTbody = document.querySelector("#keywords-tbody");
+
+        let keywords_table_html = '';
+        for(let i = 0; i < keywords.length; i++) {
+            const item = keywords[i];
+            keywords_table_html += "<tr>"
                 + "<td>" + item.item + "</td>"
                 + "<td>" + item.score + "</td>"
                 + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.link + "'>" + item.frq1 + "</a></td>"
                 + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link + "'>" + item.frq2 + "</a></td>"
                 + "</tr>";
         }
-        tbody.innerHTML = table_html;
+        keywordsTbody.innerHTML = keywords_table_html;
+
+        const terms = getFilteredTerms(domain);
+        termsTbody = document.querySelector("#terms-tbody");
+        terms_table_html = '';
+        for(let i = 0; i < terms.length; i++) {
+            const item = terms[i];
+            terms_table_html += "<tr>"
+                + "<td>" + item.item + "</td>"
+                + "<td>" + item.score + "</td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.link + "'>" + item.frq1 + "</a></td>"
+                + "<td><a href='https://ske.fi.muni.cz/bonito/run.cgi/" + item.ref_link + "'>" + item.frq2 + "</a></td>"
+                + "</tr>";
+        }
+        termsTbody.innerHTML = terms_table_html;
     };
-    loadStatistics('parlamentnilisty.cz');
+    loadStatistics('all');
 
 </script>
 <!-- Optional JavaScript -->
