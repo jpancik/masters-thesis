@@ -4,6 +4,7 @@ import os
 import sys
 from xml.sax.saxutils import quoteattr
 
+from lib import webtrack_logger
 from lib.crawler_db import connector
 from lib.webtrack_logger import log
 
