@@ -125,21 +125,13 @@ class ProcessArticles:
                                     '(website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
                                     'empty_perex_count, empty_keywords_count, empty_article_content_count, '
                                     'total_articles_processed_count, start_article_id, end_article_id) '
-                                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
-                        python_environment = os.environ.get('PYTHON_ENV', 'local')
-                        is_postgres = python_environment != 'sqlite'
-                        if is_postgres:
-                            sql_query += 'RETURNING id'
-
+                                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id')
                         cur.execute(sql_query,
                                     (website_domain_name, empty_title_count, empty_author_count, empty_publication_date_count,
                                      empty_perex_count, empty_keywords_count, empty_article_content_count,
                                      processed_articles_count, article_begin_id, processed_articles_last_id))
 
-                        if is_postgres:
-                            processing_summary_id = cur.fetchone()[0]
-                        else:
-                            processing_summary_id = cur.lastrowid()
+                        processing_summary_id = cur.fetchone()[0]
 
                         for article_metadata_id, file_path in processed_articles:
                             cur.execute('INSERT INTO article_processed_data'

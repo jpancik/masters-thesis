@@ -17,7 +17,5 @@ def get_db_connection():
             db_password = db_password_file.read().strip()
 
         return psycopg2.connect("host=db.fi.muni.cz dbname=pgdb user=xpancik2 password=%s" % db_password)
-    elif python_environment == 'sqlite':
-        return sqlite3.connect('data/database.db')
     else:
         raise Exception('Unknown environment %s. Did you mean local or production?' % python_environment)
