@@ -1,7 +1,9 @@
 import argparse
 import json
+import math
 import os
 import sys
+from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
 from lib import webtrack_logger
@@ -120,8 +122,10 @@ class CreatePreverticals:
         if author:
             output_file.write(' author=%s' % quoteattr(author))
         if publication_date:
+            parsed_date = datetime.strptime(publication_date, '%Y-%m-%d %H:%M:%S')
             output_file.write(' date=%s' % quoteattr(publication_date))
-            output_file.write(' yearmonth=%s' % quoteattr(publication_date[0:7].replace('-', '')))
+            output_file.write(' yearmonth=%s' % quoteattr(parsed_date.strftime('%Y%m')))
+            output_file.write(' yearq=%s' % quoteattr('%s%s' % (parsed_date.year, math.ceil(parsed_date.month / 3.0))))
         if language:
             output_file.write(' language=%s' % quoteattr(language))
         output_file.write('>\n')
