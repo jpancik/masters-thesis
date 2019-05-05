@@ -85,7 +85,7 @@ class CreateCorpus:
         if not self.args.debug:
             log.info('Running compilecorp')
             compilecorp_process = subprocess.Popen(
-                ['compilecorp', '--recompile-corpus','/home/xpancik2/masters-thesis/files/compilecorp_config/dezinfo'],
+                ['compilecorp', '--recompile-corpus','/corpora/registry/dezinfo'],
                 env=env_with_py2)
             compilecorp_process.wait()
 

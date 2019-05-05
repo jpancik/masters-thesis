@@ -130,7 +130,7 @@
             if (i === page) {
                 pages.innerHTML += "<span>" + (i + 1) + "     </span>";
             } else {
-                pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ",'" + filter + "');'>" + (i + 1) + "     </a>";
+                pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ",\"" + filter + "\");'>" + (i + 1) + "     </a>";
             }
         }
     };
@@ -179,7 +179,7 @@
 
     inputChanged = function(input) {
         renderTrends(0, input.value);
-    }
+    };
 </script>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
