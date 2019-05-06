@@ -18,7 +18,11 @@ class CreatePreverticals:
     def __init__(self):
         self.args = self.parse_commandline()
         webtrack_logger.setup_logging()
-        self.db_con = connector.get_db_connection()
+
+        if not self.args.pipeline:
+            self.db_con = connector.get_db_connection()
+        else:
+            self.db_con = None
 
     @staticmethod
     def parse_commandline():

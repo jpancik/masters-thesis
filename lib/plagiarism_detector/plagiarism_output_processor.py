@@ -36,6 +36,7 @@ class PlagiarismOutputProcessor:
         doc_id_re = re.compile(' %s="([^"]+)"' % self.doc_id)
         doc_url_re = re.compile(' %s="([^"]+)"' % 'url')
         doc_date_re = re.compile(' %s="([^"]+)"' % 'date')
+        doc_language_re = re.compile(' %s="([^"]+)"' % 'language')
         sent_start_re = re.compile('<%s[ >]' % self.sent_struct)
         sent_end_re = re.compile('</%s>' % self.sent_struct)
         doc_attrs_re = re.compile(' ([^=]+)="([^"]+)"')
@@ -110,12 +111,14 @@ class PlagiarismOutputProcessor:
                     try:
                         doc_id = doc_id_re.search(doc_header).group(1)
                         doc_url = doc_url_re.search(doc_header).group(1)
+                        doc_language = doc_language_re.search(doc_header).group(1)
                         doc_date = doc_date_re.search(doc_header)
                         if doc_date:
                             doc_date = doc_date.group(1)
                         id_to_doc_attrs_map[doc_id] = {
                             'domain': urlparse(doc_url).netloc,
                             'url': doc_url,
+                            'language': doc_language,
                             'date': doc_date
                         }
                     except AttributeError:
@@ -397,7 +400,12 @@ class PlagiarismOutputProcessor:
 
         # Remove cases where plagiates are not above % treshold.
         plagiates = list(filter(
-            lambda plagiate: (plagiate['plagiated_words_count']/plagiate['total_words_count']) > self.plagiate_threshold_word_ratio,
+            lambda plagiate: ((plagiate['plagiated_words_count']/plagiate['total_words_count']) > self.plagiate_threshold_word_ratio),
+            plagiates))
+
+        # Remove plagiates that are not in cs language.
+        plagiates = list(filter(
+            lambda plagiate: id_to_doc_attrs_map[plagiate['dbid']]['language'] == 'cs',
             plagiates))
 
         with open(self.output_json_file_path, 'w') as json_file:
@@ -407,10 +415,6 @@ class PlagiarismOutputProcessor:
 
     def _write_graph_jsons(self, plagiates, id_to_doc_attrs_map):
         # Graph with number of articles taken from other domain.
-        domains = set()
-        for doc_id, doc in id_to_doc_attrs_map.items():
-            domains.add(doc['domain'])
-
         links_by_article = dict()
         links_by_words = dict()
 
@@ -481,6 +485,17 @@ class PlagiarismOutputProcessor:
             'statistics': plagiates_statistics,
         }
 
+        domains = set()
+        for (source_domain, plagiate_domain), count in links_by_article.items():
+            if count >= self.GRAPH_LINK_BY_ARTICLES_THRESHOLD or not self.use_threshold:
+                domains.add(source_domain)
+                domains.add(plagiate_domain)
+                json_data['links'].append({
+                    'value': count,
+                    'source': source_domain,
+                    'target': plagiate_domain
+                })
+
         colors = util.get_spaced_colors(len(domains))
         for index, domain in enumerate(domains):
             json_data['nodes'].append({
@@ -490,25 +505,30 @@ class PlagiarismOutputProcessor:
                 'color': colors[index]
             })
 
-        for (source_domain, plagiate_domain), count in links_by_article.items():
-            if count >= self.GRAPH_LINK_BY_ARTICLES_THRESHOLD or not self.use_threshold:
-                json_data['links'].append({
-                    'value': count,
-                    'source': source_domain,
-                    'target': plagiate_domain
-                })
-
         with open(self.output_json_graph_by_articles_file_path, 'w') as json_file:
             json_file.write(json.dumps(json_data))
 
+        json_data['nodes'] = []
         json_data['links'] = []
+        domains = set()
         for (source_domain, plagiate_domain), count in links_by_words.items():
             if count >= self.GRAPH_LINK_BY_WORDS_THRESHOLD or not self.use_threshold:
+                domains.add(source_domain)
+                domains.add(plagiate_domain)
                 json_data['links'].append({
                     'value': count,
                     'source': source_domain,
                     'target': plagiate_domain
                 })
+
+        colors = util.get_spaced_colors(len(domains))
+        for index, domain in enumerate(domains):
+            json_data['nodes'].append({
+                'domain': domain,
+                'name': domain,
+                'id': domain,
+                'color': colors[index]
+            })
 
         with open(self.output_json_graph_by_words_file_path, 'w') as json_file:
             json_file.write(json.dumps(json_data))

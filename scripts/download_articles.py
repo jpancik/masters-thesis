@@ -20,7 +20,11 @@ class DownloadArticles:
     def __init__(self):
         self.args = self.parse_commandline()
         webtrack_logger.setup_logging()
-        self.db_con = connector.get_db_connection()
+
+        if not self.args.pipeline:
+            self.db_con = connector.get_db_connection()
+        else:
+            self.db_con = None
 
     @staticmethod
     def parse_commandline():
@@ -50,7 +54,7 @@ class DownloadArticles:
 
             articles_metadata = []
             for _, website_domain_name, url, title, publication_date in list(result):
-                articles_metadata.append((-1, website_domain_name, url, title, publication_date))
+                articles_metadata.append((-1, website_domain_name, url, title, publication_date, None))
         else:
             cur = self.db_con.cursor()
 

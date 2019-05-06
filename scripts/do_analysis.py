@@ -196,6 +196,9 @@ class DoAnalysis:
                 with open(article_filename, 'r') as json_file:
                     data = json.load(json_file)
 
+                    if 'language' in data and data['language'] != 'cs':
+                        continue
+
                     if 'hyperlinks' in data:
                         hyperlinks_in_files[(article_id, article_url)] = data['hyperlinks']
                     else:
@@ -214,10 +217,7 @@ class DoAnalysis:
         # raw_data: source_url: [reference_urls]
         raw_data = dict()
         links = dict()
-        domains = set()
         for index, ((article_id, article_url), hyperlinks) in enumerate(hyperlinks_in_files.items()):
-            domains.add(urlparse(article_url).netloc)
-
             for hyperlink in hyperlinks:
                 parsed_url = urlparse(hyperlink)
                 key = (parsed_url.netloc, parsed_url.path)
@@ -251,8 +251,11 @@ class DoAnalysis:
             'nodes': [],
             'links': []
         }
+        domains = set()
         for (source, target), count in links.items():
             if count >= self.HYPERLINKS_GRAPH_LINK_THRESHOLD:
+                domains.add(source)
+                domains.add(target)
                 graph_json_data['links'].append({
                     'value': count,
                     'source': source,

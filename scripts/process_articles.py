@@ -25,7 +25,11 @@ class ProcessArticles:
         self.args = self.parse_commandline()
         webtrack_logger.setup_logging()
         self.domain_types = self._init_domain_types(self.args.config)
-        self.db_con = connector.get_db_connection()
+
+        if not self.args.pipeline:
+            self.db_con = connector.get_db_connection()
+        else:
+            self.db_con = None
 
     @staticmethod
     def parse_commandline():
@@ -45,8 +49,6 @@ class ProcessArticles:
         return parser.parse_args()
 
     def run(self):
-        cur = self.db_con.cursor()
-
         if self.args.pipeline:
             input_articles_data = []
             capturing_article = False
@@ -93,6 +95,8 @@ class ProcessArticles:
                     json_data['url'] = url
                     print(json.dumps(json_data, ensure_ascii=False))
         else:
+            cur = self.db_con.cursor()
+
             with ProcessPool(max_workers=self.args.processes) as pool:
                 for website_domain_name, domain_type in self.domain_types.items():
                     if self.args.domain is not None and self.args.domain != website_domain_name:
@@ -141,7 +145,7 @@ class ProcessArticles:
 
                         self.db_con.commit()
 
-        cur.close()
+            cur.close()
         self._close_db_connection()
 
     def _process_articles(self, pool, domain_type, articles_raw_data):

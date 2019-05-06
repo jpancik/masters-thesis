@@ -20,7 +20,10 @@ class GatherArticlesMetadata:
         webtrack_logger.setup_logging()
         self.domain_types = self._init_domain_types(self.args.config)
 
-        self.db_con = connector.get_db_connection()
+        if not self.args.pipeline:
+            self.db_con = connector.get_db_connection()
+        else:
+            self.db_con = None
 
 
     @staticmethod
@@ -42,7 +45,7 @@ class GatherArticlesMetadata:
             allowed_domains = []
             for line in sys.stdin:
                 allowed_domains.append(line[:-1])
-            log.info('Gathering article metadata for domains %s.' % allowed_domains, file=sys.stderr)
+            log.info('Gathering article metadata for domains %s.' % allowed_domains)
 
         domain_types_to_process = []
         for domain_type in self.domain_types:
