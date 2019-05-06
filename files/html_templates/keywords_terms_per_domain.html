@@ -70,7 +70,7 @@
 
     // Fill selector.
     select_div = document.querySelector("#domain-select");
-    select_html = '<span>Select website domain: </span> <select>';
+    select_html = '<span>Select website domain: </span> <select class="form-control">';
     for(var key in keywordsTermsJson) {
         option = '<option value="' + key + '">' + key + '</option>';
         select_html += option;
