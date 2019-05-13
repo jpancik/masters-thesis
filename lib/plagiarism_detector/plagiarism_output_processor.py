@@ -111,7 +111,11 @@ class PlagiarismOutputProcessor:
                     try:
                         doc_id = doc_id_re.search(doc_header).group(1)
                         doc_url = doc_url_re.search(doc_header).group(1)
-                        doc_language = doc_language_re.search(doc_header).group(1)
+
+                        doc_language = doc_language_re.search(doc_header)
+                        if doc_language:
+                            doc_language = doc_language.group(1)
+
                         doc_date = doc_date_re.search(doc_header)
                         if doc_date:
                             doc_date = doc_date.group(1)
