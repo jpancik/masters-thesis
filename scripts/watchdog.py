@@ -86,7 +86,7 @@ class Watchdog:
 
             percentage = float(empty_article_content_count) / float(total_articles_processed_count)
             if percentage > self.args.threshold_articles:
-                log.warning('Warning: %s has %.0f%% of %s empty.' % (website_domain, percentage * 100, 'articles'))
+                log.warning('%s has %.0f%% of %s empty.' % (website_domain, percentage * 100, 'articles'))
                 processing_problems.append({
                     'created_at': str(created_at),
                     'website_domain': website_domain,
