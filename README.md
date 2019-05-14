@@ -77,3 +77,8 @@ Steps:
 2. Run script `scripts/create_corpus.py`, that will process prevertical files into vertical files and compile a text corpora.
 3. Run script `scripts/do_analysis.py` with `--type` argument specifying which analysis you want.
 4. Run script `scripts/generate_html.py`, which will generate static website into `data/html/`.
+
+#### Removing Postgres dependency
+If needed, it is possible to remove Postgres database dependency from the project. You'll have to modify 
+`lib/crawler_db/connector.py` to use sqlite3 connector. Then you have to replace `%s` in every SQL for `?`. Last step 
+is changing `scripts/process_articles.py` to use `cursor.lastrowid` instead of `RETURNING id`. 
