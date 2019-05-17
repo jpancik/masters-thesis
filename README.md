@@ -53,7 +53,8 @@ after adding a CSS selector you can remove HTML tags inside that article selecto
 and/or look at the `lib/article_data_extractors/html_extractor.py`.
 
 Last step is adding a subcorpora definition, which is needed for text analysis. You can do that in `files/compilecorp_config/dezinfo_subcdef.txt`.
-Just add a new domain with the same structure as there are other website domains.
+Just add a new domain with the same structure as there are other website domains. Also you'll have to add commands to compile 
+terms and trends for the subcorpora in `scripts/compile_subcorpuses.sh`.
 
 #### Fixing problems in data found by `scripts/watchdog.py`
 If watchdog.py is reporting a lot of errors, especially in high 90% or 100% of articles are missing some sort of
