@@ -22,7 +22,13 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-12 text-center" id="domain-select">
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-12 text-center">
+            <br/>
+            <br/>
             <span>Search for word:</span>
             <input type="text" id="search" oninput="inputChanged(this); return false;"/>
             <br/>
@@ -62,7 +68,25 @@
     <br/>
 </main><!-- /.container -->
 <script>
-    trendsJson = {{trends_json}};
+    const trendsJson = {{trends_json}};
+    var filterKeyword = '';
+    var currentSubcorpora = 'all';
+
+    // Fill selector.
+    select_div = document.querySelector("#domain-select");
+    select_html = '<span>Select website domain: </span> <select class="form-control">';
+    for(const key in trendsJson) {
+        option = '<option value="' + key + '">' + key + '</option>';
+        select_html += option;
+    }
+    select_html += '</select>';
+    select_div.innerHTML = select_html;
+
+    domain_select = document.querySelector("#domain-select select");
+    domain_select.onchange = function(e) {
+        currentSubcorpora = domain_select.value;
+        renderTrends(0, filterKeyword, currentSubcorpora)
+    };
 
     const pageSize = 100;
 
@@ -123,19 +147,23 @@
     renderPages = function(page, filter, keywordsLength) {
         pages = document.querySelector("#pages");
 
-        pages.innerHTML = "Page: ";
-        const pagesCount = Math.ceil(keywordsLength / pageSize);
+        if (keywordsLength > 0) {
+            pages.innerHTML = "Page: ";
+            const pagesCount = Math.ceil(keywordsLength / pageSize);
 
-        for (let i = 0; i < pagesCount; i++) {
-            if (i === page) {
-                pages.innerHTML += "<span>" + (i + 1) + "     </span>";
-            } else {
-                pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ",\"" + filter + "\");'>" + (i + 1) + "     </a>";
+            for (let i = 0; i < pagesCount; i++) {
+                if (i === page) {
+                    pages.innerHTML += "<span>" + (i + 1) + "     </span>";
+                } else {
+                    pages.innerHTML += "<a href='#' onclick='renderTrends(" + i + ",\"" + filter + "\");'>" + (i + 1) + "     </a>";
+                }
             }
+        } else {
+            pages.innerHTML = '';
         }
     };
 
-    renderTrends = function(page, filter) {
+    renderTrends = function(page, filter, subcorpora) {
         trendsBoxes = document.querySelector("#trends-boxes");
 
         trendsBoxes.innerHTML = "";
@@ -145,40 +173,46 @@
         rowHtml = "<div class='row'>";
         rowFilled = 0;
 
-        unfiltered = trendsJson.result;
-        keywords = unfiltered.filter(function (keyword) {
-            return keyword[1].toLowerCase().startsWith(filter.toLowerCase());
-        });
-        for (let i = page * pageSize; i < keywords.length && i < (page + 1) * pageSize; i++) {
-            const item = keywords[i];
-            const id = item[0];
-            const keyword = item[1];
-            const trend = item[2];
-            const pvalue = item[3];
-            const frequency = item[4];
+        if ("error" in trendsJson[subcorpora]) {
+            trendsBoxes.innerHTML = "<h5>" + trendsJson[subcorpora].error + "</h5>";
+            renderPages(page, filter, 0);
+        } else {
+            unfiltered = trendsJson[subcorpora].result;
+            keywords = unfiltered.filter(function (keyword) {
+                return keyword[1].toLowerCase().startsWith(filter.toLowerCase());
+            });
+            for (let i = page * pageSize; i < keywords.length && i < (page + 1) * pageSize; i++) {
+                const item = keywords[i];
+                const id = item[0];
+                const keyword = item[1];
+                const trend = item[2];
+                const pvalue = item[3];
+                const frequency = item[4];
 
-            if (rowFilled >= 4) {
+                if (rowFilled >= 4) {
+                    rowHtml += "</div>";
+                    newHtml += rowHtml;
+                    rowHtml = "<div class='row'>";
+                    rowFilled = 0;
+                }
+                rowHtml += getTrendHtml(id, keyword, trend, pvalue, frequency, getGraphSvg(trendsJson[subcorpora].samples[id]));
+                rowFilled += 1;
+            }
+
+            if (rowFilled > 0) {
                 rowHtml += "</div>";
                 newHtml += rowHtml;
-                rowHtml = "<div class='row'>";
-                rowFilled = 0;
             }
-            rowHtml += getTrendHtml(id, keyword, trend, pvalue, frequency, getGraphSvg(trendsJson.samples[id]));
-            rowFilled += 1;
-        }
 
-        if(rowFilled > 0) {
-            rowHtml += "</div>";
-            newHtml += rowHtml;
+            trendsBoxes.innerHTML = newHtml;
+            renderPages(page, filter, keywords.length);
         }
-
-        trendsBoxes.innerHTML = newHtml;
-        renderPages(page, filter, keywords.length);
     };
-    renderTrends(0, '');
+    renderTrends(0, filterKeyword, currentSubcorpora);
 
     inputChanged = function(input) {
-        renderTrends(0, input.value);
+        filterKeyword = input.value;
+        renderTrends(0, filterKeyword, currentSubcorpora);
     };
 </script>
 <!-- Optional JavaScript -->

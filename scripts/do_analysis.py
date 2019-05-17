@@ -334,26 +334,32 @@ class DoAnalysis:
             keywords_terms_file.write(json.dumps(keywords_terms_data))
 
     def trends(self):
-        params = {
-            'corpname': 'preloaded/dezinfo',
-            'reload': '',
-            'structattr': 'doc.yearmonth',
-            'trends_attr': 'word',
-            'trends_method': 'mkts_all',
-            'trends_maxp': '0.1',
-            'trends_sort_by': 't',
-            'trends_minfreq': '2',
-            'trends_re': '',
-            'filter_nonwords': '0',
-            'filter_capitalized': '0',
-            'format': 'json'
-        }
-        trends_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/trends?'
+        subcorpuses_list = self._get_subcorpuses()
+        trends_data = {}
 
-        response = self._send_api_request(trends_url_base, params)
+        for subcorpus_name in subcorpuses_list:
+            params = {
+                'corpname': 'preloaded/dezinfo',
+                'usesubcorp': subcorpus_name,
+                'reload': '',
+                'structattr': 'doc.yearmonth',
+                'trends_attr': 'word',
+                'trends_method': 'mkts_all',
+                'trends_maxp': '0.1',
+                'trends_sort_by': 't',
+                'trends_minfreq': '2',
+                'trends_re': '',
+                'filter_nonwords': '0',
+                'filter_capitalized': '0',
+                'format': 'json'
+            }
+            trends_url_base = 'https://ske.fi.muni.cz/bonito/api.cgi/trends?'
+            trends_response = self._send_api_request(trends_url_base, params)
+            trends_data[subcorpus_name] = json.loads(trends_response.text)
+            log.info('Finished retrieving trends through API for subcorpus %s.' % subcorpus_name)
 
         with open(self.TRENDS_OUTPUT_JSON_DATA, 'w') as trends_file:
-            trends_file.write(response.text)
+            trends_file.write(json.dumps(trends_data))
 
         log.info('Finished retrieving trends through API.')
 
