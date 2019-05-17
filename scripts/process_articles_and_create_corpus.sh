@@ -12,3 +12,4 @@ scripts/compile_subcorpuses.sh
 python scripts/do_analysis.py --type all
 rm /nlp/projekty/webtrack/public_html/*
 python scripts/generate_html.py --output /nlp/projekty/webtrack/public_html/
+cat files/compiled_corpora_email.txt | mail -s "Dezinfo corpora compiled" vit.baisa@gmail.com

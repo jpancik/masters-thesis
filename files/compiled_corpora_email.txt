@@ -1,0 +1,9 @@
+Hello,
+
+New version of dezinfo corpora has been compiled. Check the crawler status page on https://nlp.fi.muni.cz/projekty/webtrack/crawler_status.html for possible problems.
+
+This email has been generated from files/update_email.txt and sent from script /home/xpancik2/scripts/process_articles_and_create_corpus.sh.
+
+Kind regards,
+Juraj Pancik 433584
+Webtrack project
