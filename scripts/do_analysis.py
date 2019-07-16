@@ -219,7 +219,11 @@ class DoAnalysis:
         links = dict()
         for index, ((article_id, article_url), hyperlinks) in enumerate(hyperlinks_in_files.items()):
             for hyperlink in hyperlinks:
-                parsed_url = urlparse(hyperlink)
+                try:
+                    parsed_url = urlparse(hyperlink)
+                except ValueError:
+                    log.exception('Failed to parse URL, skipping.')
+                    continue
                 key = (parsed_url.netloc, parsed_url.path)
 
                 if key in id_by_url:
