@@ -58,14 +58,17 @@ class GenerateHtml:
 
         with open('data/corpus_info.json', 'r') as corpus_info_file:
             corpus_info = json.load(corpus_info_file)
+            corpus_doccount = int(corpus_info['sizes']['doccount']) if ('doccount' in corpus_info['sizes']) else -1
+            corpus_sentcount = int(corpus_info['sizes']['sentcount']) if ('sentcount' in corpus_info['sizes']) else -1
+            corpus_tokencount = int(corpus_info['sizes']['tokencount']) if ('tokencount' in corpus_info['sizes']) else -1
 
         with open(html_file_path, 'w') as html_file, open('data/watchdog_output.json', 'r') as watchdog_json:
             html_file.write(self._load_template('files/html_templates/crawler_status.html', {
                 'watchdog_json': watchdog_json.read(),
                 'corpus_info_compiled_at': corpus_info['compiled'],
-                'corpus_info_documents': '{:,}'.format(int(corpus_info['sizes']['doccount'])),
-                'corpus_info_sentences': '{:,}'.format(int(corpus_info['sizes']['sentcount'])),
-                'corpus_info_tokens': '{:,}'.format(int(corpus_info['sizes']['tokencount'])),
+                'corpus_info_documents': '{:,}'.format(corpus_doccount),
+                'corpus_info_sentences': '{:,}'.format(corpus_sentcount),
+                'corpus_info_tokens': '{:,}'.format(corpus_tokencount),
             }, active_tab='status'))
 
     def _prepare_analysis_plagiarism_page(self):
