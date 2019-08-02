@@ -62,14 +62,15 @@ class CreatePreverticals:
             cur.execute('SELECT DATE(a.created_at) FROM article_processed_data a GROUP BY DATE(a.created_at)')
             dates = cur.fetchall()
             for date in dates:
-                file_name = '%s-%s-%s.pvert' % (date[0].year, date[0].month, date[0].day)
+                date_parsed = datetime.strptime(date[0], '%Y-%m-%d')
+                file_name = '%s-%s-%s.pvert' % (date_parsed.year, date_parsed.month, date_parsed.day)
                 if os.path.exists('%s/%s' % (self.PRE_VERTICAL_FILES_FOLDER, file_name)) and not self.args.dont_skip:
                     log.info('Skipping "%s" because it already exists.' % file_name)
                     continue
 
                 cur.execute('SELECT m.id, m.url, d.filename FROM article_processed_data d '
                             'JOIN article_metadata m ON m.id = d.article_metadata_id '
-                            'WHERE DATE(d.created_at) = %s', date)
+                            'WHERE DATE(d.created_at) = ?', date)
                 article_processed_data_rows = cur.fetchall()
                 self.create_vertical(file_name, article_processed_data_rows)
 

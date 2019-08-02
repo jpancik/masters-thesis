@@ -129,18 +129,18 @@ class ProcessArticles:
                                     '(website_domain, empty_title_count, empty_author_count, empty_publication_date_count, '
                                     'empty_perex_count, empty_keywords_count, empty_article_content_count, '
                                     'total_articles_processed_count, start_article_id, end_article_id) '
-                                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id')
+                                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
                         cur.execute(sql_query,
                                     (website_domain_name, empty_title_count, empty_author_count, empty_publication_date_count,
                                      empty_perex_count, empty_keywords_count, empty_article_content_count,
                                      processed_articles_count, article_begin_id, processed_articles_last_id))
 
-                        processing_summary_id = cur.fetchone()[0]
+                        processing_summary_id = cur.lastrowid
 
                         for article_metadata_id, file_path in processed_articles:
                             cur.execute('INSERT INTO article_processed_data'
                                         '(website_domain, article_metadata_id, article_processing_summary_id, filename) '
-                                        'VALUES (%s, %s, %s, %s)',
+                                        'VALUES (?, ?, ?, ?)',
                                         (website_domain_name, article_metadata_id, processing_summary_id, file_path))
 
                         self.db_con.commit()
@@ -282,7 +282,7 @@ class ProcessArticles:
             cur.execute(
                 ('SELECT s.end_article_id '
                  'FROM article_processing_summary s '
-                 'WHERE s.website_domain=%s '
+                 'WHERE s.website_domain=? '
                  'ORDER BY s.end_article_id DESC LIMIT 1'), (domain,))
             row = cur.fetchone()
             if row:

@@ -2,7 +2,6 @@ import argparse
 import csv
 import os
 import sys
-import traceback
 from datetime import datetime
 
 import requests
@@ -76,12 +75,12 @@ class DownloadArticles:
                 cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
                             'FROM article_metadata a '
                             'LEFT JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                            'WHERE a.id = %s', (self.args.id, ))
+                            'WHERE a.id = ?', (self.args.id, ))
             elif self.args.domain:
                 cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
                             'FROM article_metadata a '
                             'LEFT JOIN article_raw_html r ON r.article_metadata_id = a.id '
-                            'WHERE a.website_domain = %s', (self.args.domain,))
+                            'WHERE a.website_domain = ?', (self.args.domain,))
             else:
                 cur.execute('SELECT a.id, a.website_domain, a.url, a.title, a.publication_date, r.filename '
                             'FROM article_metadata a '
@@ -126,7 +125,7 @@ class DownloadArticles:
 
                         if not stored_path:
                             cur.execute(
-                                'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (%s, %s)',
+                                'INSERT INTO article_raw_html (article_metadata_id, filename) VALUES (?, ?)',
                                 (id, file_path))
                             self.db_con.commit()
                         log.info('(%s/%s) Stored response in %s.' % (index, total_count, file_path))

@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+from datetime import datetime
 
 from lib import webtrack_logger
 from lib.crawler_db import connector
@@ -111,6 +112,7 @@ class Watchdog:
 
         cur.execute('SELECT MIN(a.created_at) FROM article_metadata_gathering_summary a;')
         gathering_started_at = cur.fetchone()
+        gathering_started_at_datetime = datetime.strptime(gathering_started_at[0], '%Y-%m-%d %H:%M:%S.%f')
 
         cur.close()
         self._close_db_connection()
@@ -123,7 +125,7 @@ class Watchdog:
                 'processing_problems': processing_problems,
                 'articles_count_per_day': articles_count_per_day,
                 'website_domains_article_counts': website_domains_article_counts,
-                'gathering_started_at': str(gathering_started_at[0].strftime('%B %-d, %Y'))
+                'gathering_started_at': str(gathering_started_at_datetime.strftime('%B %-d, %Y'))
             }, ensure_ascii=False))
 
     def _close_db_connection(self):

@@ -111,20 +111,20 @@ class GatherArticlesMetadata:
         uploaded_count = 0
 
         for metadata in articles_metadata:
-            cur.execute('SELECT COUNT(*) FROM article_metadata a WHERE a.url = %s', (metadata['link'],))
+            cur.execute('SELECT COUNT(*) FROM article_metadata a WHERE a.url = ?', (metadata['link'],))
 
             if cur.fetchone()[0] == 0:
                 uploaded_count += 1
 
                 cur.execute(
-                    'INSERT INTO article_metadata (website_domain, url, title, publication_date) VALUES (%s, %s, %s, %s)',
+                    'INSERT INTO article_metadata (website_domain, url, title, publication_date) VALUES (?, ?, ?, ?)',
                     (domain_type.get_name(),
                      metadata['link'],
                      metadata['title'] if 'title' in metadata else None,
                      metadata['published_parsed'] if 'published_parsed' in metadata else None))
 
         cur.execute(
-            'INSERT INTO article_metadata_gathering_summary (website_domain, total_articles_count, new_articles_count) VALUES (%s, %s, %s)',
+            'INSERT INTO article_metadata_gathering_summary (website_domain, total_articles_count, new_articles_count) VALUES (?, ?, ?)',
             (domain_type.get_name(), len(articles_metadata), uploaded_count)
         )
 
